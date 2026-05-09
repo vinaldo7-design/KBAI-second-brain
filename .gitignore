@@ -1,0 +1,36 @@
+# Vault notes and personal content
+01-Ideas/
+02-Learning/
+03-Projects/
+04-Substack/
+05-Personal/
+06-Maps/
+00-Captures/
+Templates/
+CLAUDE.md
+CLAUDE-static.md
+
+# Generated outputs
+06-Maps/vault-graph.json
+06-Maps/vault-embeddings.db
+06-Maps/connect-suggestions.md
+
+# One-shot cleanup scripts (no longer needed)
+strip_deprecated_frontmatter.py
+add_summary_stubs.py
+pile_a_patcher.py
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.Python
+*.egg-info/
+
+# Environments
+.env
+.venv
+env/
+
+# OS
+.DS_Store

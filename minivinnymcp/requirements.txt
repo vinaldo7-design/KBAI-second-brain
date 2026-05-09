@@ -1,0 +1,4 @@
+mcp>=1.0.0
+sentence-transformers==3.2.1
+numpy==1.26.4
+sqlite-vec
