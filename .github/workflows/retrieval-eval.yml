@@ -1,0 +1,31 @@
+name: retrieval-eval
+
+# Stage 0 stub. Stage 6 wires this in as a real PR gate with metric thresholds.
+on:
+  pull_request:
+    paths:
+      - "minivinnymcp/**"
+      - "perplexitymcp/**"
+      - "writeagentmcp/**"
+      - "kbai/**"
+      - "vault_graph_loader.py"
+      - "vault_graph.py"
+      - "vault_search.py"
+      - "vault_embed.py"
+
+jobs:
+  retrieval-eval:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install minimal deps for dry run
+        run: |
+          python -m pip install --upgrade pip
+          # Stage 0: dry run does not need sentence-transformers.
+          # Stage 6 will install full runtime + run scored eval.
+      - name: Dry run eval pipeline
+        run: |
+          python -m kbai.eval.run_retrieval_eval --dry || echo "stub eval — Stage 6 will gate"
