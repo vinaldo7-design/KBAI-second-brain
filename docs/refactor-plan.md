@@ -199,6 +199,14 @@ All green → tag `stage-0` → start Stage 1.
 - New `kbai/` package skeleton: `analytics`, `embed`, `eval`, `graph`, `instrumentation`, `voice_profile`.
 - `note_hits` schema preserved; new `query_log` and `retrieval_events` tables additive.
 
+**Stage 5.6 verification** (✅ 2026-05-10):
+- **153/153 tests passing** in `minivinnymcp` env (28 new across council + cognitive routing + contracts).
+- 12 new MCP tools live across mini-vinny (was 5 → now 13: 8 from earlier stages + cognition_list_profiles + cognition_get_profile + cognition_retrieve_as + council_retrieve + analytics_connect_suggest).
+- Council differentiation proven on synthetic graph: weight_overrides demonstrably re-rank PPR (test_skeptic_admits_contradicts_and_boosts_E, test_explorer_boost_raises_C).
+- Live smoke test ran council_retrieve against the real vault graph successfully.
+- New `council_events` SQLite table — feedback signal accumulating from `/council` calls.
+- `_assemble_context_impl` (the existing single-profile entry point) was NOT touched. Stage 5.5.3 in Code can proceed cleanly.
+
 **Stage 1 partial verification** (✅ 2026-05-10):
 - pyproject.toml declares `kbai`, `minivinnymcp`, `perplexitymcp`, `writeagentmcp` as installable packages (not yet installed).
 - `connect_suggest` 5 categories + helpers physically live in `kbai/analytics/connect_suggest.py`. `vault_connect_suggest.py` is now a 150-line CLI wrapper that re-exports for backward compat.
@@ -287,12 +295,32 @@ class CognitiveProfile(BaseModel):
 - ☐ 5.5.6 — Slash command `/think <profile> <query>`
 - ☐ 5.5.7 — Tests: synthetic graph, assert each profile produces different top-N
 
-### Stage 5.6 — Compare-thinkers mode
-- ☐ Tool: `cognition_compare_profiles(query, profile_ids[]) -> ProfileComparison`
-- ☐ Output: side-by-side top-15 per profile, with `divergence_score` =
-  Jaccard distance of top-N sets
-- ☐ Slash command `/compare-thinkers <p1>+<p2> <query>`
-- ☐ Test: identical profiles produce divergence_score = 0; orthogonal profiles > 0.5
+### Stage 5.6 — Council Mode + compare-thinkers
+**Premise**: same query through N profiles, with a synthesizer (Claude) reading
+the bundle. Council Mode is the opinionated 3-profile preset (explorer +
+operator + skeptic). Compare-thinkers is the raw multi-profile primitive.
+They share the same retrieval primitive.
+
+- ☑ 5.6.1 — `weight_overrides` parameter added to `VaultGraph.ppr_expand`
+  (lets profile edge-weight multipliers actually take effect; default behaviour
+  unchanged when not passed).
+- ☑ 5.6.2 — `explorer` profile YAML shipped (analogous-to + exemplifies bias).
+- ☑ 5.6.3 — `CouncilEvidence` + `CouncilProfileResult` Pydantic models in
+  `kbai/contracts.py`.
+- ☑ 5.6.4 — `kbai/council/` package: `run_council`, `build_council_evidence`
+  (pure overlap math), `profile_focus_summary`, `DEFAULT_COUNCIL_PROFILES`.
+- ☑ 5.6.5 — Server: `_assemble_context_with_profile` (profile-aware retrieval
+  parallel to `_assemble_context_impl`, doesn't disturb existing tool).
+- ☑ 5.6.6 — MCP tools: `cognition_retrieve_as`, `council_retrieve`.
+- ☑ 5.6.7 — Feedback capture: `record_council_event` writes to a new
+  `council_events` table on every `/council` invocation. Stage 8 calibration
+  reads this to correlate profiles → notes the user later acts on.
+- ☑ 5.6.8 — `claude/commands/council.md` — synthesizer prompt with hard
+  rules: must call the tool (no role-play), must include a Skeptic note,
+  must explain how the debate sharpened the answer.
+- ☐ 5.6.9 — `cognition_compare_profiles(query, profile_ids[]) -> ProfileComparison`
+  (raw primitive without synthesis prompt; lower priority than Council).
+- ☐ 5.6.10 — Slash command `/compare-thinkers <p1>+<p2> <query>`.
 
 ### Stage 6 — eval harness production
 - Wire `eval/run_retrieval_eval.py` into pre-push hook (mandatory).
