@@ -96,7 +96,7 @@ Surfaces missing connections: orphan rescue, missing bidirectional edges, tag-cl
 
 ## Slash Commands
 
-Lives at `~/.claude/commands/`. Each is a self-contained micro-prompt that encodes the right tool sequence per intent.
+Lives at `~/.claude/commands/` (mirrored in this repo at `claude/commands/`). Each is a self-contained micro-prompt that encodes the right tool sequence per intent.
 
 | Command | What it does |
 |---|---|
@@ -107,6 +107,30 @@ Lives at `~/.claude/commands/`. Each is a self-contained micro-prompt that encod
 | `/paths <id1> <id2>` | Show the shortest semantic chain between two notes. |
 | `/research <note-id>` | Perplexity Deep Research with cost guard, compact menu, selective apply. |
 | `/audit-edges <type1> <type2>` | Run `audit_taxonomy`, present top retype candidates. |
+| `/voice <name> <query>` | Apply a voice from the voice library to the response. |
+| `/voices` | List available voices with their dimensions and combination hints. |
+
+---
+
+## Voice System
+
+Modular, combinable response styling. Voices live at `~/.claude/voices/` (mirrored in this repo at `claude/voices/`). Each voice file declares dimensions (length, structure, register, persona, density), style rules, anti-patterns, and exemplars.
+
+| Voice | Description |
+|---|---|
+| `naval` | Short aphoristic compression, first-principle assertions |
+| `tharoor` | Long erudite argument with multi-clause sentences and historical reference |
+| `bourdain` | Vernacular first-person observation, deeply specific |
+| `clarkson` | Hyperbolic provocation with parenthetical asides |
+| `vinay` | *(reserved)* — pulled live from vault notes tagged `voice-exemplar: true` |
+
+**Single voice:** `/voice naval brief me on governance capital`
+
+**Combination:** `/voice naval+bourdain spar against mastery-trap` — fuses two voices creatively. Combinations are not mechanical merges; they pick dimensions from each voice (e.g. naval's compression + bourdain's observation persona) for the strongest hybrid.
+
+**Adding a voice:** drop a new `.md` file in `claude/voices/` matching the existing format. The slash command picks it up automatically — no code changes.
+
+Voice affects **how** responses are written, not **what** gets retrieved. It sits in front of the PPR/path-attribution pipeline as the final rendering layer.
 
 ---
 
@@ -198,7 +222,19 @@ pytest minivinnymcp/tests/ perplexitymcp/tests/ -v
 # Restart Claude Desktop — both servers appear under connectors
 ```
 
-**Slash commands** ship at `~/.claude/commands/`. Reload Claude Code to pick them up.
+**Slash commands and voices** are version-controlled in this repo at `claude/commands/` and `claude/voices/`. To activate them in Claude Code, symlink (or copy) into `~/.claude/`:
+
+```bash
+# One-time setup (symlinks track repo updates automatically)
+ln -s "$(pwd)/claude/commands" ~/.claude/commands
+ln -s "$(pwd)/claude/voices"   ~/.claude/voices
+
+# Or copy if you prefer divergence between repo + active versions
+cp claude/commands/*.md ~/.claude/commands/
+cp claude/voices/*.md   ~/.claude/voices/
+```
+
+Reload Claude Code (or restart) to pick them up.
 
 ---
 
@@ -222,12 +258,16 @@ pytest minivinnymcp/tests/ perplexitymcp/tests/ -v
 │       ├── test_vault_search.py
 │       └── test_graph_tools.py        # 27 tests covering PPR, paths, instrumentation
 │
-└── perplexitymcp/              # External research MCP
-    ├── server.py               # 2 tools: research_note, apply_research
-    ├── requirements.txt
-    ├── claude_desktop_config_snippet.json
-    └── tests/
-        └── test_perplexity.py         # 21 tests with mocked API
+├── perplexitymcp/              # External research MCP
+│   ├── server.py               # 2 tools: research_note, apply_research
+│   ├── requirements.txt
+│   ├── claude_desktop_config_snippet.json
+│   └── tests/
+│       └── test_perplexity.py         # 21 tests with mocked API
+│
+└── claude/                     # User-global Claude assets (symlink to ~/.claude/)
+    ├── commands/               # 9 slash commands (about, challenge, ops, etc.)
+    └── voices/                 # 4 voice archetypes + README
 ```
 
 ---
@@ -254,8 +294,9 @@ pytest minivinnymcp/tests/ perplexitymcp/tests/ -v
 - ✅ Phase 4 Milestone 3 — `get_note_with_context` + `assemble_context`
 - ✅ Phase 4 Milestone 3.5 — PPR retrieval + path attribution + `note_hits` instrumentation
 - ✅ Phase 4 Milestone 3.6 — Perplexity research MCP server (`research_note`, `apply_research`)
-- ✅ Slash command suite + CLAUDE.md tool discipline section
-- 🔨 Phase 4 Milestone 4 — Voice prior + auto-routing for non-slash queries
+- ✅ Slash command suite (9 commands) + CLAUDE.md tool discipline section
+- ✅ Voice library (4 archetypes + `/voice`, `/voices` commands, modular + combinable)
+- 🔨 Phase 4 Milestone 4 — `vinay` voice from vault `voice-exemplar: true` notes + auto-routing for non-slash queries
 - 📋 Phase 5 candidates — TERAG soft-prior from `note_hits`, Perplexity cluster mode, AGRAG cost-penalised subgraph selection
 
 ---
