@@ -95,6 +95,45 @@ def record_note_hits(
         pass  # never block retrieval on instrumentation failure
 
 
+_COUNCIL_EVENTS_DDL = """
+CREATE TABLE IF NOT EXISTS council_events (
+    ts                INTEGER,
+    query_hash        TEXT,
+    query_text        TEXT,
+    profiles          TEXT,        -- comma-joined profile_ids in invocation order
+    per_profile_json  TEXT         -- {profile_id: [note_id, ...]} as JSON
+)
+"""
+
+
+def record_council_event(
+    db_path,
+    *,
+    query: str,
+    profiles: list[str],
+    per_profile_top_ids: dict[str, list[str]],
+) -> None:
+    """Stage 5.6 feedback capture. Append one row per /council invocation.
+
+    Stage 8 calibration reads this table to correlate profiles → notes the
+    user later interacts with. Best-effort, never raises.
+    """
+    import json
+    qh = _hash_query(query)
+    ts = int(time.time())
+    try:
+        db = sqlite3.connect(str(db_path))
+        db.execute(_COUNCIL_EVENTS_DDL)
+        db.execute(
+            "INSERT INTO council_events VALUES (?,?,?,?,?)",
+            (ts, qh, query, ",".join(profiles), json.dumps(per_profile_top_ids)),
+        )
+        db.commit()
+        db.close()
+    except Exception:
+        pass
+
+
 def log_retrieval_event(
     db_path: Path | str,
     *,

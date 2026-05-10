@@ -1,0 +1,14 @@
+profile_id: default
+display_name: Default
+schema_version: 1
+edge_weight_overrides: {}
+contradiction_policy: suppress
+mention_policy: ignore
+path_length_preference: balanced
+abstraction_preference: balanced
+restart_bias_tags: {}
+confidence_threshold: 0.0
+notes: |
+  Baseline profile. Reproduces current Mini Vinny standard-mode behaviour:
+  contradicts edges suppressed from the PPR walk, mentioned edges absent.
+  Used as the fallback when no profile is specified.

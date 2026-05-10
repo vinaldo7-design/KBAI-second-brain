@@ -76,7 +76,10 @@ class RetrievalResult(BaseModel):
 class ReasoningStep(BaseModel):
     """One step in a reasoning_path attribution."""
 
-    model_config = _MODEL_CFG
+    # Need populate_by_name so the model also accepts `from_` (the Python attr
+    # name) on input, not only the `from` alias. Roundtrip safety: the model
+    # can be dumped and re-parsed without by_alias=True everywhere.
+    model_config = ConfigDict(extra="allow", populate_by_name=True)
 
     from_: str = Field(alias="from")
     edge: str
@@ -278,3 +281,37 @@ class ProfileComparison(BaseModel):
     per_profile: dict[str, list[ContextNote]] = Field(default_factory=dict)
     divergence_score: float | None = None  # Jaccard distance over top-N sets
     overlap_top_n: int = 15
+
+
+# --- Council Mode (Stage 5.6) --------------------------------------------
+
+
+class CouncilProfileResult(BaseModel):
+    """One profile's contribution to a CouncilEvidence bundle."""
+
+    model_config = _MODEL_CFG
+
+    profile_id: str
+    display_name: str
+    focus_summary: str  # one-line machine summary of what this lens prioritises
+    notes: list[ContextNote] = Field(default_factory=list)
+
+
+class CouncilEvidence(BaseModel):
+    """Result of `council_retrieve`. Same query run through N profiles,
+    with overlap analysis. Synthesizer (Claude) reads this and writes
+    the final answer via the /council slash command."""
+
+    model_config = _MODEL_CFG
+
+    query: str
+    profiles: list[str]
+    per_profile: list[CouncilProfileResult] = Field(default_factory=list)
+
+    # Overlap analysis over the union of top-k note ids.
+    consensus: list[str] = Field(default_factory=list)  # ≥2 profiles surfaced it
+    unanimous: list[str] = Field(default_factory=list)   # all profiles surfaced it
+    unique_to: dict[str, list[str]] = Field(default_factory=dict)  # profile_id → ids only it surfaced
+
+    top_k: int = 10
+    coverage_count: int = 0  # total distinct note ids across profiles

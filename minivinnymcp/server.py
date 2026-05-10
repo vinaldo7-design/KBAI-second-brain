@@ -414,6 +414,215 @@ def retrieve_assemble(
     return _assemble_context_impl(query, seed_k, char_budget, mode)
 
 
+def _assemble_context_with_profile(
+    query: str,
+    profile_id: str,
+    seed_k: int = 5,
+    char_budget: int = 6000,
+    top_k: int = 10,
+) -> dict:
+    """Profile-aware retrieval. Parallel to _assemble_context_impl but driven
+    by a CognitiveProfile (Stage 5.5+). Used by council_retrieve and by the
+    future profile-aware retrieve_assemble (Stage 5.5.3, Code session).
+
+    Returns a dict with the same shape as assemble_context, plus profile_id.
+    Truncated to `top_k` notes (council mode wants tight per-profile lists).
+    """
+    from kbai.cognitive_routing import apply_profile, load_profile
+
+    profile = load_profile(profile_id)
+    g = (
+        _get_graph_exhaustive()
+        if profile.mention_policy == "exhaustive"
+        else _get_graph()
+    )
+
+    base_weights = dict(g.taxonomy_weights)
+    effective = apply_profile(profile, base_weights, base_exclude_types=set())
+
+    model = _get_model()
+    qvec = model.encode(QUERY_PREFIX + query, normalize_embeddings=True)
+    db = sqlite3.connect(_DB_PATH)
+    db.enable_load_extension(True)
+    sqlite_vec.load(db)
+    db.enable_load_extension(False)
+    rows = db.execute(
+        """
+        SELECT v.note_id, v.distance, n.title, n.summary, n.filepath
+        FROM note_vectors v
+        JOIN notes n ON n.id = v.note_id
+        WHERE v.embedding MATCH ? AND k = ?
+        ORDER BY v.distance
+        """,
+        (serialize_embedding(qvec), seed_k),
+    ).fetchall()
+    db.close()
+
+    seed_meta: dict[str, dict] = {}
+    seed_scores: dict[str, float] = {}
+    for nid, dist, title, summary, fp in rows:
+        sim = max(0.0, 1.0 - float(dist))
+        seed_scores[nid] = sim
+        seed_meta[nid] = {"title": title, "summary": summary, "filepath": fp}
+
+    # Profile-driven PPR — exclude_types AND weight overrides applied.
+    ppr_scores = g.ppr_expand(
+        seed_scores,
+        exclude_types=effective["effective_exclude_types"],
+        weight_overrides=profile.edge_weight_overrides,
+    )
+
+    ranked = sorted(
+        ((nid, score) for nid, score in ppr_scores.items() if g.exists(nid)),
+        key=lambda x: -x[1],
+    )[:top_k]
+
+    results: list[dict] = []
+    chars_used = 0
+    for nid, ppr in ranked:
+        node = g.node(nid) or {}
+        if nid in seed_meta:
+            title = seed_meta[nid]["title"]
+            summary = seed_meta[nid]["summary"]
+            source = "seed"
+        else:
+            title = node.get("title")
+            summary = node.get("summary")
+            source = "ppr"
+        results.append({
+            "note_id": nid,
+            "title": title,
+            "summary": summary,
+            "content": None,  # council pulls compact summaries; full content is /about's job
+            "composite_score": round(ppr, 4),
+            "source": source,
+            "via_edge": None,
+            "parent": None,
+        })
+
+    # Path attribution — restricted to semantic edges, profile-aware.
+    seed_ids = list(seed_meta.keys())
+    ppr_targets = [r["note_id"] for r in results if r["source"] == "ppr"]
+    path_exclude = {"referenced-in", "untyped"}
+    if profile.contradiction_policy == "suppress":
+        path_exclude.add("contradicts")
+    if profile.mention_policy == "ignore":
+        path_exclude.add("mentioned")
+    attributions = g.path_attributions(seed_ids, ppr_targets, exclude_types=path_exclude)
+    for r in results:
+        r["reasoning_path"] = (
+            attributions.get(r["note_id"]) if r["source"] == "ppr" else None
+        )
+
+    # Reuse existing instrumentation; record under the profile_id as `mode`.
+    _record_hits(query, results, f"profile:{profile_id}")
+
+    return {
+        "query": query,
+        "profile_id": profile_id,
+        "notes": results,
+        "chars_used": chars_used,
+        "char_budget": char_budget,
+    }
+
+
+@app.tool()
+def cognition_retrieve_as(
+    query: str,
+    profile_id: str,
+    top_k: int = 10,
+    seed_k: int = 5,
+) -> dict:
+    """Profile-aware retrieval. Same query, the lens specified by profile_id.
+    Use cognition_list_profiles to see available lenses.
+    Note: this is the single-profile version; for multi-profile council see
+    council_retrieve."""
+    try:
+        return _assemble_context_with_profile(
+            query=query, profile_id=profile_id, seed_k=seed_k, top_k=top_k
+        )
+    except FileNotFoundError as e:
+        return {"error": str(e)}
+
+
+@app.tool()
+def council_retrieve(
+    query: str,
+    profile_ids: list[str] | None = None,
+    top_k: int = 10,
+    seed_k: int = 5,
+) -> dict:
+    """Council Mode (Stage 5.6). Runs the same query through multiple
+    cognitive profiles and returns CouncilEvidence — per-profile top-k notes
+    plus consensus / unanimous / unique-to overlap analysis.
+
+    Default profiles: explorer, operator, skeptic. Synthesis (the fourth role)
+    is Claude reading this evidence via the /council slash command — there is
+    no separate synthesis agent.
+
+    Returns a CouncilEvidence dict (see kbai.contracts.CouncilEvidence)."""
+    from kbai.contracts import ContextNote
+    from kbai.council import run_council
+
+    def _retrieve_fn(q: str, pid: str, k: int) -> list[ContextNote]:
+        try:
+            out = _assemble_context_with_profile(
+                query=q, profile_id=pid, seed_k=seed_k, top_k=k,
+            )
+        except FileNotFoundError:
+            return []
+        return [ContextNote(**n) for n in out.get("notes", [])][:k]
+
+    evidence = run_council(
+        query=query,
+        profile_ids=profile_ids,
+        top_k=top_k,
+        retrieve_fn=_retrieve_fn,
+    )
+
+    # Stage 5.6 feedback hook: record the council event so Stage 8 calibration
+    # can correlate which profiles surface notes the user later acts on.
+    try:
+        from kbai.instrumentation import record_council_event
+        record_council_event(
+            _DB_PATH,
+            query=query,
+            profiles=evidence.profiles,
+            per_profile_top_ids={
+                p.profile_id: [n.note_id for n in p.notes]
+                for p in evidence.per_profile
+            },
+        )
+    except Exception:
+        pass  # never block retrieval on instrumentation
+
+    return evidence.model_dump(by_alias=True)
+
+
+@app.tool()
+def cognition_list_profiles() -> list[dict]:
+    """List all cognitive (thinking-fidelity) profiles available in the
+    registry. A profile is a retrieval/ranking lens over the same vault
+    graph — distinct from voice_profile (which only changes rendering).
+    v1 ships functional profiles only: default, skeptic, operator, builder.
+    Person-named profiles are calibrated, not declared (see Stage 8)."""
+    from kbai.cognitive_routing import list_profiles
+    return [p.model_dump() for p in list_profiles()]
+
+
+@app.tool()
+def cognition_get_profile(profile_id: str) -> dict:
+    """Fetch a single cognitive profile by id. Returns the full profile
+    schema: edge weight overrides, contradiction/mention policies, path
+    and abstraction preferences. Used by retrieve_assemble (in a future
+    stage) to gate the PPR walk and modify edge weights."""
+    from kbai.cognitive_routing import load_profile
+    try:
+        return load_profile(profile_id).model_dump()
+    except FileNotFoundError as e:
+        return {"error": str(e)}
+
+
 @app.tool()
 def analytics_connect_suggest(categories: list[str] | None = None) -> dict:
     """Read-only link-suggestion analytics over the vault graph. Returns ranked

@@ -255,11 +255,22 @@ class VaultGraph:
         seed_scores: dict[str, float],
         alpha: float = 0.85,
         exclude_types: set[str] | None = None,
+        weight_overrides: dict[str, float] | None = None,
     ) -> dict[str, float]:
         """Personalized PageRank seeded by seed_scores (note_id → weight).
         Builds a weighted DiGraph from taxonomy weights, runs PPR, returns
-        scores normalised 0–1. exclude_types gates edge types out of the walk."""
+        scores normalised 0–1.
+
+        Args:
+            seed_scores: note_id → personalization weight
+            alpha: PPR damping
+            exclude_types: edge types gated out of the walk entirely
+            weight_overrides: edge type → multiplier applied on top of the
+                taxonomy weight. Used by cognitive profiles (Stage 5.5+).
+                Default behaviour (no overrides) is unchanged.
+        """
         exclude_types = exclude_types or set()
+        weight_overrides = weight_overrides or {}
 
         simple = nx.DiGraph()
         for node in self.G.nodes:
@@ -268,7 +279,8 @@ class VaultGraph:
             etype = data.get("type", "untyped")
             if etype in exclude_types:
                 continue
-            w = self.taxonomy_weights.get(etype, 1.0)
+            base_w = self.taxonomy_weights.get(etype, 1.0)
+            w = base_w * float(weight_overrides.get(etype, 1.0))
             if simple.has_edge(source, target):
                 simple[source][target]["weight"] += w
             else:

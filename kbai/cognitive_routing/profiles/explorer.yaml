@@ -1,0 +1,21 @@
+profile_id: explorer
+display_name: Explorer
+schema_version: 1
+edge_weight_overrides:
+  analogous-to: 1.6
+  exemplifies: 1.4
+  builds-on: 1.0
+  mentioned: 0.6
+contradiction_policy: allow
+mention_policy: ignore
+path_length_preference: deep
+abstraction_preference: abstract
+restart_bias_tags: {}
+confidence_threshold: 0.0
+notes: |
+  Cross-domain exploration lens. Privileges analogous-to and exemplifies
+  edges so retrieval surfaces structural parallels across topics, not just
+  parents. Allows contradicts edges in the walk (without seeking them as
+  the skeptic does) — useful for noticing tensions you didn't query for.
+  Use as part of /council. Distinct from builder (which boosts builds-on
+  for genealogy queries).

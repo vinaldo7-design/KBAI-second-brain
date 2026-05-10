@@ -1,0 +1,19 @@
+profile_id: skeptic
+display_name: Skeptic
+schema_version: 1
+edge_weight_overrides:
+  contradicts: 1.6
+  challenges: 1.3
+  builds-on: 0.9
+contradiction_policy: seek
+mention_policy: ignore
+path_length_preference: balanced
+abstraction_preference: balanced
+restart_bias_tags: {}
+confidence_threshold: 0.0
+notes: |
+  Counterargument-seeking lens. Boosts contradicts and challenges edges in
+  the PPR walk; mildly penalises builds-on (which can otherwise drown out
+  dissent in evergreen clusters). Generalises today's mode="sparring".
+  Use for: pressure-testing claims, finding edge cases, mapping
+  intellectual fault lines.

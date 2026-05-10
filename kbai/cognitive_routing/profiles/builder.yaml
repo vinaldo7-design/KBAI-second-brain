@@ -1,0 +1,20 @@
+profile_id: builder
+display_name: Builder
+schema_version: 1
+edge_weight_overrides:
+  builds-on: 1.7
+  builds-toward: 1.5
+  analogous-to: 0.9
+  exemplifies: 0.85
+contradiction_policy: suppress
+mention_policy: ignore
+path_length_preference: deep
+abstraction_preference: balanced
+restart_bias_tags: {}
+confidence_threshold: 0.0
+notes: |
+  Foundation-tracing lens. Boosts builds-on chains so retrieval follows
+  derivation backwards toward first principles. Allows deep paths so the
+  full chain surfaces, not just immediate parents.
+  Use for: "where does this idea come from", essay scaffolding,
+  understanding intellectual lineage.
