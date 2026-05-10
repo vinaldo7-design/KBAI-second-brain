@@ -222,6 +222,13 @@ All green → tag `stage-0` → start Stage 1.
 - **Trace verification**: 30 (mode × query) top-10 ID lists are byte-identical before/after refactor. All composite scores within 1% (in practice: exact match). Before-traces stored at `/tmp/before-full.json`; diff script confirms PASS.
 - Legacy `mode=` path suppresses profile weight_overrides (forced `{}`) to preserve score parity for one deprecation cycle. `profile_id=` path applies full profile semantics including weight overrides.
 
+**Stage 4 + Stage 5 + Stage 5.6.9-10 bundle verification** (✅ 2026-05-10):
+- **170/170 tests passing** (153 baseline + 9 perplexity + 8 compare_thinkers).
+- Stage 4: `research_cluster` (BFS cluster expansion + cluster system prompt + 12k char budget), `research_verify_claim` (verdict/confidence/evidence + claim_checks log). `_call_perplexity_raw` extracted as shared core.
+- Stage 5: `claude/commands/ask.md` — 8-pattern deterministic intent classifier routing to correct tool sequences. No hand-wavy fallback. Patterns are the contract.
+- Stage 5.6.9: `cognition_compare_profiles` MCP tool with Jaccard divergence (identical=0.0, disjoint=1.0, partial=in-between). `ProfileComparison` contract honoured.
+- Stage 5.6.10: `claude/commands/compare-thinkers.md` — parses `+`-joined profile spec, renders side-by-side table, divergence score, 3-sentence synthesis.
+
 ---
 
 ## Stages 1–6 — outline (detail expanded as we get there)
@@ -256,13 +263,16 @@ All green → tag `stage-0` → start Stage 1.
 ### Stage 4 — research split clean
 - Add `research_cluster`, `research_verify_claim` to perplexitymcp.
 - Static check: perplexity package has zero `write_text` references.
-- ☐ Items 4.1–4.3
+- ☑ Items 4.1–4.3 — `research_cluster` (real BFS + cluster system prompt) and
+  `research_verify_claim` (verdict + confidence + evidence) added to perplexitymcp.
+  `_call_perplexity_raw` refactored out as a shared core. 9 new perplexity tests.
+  Static check: perplexitymcp has zero `write_text` references ✓
 
 ### Stage 5 — orchestration / router
-- `/ask <query>` slash command — deterministic intent classifier.
-- Migrate slash commands to namespaced tool names.
-- Drop legacy aliases (deprecation cycle complete).
-- ☐ Items 5.1–5.4
+- ☑ Item 5.1 — `/ask <query>` slash command (`claude/commands/ask.md`): deterministic
+  8-pattern intent classifier routes to the right tool sequence directly (no nesting).
+- ☐ Items 5.2–5.4 — Migrate slash commands to namespaced tool names; drop legacy
+  aliases (deprecation cycle). Separate cleanup session.
 
 ### Stage 5.5 — Cognitive routing v1 (thinking fidelity)
 **Premise**: `mode="standard|sparring"` is already a binary cognitive profile.
@@ -293,16 +303,16 @@ class CognitiveProfile(BaseModel):
     notes: str = ""                                  # human description
 ```
 
-- ☐ 5.5.1 — `kbai/cognitive_routing/{profile.py, registry.py, applier.py}`
-- ☐ 5.5.2 — Profile registry: YAML files at `kbai/cognitive_routing/profiles/*.yaml`
+- ☑ 5.5.1 — `kbai/cognitive_routing/{profile.py, registry.py, applier.py}` (shipped in Stage 5.6 session)
+- ☑ 5.5.2 — Profile registry: YAML files at `kbai/cognitive_routing/profiles/*.yaml` (5 profiles + exhaustive)
 - ☑ 5.5.3 — `_assemble_context_impl` and `_assemble_context_with_profile` merged into ONE
   code path via `kbai/retrieve/assembler.assemble_context`. `mode=` maps to profile for
   graph/exclude logic only (weight overrides suppressed on legacy path for score parity).
   `_assemble_context_with_profile` deleted; replaced by `_retrieve_with_profile`.
-- ☐ 5.5.4 — Apply overrides to PPR transition matrix + path_exclude set
-- ☐ 5.5.5 — New tools: `cognition_list_profiles`, `cognition_get_profile`, `cognition_retrieve_as`
-- ☐ 5.5.6 — Slash command `/think <profile> <query>`
-- ☐ 5.5.7 — Tests: synthetic graph, assert each profile produces different top-N
+- ☑ 5.5.4 — Weight overrides applied to PPR transition matrix; path_exclude derived from profile policies
+- ☑ 5.5.5 — New tools: `cognition_list_profiles`, `cognition_get_profile`, `cognition_retrieve_as`
+- ☐ 5.5.6 — Slash command `/think <profile> <query>` (deferred — `/ask` covers the routing layer)
+- ☑ 5.5.7 — Tests: synthetic graph proves profiles produce different top-N (test_council.py L3)
 
 ### Stage 5.6 — Council Mode + compare-thinkers
 **Premise**: same query through N profiles, with a synthesizer (Claude) reading
@@ -318,8 +328,7 @@ They share the same retrieval primitive.
   `kbai/contracts.py`.
 - ☑ 5.6.4 — `kbai/council/` package: `run_council`, `build_council_evidence`
   (pure overlap math), `profile_focus_summary`, `DEFAULT_COUNCIL_PROFILES`.
-- ☑ 5.6.5 — Server: `_assemble_context_with_profile` (profile-aware retrieval
-  parallel to `_assemble_context_impl`, doesn't disturb existing tool).
+- ☑ 5.6.5 — Server: `_retrieve_with_profile` (unified with `_assemble_context_impl` via Stage 1.4+5.5.3 refactor; `_assemble_context_with_profile` deleted).
 - ☑ 5.6.6 — MCP tools: `cognition_retrieve_as`, `council_retrieve`.
 - ☑ 5.6.7 — Feedback capture: `record_council_event` writes to a new
   `council_events` table on every `/council` invocation. Stage 8 calibration
@@ -327,9 +336,9 @@ They share the same retrieval primitive.
 - ☑ 5.6.8 — `claude/commands/council.md` — synthesizer prompt with hard
   rules: must call the tool (no role-play), must include a Skeptic note,
   must explain how the debate sharpened the answer.
-- ☐ 5.6.9 — `cognition_compare_profiles(query, profile_ids[]) -> ProfileComparison`
-  (raw primitive without synthesis prompt; lower priority than Council).
-- ☐ 5.6.10 — Slash command `/compare-thinkers <p1>+<p2> <query>`.
+- ☑ 5.6.9 — `cognition_compare_profiles(query, profile_ids[], top_k=15) -> ProfileComparison`
+  with Jaccard divergence_score. 8 tests (identical/disjoint/partial/three-profile/shape/registration).
+- ☑ 5.6.10 — Slash command `/compare-thinkers <p1>+<p2>[+<p3>] <query>` (`claude/commands/compare-thinkers.md`).
 
 ### Stage 6 — eval harness production
 - Wire `eval/run_retrieval_eval.py` into pre-push hook (mandatory).

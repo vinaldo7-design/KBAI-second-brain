@@ -1,8 +1,10 @@
 """perplexity-mcp — Perplexity Deep Research as an annotator for the vault.
 
-Two tools:
-  research_note   — call Perplexity, return structured findings (no file writes)
-  apply_research  — append findings to the note as a clearly-marked section
+Four tools (Stage 4 — research split):
+  research_note          — single-note deep research (no writes)
+  research_cluster       — cluster-level cross-cutting research (no writes)
+  research_verify_claim  — narrow fact-check on a specific claim text
+  apply_research         — append findings to the note as a clearly-marked section
 
 Discipline: never silently rewrites existing prose. All Perplexity-derived
 content lives under "## External research (Perplexity, YYYY-MM-DD)".
@@ -30,6 +32,21 @@ _MODEL = os.environ.get("PERPLEXITY_MODEL", "sonar-deep-research")
 _TIMEOUT = int(os.environ.get("PERPLEXITY_TIMEOUT", "300"))
 
 _RESEARCH_SECTION_HEADING = "## External research (Perplexity"
+
+_CLUSTER_SYSTEM_PROMPT_PREFIX = (
+    "You are researching a CLUSTER of related notes from a personal knowledge base. "
+    "Surface cross-cutting themes, contradictions between notes, and external sources "
+    "relevant to the cluster as a whole — not to any single note.\n\n"
+)
+
+_VERIFY_SCHEMA_INSTRUCTION = (
+    "Return STRICT JSON with exactly these fields:\n"
+    '{"verdict": "...", "confidence": 0.0, "evidence": [{"url": "...", "note": "..."}]}\n'
+    "verdict must be one of: supports, contradicts, mixed, uncertain.\n"
+    "confidence must be a float in [0, 1].\n"
+    "evidence is a list of objects with url and note fields.\n"
+    "Do not include any extra keys or commentary."
+)
 
 _JSON_SCHEMA_INSTRUCTION = """Return your findings as STRICT JSON in exactly this shape:
 
@@ -73,6 +90,40 @@ def _load_graph() -> dict | None:
         return json.load(f)
 
 
+def _cluster_expand(map_id: str, cluster_hops: int) -> list[str]:
+    """BFS over the vault graph JSON from map_id up to cluster_hops.
+    Returns neighbour note_ids ordered by hop distance (nearest first),
+    map_id itself excluded."""
+    graph = _load_graph()
+    if not graph:
+        return []
+
+    adj: dict[str, list[str]] = {}
+    for e in graph.get("edges", []):
+        if not e.get("target_exists", True):
+            continue
+        src, tgt = e.get("source", ""), e.get("target", "")
+        if src and tgt:
+            adj.setdefault(src, []).append(tgt)
+            adj.setdefault(tgt, []).append(src)
+
+    visited: set[str] = {map_id}
+    frontier = [map_id]
+    result: list[str] = []
+    for _ in range(cluster_hops):
+        next_frontier: list[str] = []
+        for nid in frontier:
+            for neighbour in adj.get(nid, []):
+                if neighbour not in visited:
+                    visited.add(neighbour)
+                    next_frontier.append(neighbour)
+                    result.append(neighbour)
+        frontier = next_frontier
+        if not frontier:
+            break
+    return result
+
+
 def _normalize(s: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", s.lower()).strip("-")
 
@@ -101,36 +152,24 @@ def _match_vault_note(hint_text: str, graph: dict | None) -> str | None:
 
 # --- Perplexity call ------------------------------------------------------
 
-def _call_perplexity(note_content: str) -> dict:
-    """Call Perplexity Deep Research, return parsed JSON payload.
-    Raises RuntimeError on any failure (network, status, JSON parse)."""
+def _call_perplexity_raw(system_prompt: str, user_content: str) -> str:
+    """Core Perplexity caller. Returns raw response content string.
+    Raises RuntimeError on any failure (network, status, parse)."""
     api_key = os.environ.get("PERPLEXITY_API_KEY")
     if not api_key:
         raise RuntimeError("PERPLEXITY_API_KEY not set in environment.")
-
-    system_prompt = (
-        "You are a research agent helping update a personal knowledge note. "
-        "The note content will be provided by the user.\n\n"
-        "1. Find recent, high-quality sources (papers, articles, docs) directly relevant to the note.\n"
-        "2. Check whether the core claims still hold according to current literature.\n"
-        "3. Suggest cross-references or related concepts that should be linked.\n"
-        "4. Surface open questions the note doesn't address.\n\n"
-        + _JSON_SCHEMA_INSTRUCTION
-    )
 
     payload = {
         "model": _MODEL,
         "messages": [
             {"role": "system", "content": system_prompt},
-            {"role": "user", "content": f"Note content:\n\n{note_content}"},
+            {"role": "user", "content": user_content},
         ],
     }
-
     headers = {
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",
     }
-
     try:
         resp = requests.post(_API_URL, json=payload, headers=headers, timeout=_TIMEOUT)
     except requests.RequestException as e:
@@ -141,11 +180,24 @@ def _call_perplexity(note_content: str) -> dict:
 
     try:
         data = resp.json()
-        content = data["choices"][0]["message"]["content"]
+        return data["choices"][0]["message"]["content"]
     except (KeyError, ValueError) as e:
         raise RuntimeError(f"Unexpected Perplexity response shape: {e}") from e
 
-    return _extract_json(content)
+
+def _call_perplexity(note_content: str) -> dict:
+    """Single-note research. Wraps _call_perplexity_raw with the default research prompt."""
+    system_prompt = (
+        "You are a research agent helping update a personal knowledge note. "
+        "The note content will be provided by the user.\n\n"
+        "1. Find recent, high-quality sources (papers, articles, docs) directly relevant to the note.\n"
+        "2. Check whether the core claims still hold according to current literature.\n"
+        "3. Suggest cross-references or related concepts that should be linked.\n"
+        "4. Surface open questions the note doesn't address.\n\n"
+        + _JSON_SCHEMA_INSTRUCTION
+    )
+    raw = _call_perplexity_raw(system_prompt, f"Note content:\n\n{note_content}")
+    return _extract_json(raw)
 
 
 def _extract_json(content: str) -> dict:
@@ -188,6 +240,29 @@ def _log_research(note_id: str, researched_at: str, content_hash: str) -> None:
         db.execute(
             "INSERT INTO research_log VALUES (?,?,?,?)",
             (note_id, researched_at, content_hash, _MODEL),
+        )
+        db.commit()
+        db.close()
+    except Exception:
+        pass
+
+
+def _log_claim_verify(claim_hash: str, verdict: str, confidence: float) -> None:
+    """Best-effort: record claim verification results for Stage 8 calibration."""
+    try:
+        db = sqlite3.connect(_LOG_DB)
+        db.execute(
+            """CREATE TABLE IF NOT EXISTS claim_checks (
+                claim_hash TEXT,
+                verdict    TEXT,
+                confidence REAL,
+                model      TEXT,
+                ts         INTEGER
+            )"""
+        )
+        db.execute(
+            "INSERT INTO claim_checks VALUES (?,?,?,?,?)",
+            (claim_hash, verdict, float(confidence), _MODEL, int(time.time())),
         )
         db.commit()
         db.close()
@@ -339,6 +414,115 @@ def apply_research(
         "section_chars": len(section),
         "file": str(note_file.relative_to(_VAULT_ROOT)),
         "status": "appended",
+    }
+
+
+@app.tool()
+def research_cluster(map_id: str, cluster_hops: int = 1) -> dict:
+    """Call Perplexity Deep Research on a cluster of related notes anchored at
+    map_id. Surfaces cross-cutting themes, contradictions between notes, and
+    external sources relevant to the cluster as a whole — not to any single note.
+
+    Returns the same ResearchPayload shape as research_note, plus a
+    `cluster_notes` list of note_ids included in the cluster."""
+    cluster_ids = _cluster_expand(map_id, cluster_hops)
+    if not cluster_ids:
+        return {"error": f"Note '{map_id}' not found in graph or has no neighbours."}
+
+    # Priority-order: root note first, then cluster members; truncate to 12k total.
+    note_ids_ordered = [map_id] + cluster_ids
+    chunks: list[str] = []
+    total_chars = 0
+    included: list[str] = []
+    for nid in note_ids_ordered:
+        if total_chars >= 12000:
+            break
+        nf = _find_note_file(nid)
+        if not nf:
+            continue
+        text = nf.read_text(encoding="utf-8")
+        remaining = 12000 - total_chars
+        chunk = text[:remaining] if len(text) > remaining else text
+        chunks.append(f"--- Note: {nid} ---\n{chunk}")
+        total_chars += len(chunk)
+        included.append(nid)
+
+    if not chunks:
+        return {"error": f"No readable note files found for cluster anchored at '{map_id}'."}
+
+    cluster_content = "\n\n".join(chunks)
+    system_prompt = (
+        _CLUSTER_SYSTEM_PROMPT_PREFIX + _JSON_SCHEMA_INSTRUCTION
+    )
+
+    try:
+        raw = _call_perplexity_raw(system_prompt, f"Cluster content:\n\n{cluster_content}")
+        payload = _extract_json(raw)
+    except RuntimeError as e:
+        return {"error": str(e)}
+
+    graph = _load_graph()
+    for cl in payload.get("cross_links") or []:
+        hint = cl.get("hint_text") or ""
+        match = _match_vault_note(hint, graph)
+        if match:
+            cl["vault_note_id"] = match
+
+    researched_at = datetime.now(timezone.utc).isoformat()
+    content_hash = md5(cluster_content.encode("utf-8")).hexdigest()[:12]
+    _log_research(map_id, researched_at, content_hash)
+
+    return {
+        "note_id": map_id,
+        "cluster_notes": included,
+        "researched_at": researched_at,
+        "model": _MODEL,
+        "sources": payload.get("sources") or [],
+        "claim_checks": payload.get("claim_checks") or [],
+        "cross_links": payload.get("cross_links") or [],
+        "open_questions": payload.get("open_questions") or [],
+        "raw_summary": payload.get("raw_summary") or "",
+    }
+
+
+@app.tool()
+def research_verify_claim(claim_text: str, context: str = "") -> dict:
+    """Narrow Perplexity fact-check on a specific claim. Returns a structured
+    verdict with confidence and supporting/contradicting evidence.
+
+    verdict ∈ {supports, contradicts, mixed, uncertain}
+    confidence ∈ [0, 1]"""
+    user_content = (
+        f"Claim: {claim_text}"
+        + (f"\n\nContext: {context}" if context.strip() else "")
+    )
+    system_prompt = (
+        "Evaluate whether the following claim is supported by current literature. "
+        "Be precise and cite specific sources.\n\n"
+        + _VERIFY_SCHEMA_INSTRUCTION
+    )
+
+    try:
+        raw = _call_perplexity_raw(system_prompt, user_content)
+        payload = _extract_json(raw)
+    except RuntimeError as e:
+        return {"error": str(e)}
+
+    verdict = payload.get("verdict", "uncertain")
+    if verdict not in ("supports", "contradicts", "mixed", "uncertain"):
+        verdict = "uncertain"
+    confidence = float(payload.get("confidence", 0.0))
+    confidence = max(0.0, min(1.0, confidence))
+    evidence = payload.get("evidence") or []
+
+    claim_hash = md5(claim_text.encode("utf-8")).hexdigest()[:12]
+    _log_claim_verify(claim_hash, verdict, confidence)
+
+    return {
+        "claim": claim_text,
+        "verdict": verdict,
+        "confidence": confidence,
+        "evidence": evidence,
     }
 
 

@@ -446,6 +446,51 @@ def cognition_get_profile(profile_id: str) -> dict:
 
 
 @app.tool()
+def cognition_compare_profiles(
+    query: str,
+    profile_ids: list[str],
+    top_k: int = 15,
+) -> dict:
+    """Compare multiple cognitive profiles on the same query. Returns a
+    ProfileComparison with per-profile top-k note lists and a divergence_score
+    (Jaccard distance over top-k id sets: 0.0=identical, 1.0=disjoint).
+
+    Use /compare-thinkers for a rendered side-by-side view."""
+    from kbai.contracts import ContextNote, ProfileComparison
+
+    per_profile: dict[str, list[ContextNote]] = {}
+    for pid in profile_ids:
+        try:
+            out = _retrieve_with_profile(query=query, profile_id=pid, top_k=top_k)
+        except FileNotFoundError:
+            per_profile[pid] = []
+            continue
+        per_profile[pid] = [ContextNote(**n) for n in out.get("notes", [])][:top_k]
+
+    # Jaccard distance over the union of top-k note id sets.
+    sets = [set(n.note_id for n in notes) for notes in per_profile.values()]
+    if len(sets) < 2:
+        divergence = 0.0
+    else:
+        union: set[str] = set().union(*sets)
+        intersection: set[str] = sets[0].copy()
+        for s in sets[1:]:
+            intersection &= s
+        divergence = round(
+            (len(union) - len(intersection)) / len(union) if union else 0.0, 4
+        )
+
+    result = ProfileComparison(
+        query=query,
+        profiles=list(profile_ids),
+        per_profile={pid: notes for pid, notes in per_profile.items()},
+        divergence_score=divergence,
+        overlap_top_n=top_k,
+    )
+    return result.model_dump()
+
+
+@app.tool()
 def analytics_connect_suggest(categories: list[str] | None = None) -> dict:
     """Read-only link-suggestion analytics over the vault graph. Returns ranked
     candidates per category. Does NOT mutate the vault — apply via Write Agent.

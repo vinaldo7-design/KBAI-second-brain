@@ -11,12 +11,15 @@ os.environ.setdefault("PERPLEXITY_API_KEY", "test-key")
 sys.path.insert(0, str(_vault_root))
 
 from perplexitymcp.server import (
+    _cluster_expand,
     _extract_json,
     _format_research_section,
     _match_vault_note,
     _normalize,
     apply_research,
+    research_cluster,
     research_note,
+    research_verify_claim,
 )
 
 
@@ -239,3 +242,120 @@ def test_apply_research_does_not_rewrite_body():
         assert "Line 1." in prefix and "Line 2." in prefix and "Line 3." in prefix
     finally:
         note_file.unlink(missing_ok=True)
+
+
+# --- research_cluster ---
+
+
+def _fake_graph_for_cluster():
+    return {
+        "nodes": [
+            {"id": "map-a"}, {"id": "note-b"}, {"id": "note-c"}, {"id": "note-d"},
+        ],
+        "edges": [
+            {"source": "map-a", "target": "note-b", "type": "builds-on", "target_exists": True},
+            {"source": "map-a", "target": "note-c", "type": "exemplifies", "target_exists": True},
+            {"source": "note-c", "target": "note-d", "type": "analogous-to", "target_exists": True},
+        ],
+    }
+
+
+def test_cluster_expand_one_hop():
+    with patch("perplexitymcp.server._load_graph", return_value=_fake_graph_for_cluster()):
+        result = _cluster_expand("map-a", cluster_hops=1)
+    assert set(result) == {"note-b", "note-c"}
+    assert "map-a" not in result
+
+
+def test_cluster_expand_two_hops():
+    with patch("perplexitymcp.server._load_graph", return_value=_fake_graph_for_cluster()):
+        result = _cluster_expand("map-a", cluster_hops=2)
+    assert set(result) == {"note-b", "note-c", "note-d"}
+
+
+def test_cluster_expand_empty_graph():
+    with patch("perplexitymcp.server._load_graph", return_value=None):
+        assert _cluster_expand("map-a", cluster_hops=1) == []
+
+
+def test_research_cluster_happy_path(tmp_path):
+    note_a = _vault_root / "00-Captures" / "test-cluster-map.md"
+    note_b = _vault_root / "00-Captures" / "test-cluster-nb.md"
+    note_a.write_text("# Cluster root\n", encoding="utf-8")
+    note_b.write_text("# Neighbour B\n", encoding="utf-8")
+    try:
+        with patch("perplexitymcp.server._cluster_expand", return_value=["test-cluster-nb"]), \
+             patch("perplexitymcp.server.requests.post",
+                   return_value=_mock_response(_fake_api_response())):
+            result = research_cluster("test-cluster-map", cluster_hops=1)
+        assert "error" not in result
+        assert result["note_id"] == "test-cluster-map"
+        assert "cluster_notes" in result
+        assert "test-cluster-map" in result["cluster_notes"]
+    finally:
+        note_a.unlink(missing_ok=True)
+        note_b.unlink(missing_ok=True)
+
+
+def test_research_cluster_no_graph_returns_error():
+    with patch("perplexitymcp.server._cluster_expand", return_value=[]):
+        result = research_cluster("nonexistent-map-xyz", cluster_hops=1)
+    assert "error" in result
+
+
+def test_research_cluster_missing_api_key(tmp_path):
+    note_a = _vault_root / "00-Captures" / "test-cluster-nokey.md"
+    note_a.write_text("# x\n", encoding="utf-8")
+    try:
+        saved = os.environ.pop("PERPLEXITY_API_KEY", None)
+        with patch("perplexitymcp.server._cluster_expand", return_value=["test-cluster-nokey"]):
+            result = research_cluster("test-cluster-nokey", cluster_hops=1)
+        assert "error" in result
+    finally:
+        if saved:
+            os.environ["PERPLEXITY_API_KEY"] = saved
+        note_a.unlink(missing_ok=True)
+
+
+# --- research_verify_claim ---
+
+
+def _fake_verify_api_response(verdict: str = "supports", confidence: float = 0.9):
+    return {
+        "choices": [{
+            "message": {
+                "content": json.dumps({
+                    "verdict": verdict,
+                    "confidence": confidence,
+                    "evidence": [{"url": "https://example.com", "note": "Study confirms."}],
+                })
+            }
+        }]
+    }
+
+
+def test_research_verify_claim_supports():
+    with patch("perplexitymcp.server.requests.post",
+               return_value=_mock_response(_fake_verify_api_response("supports", 0.85))):
+        result = research_verify_claim("Mastery requires 10,000 hours of deliberate practice.")
+    assert result["verdict"] == "supports"
+    assert 0.0 <= result["confidence"] <= 1.0
+    assert isinstance(result["evidence"], list)
+    assert result["claim"].startswith("Mastery")
+
+
+def test_research_verify_claim_invalid_verdict_normalised():
+    with patch("perplexitymcp.server.requests.post",
+               return_value=_mock_response(_fake_verify_api_response("bogus_verdict", 0.5))):
+        result = research_verify_claim("Some claim.")
+    assert result["verdict"] == "uncertain"
+
+
+def test_research_verify_claim_missing_api_key():
+    saved = os.environ.pop("PERPLEXITY_API_KEY", None)
+    try:
+        result = research_verify_claim("Any claim.")
+    finally:
+        if saved:
+            os.environ["PERPLEXITY_API_KEY"] = saved
+    assert "error" in result
