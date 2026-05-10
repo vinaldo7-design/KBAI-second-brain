@@ -250,6 +250,118 @@ class VaultGraph:
             and self.G.out_degree(n) == 0
         ])
 
+    def ppr_expand(
+        self,
+        seed_scores: dict[str, float],
+        alpha: float = 0.85,
+        exclude_types: set[str] | None = None,
+    ) -> dict[str, float]:
+        """Personalized PageRank seeded by seed_scores (note_id → weight).
+        Builds a weighted DiGraph from taxonomy weights, runs PPR, returns
+        scores normalised 0–1. exclude_types gates edge types out of the walk."""
+        exclude_types = exclude_types or set()
+
+        simple = nx.DiGraph()
+        for node in self.G.nodes:
+            simple.add_node(node)
+        for source, target, data in self.G.edges(data=True):
+            etype = data.get("type", "untyped")
+            if etype in exclude_types:
+                continue
+            w = self.taxonomy_weights.get(etype, 1.0)
+            if simple.has_edge(source, target):
+                simple[source][target]["weight"] += w
+            else:
+                simple.add_edge(source, target, weight=w)
+
+        total = sum(seed_scores.values())
+        if total > 0:
+            personalization = {nid: s / total for nid, s in seed_scores.items()}
+            for node in simple.nodes:
+                personalization.setdefault(node, 0.0)
+        else:
+            personalization = None  # uniform PPR fallback
+
+        try:
+            scores = nx.pagerank(
+                simple, alpha=alpha, personalization=personalization, weight="weight"
+            )
+        except (nx.PowerIterationFailedConvergence, ZeroDivisionError):
+            scores = personalization or {n: 1.0 / len(simple) for n in simple.nodes}
+
+        max_s = max(scores.values()) if scores else 1.0
+        return {k: v / (max_s or 1.0) for k, v in scores.items()}
+
+    def path_attributions(
+        self,
+        seed_ids: list[str],
+        target_ids: list[str],
+        max_hops: int = 3,
+        exclude_types: set[str] | None = None,
+    ) -> dict[str, list[dict] | None]:
+        """Batch: best semantic path from any seed to each target.
+        Uses inverted taxonomy weights as edge costs so high-semantic edges
+        (builds-on, analogous-to) are preferred over structural ones.
+        exclude_types strips edges that produce plumbing paths, not reasoning chains."""
+        exclude_types = exclude_types or {"referenced-in", "untyped", "mentioned"}
+
+        cost_graph = nx.DiGraph()
+        for node in self.G.nodes:
+            cost_graph.add_node(node)
+        for src, tgt, data in self.G.edges(data=True):
+            etype = data.get("type", "untyped")
+            if etype in exclude_types:
+                continue
+            w = self.taxonomy_weights.get(etype, 1.0)
+            cost = 1.0 / w  # invert: high weight → low cost → preferred
+            if cost_graph.has_edge(src, tgt):
+                cost_graph[src][tgt]["weight"] = min(cost_graph[src][tgt]["weight"], cost)
+            else:
+                cost_graph.add_edge(src, tgt, weight=cost)
+
+        target_set = set(target_ids)
+        best: dict[str, tuple[float, list[str]]] = {}
+
+        for seed_id in seed_ids:
+            if seed_id not in cost_graph:
+                continue
+            try:
+                lengths, paths = nx.single_source_dijkstra(
+                    cost_graph, seed_id, weight="weight"
+                )
+            except Exception:
+                continue
+            for nid, path in paths.items():
+                if nid not in target_set or len(path) - 1 > max_hops:
+                    continue
+                cost = lengths[nid]
+                if nid not in best or cost < best[nid][0]:
+                    best[nid] = (cost, path)
+
+        output: dict[str, list[dict] | None] = {}
+        for nid in target_ids:
+            if nid not in best:
+                output[nid] = None
+                continue
+            _, path = best[nid]
+            if len(path) < 2:
+                output[nid] = None
+                continue
+            steps = []
+            for i in range(len(path) - 1):
+                s, t = path[i], path[i + 1]
+                edge_type, best_w = "untyped", 0.0
+                for _, t2, edata in self.G.out_edges(s, data=True):
+                    if t2 == t:
+                        etype = edata.get("type", "untyped")
+                        w = self.taxonomy_weights.get(etype, 0.0)
+                        if w > best_w:
+                            best_w, edge_type = w, etype
+                steps.append({"from": s, "edge": edge_type, "to": t})
+            output[nid] = steps
+
+        return output
+
     def annotated_edges(
         self,
         edge_type: Optional[str] = None,

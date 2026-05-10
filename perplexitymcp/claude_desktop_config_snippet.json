@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "perplexity-research": {
+      "command": "/Users/vinaynair/opt/anaconda3/envs/minivinnymcp/bin/python",
+      "args": [
+        "/Users/vinaynair/Library/Mobile Documents/iCloud~md~obsidian/Documents/Second Brain/Second Brain/perplexitymcp/server.py"
+      ],
+      "env": {
+        "VAULT_ROOT": "/Users/vinaynair/Library/Mobile Documents/iCloud~md~obsidian/Documents/Second Brain/Second Brain",
+        "PERPLEXITY_API_KEY": "REPLACE_WITH_YOUR_KEY",
+        "PERPLEXITY_MODEL": "sonar-deep-research"
+      }
+    }
+  }
+}

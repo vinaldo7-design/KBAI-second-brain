@@ -6,36 +6,61 @@ edge_types:
     section_heading: "builds on"
     collapse_to: null
     default_weight: 1.5
+    description: "A depends on, extends, or derives from B — B is a necessary precondition or foundation for A"
 
   builds-toward:
     section_heading: "builds toward"
     collapse_to: "builds-on"   # loader reverses A→B to B→A, retyped as builds-on
     default_weight: 1.5
+    description: "A is a step toward B — A contributes to or enables B (reverse of builds-on at load time)"
 
   contradicts:
     section_heading: "contradicts"
     collapse_to: null
     default_weight: 1.2
+    description: "A and B make incompatible claims or rest on incompatible premises — accepting one weakens or refutes the other"
 
   analogous-to:
     section_heading: "analogous to"
     collapse_to: null
     default_weight: 1.3
+    description: "A and B share structural or functional pattern across different domains — the similarity is abstract, not an instance relationship"
+
+  exemplifies:
+    section_heading: "exemplifies"
+    collapse_to: null
+    default_weight: 0.85
+    description: "A is a concrete domain instance of abstract principle B — A demonstrates B in a specific context or field"
+
+  challenges:
+    section_heading: "challenges"
+    collapse_to: null
+    default_weight: 0.80
+    description: "A complicates or qualifies B without full contradiction — A introduces friction, edge cases, or conditions that limit B's scope"
+
+  operationalises:
+    section_heading: "operationalises"
+    collapse_to: null
+    default_weight: 0.85
+    description: "A is how B becomes practice — A converts the abstract principle of B into concrete method, process, or action"
 
   referenced-in:
     section_heading: "referenced in maps"
     collapse_to: null
     default_weight: 0.8
+    description: "A appears in map B as a linked node — structural navigation relationship, not a semantic claim"
 
   untyped:
     section_heading: null
     collapse_to: null
     default_weight: 0.6
+    description: "Link whose semantic relationship has not yet been classified"
 
   mentioned:
     section_heading: null
     collapse_to: null
     default_weight: 0.3
+    description: "A is mentioned by name in B without a labelled semantic relationship"
 
 untyped_section_names:
   - links
