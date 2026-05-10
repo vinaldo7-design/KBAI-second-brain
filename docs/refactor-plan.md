@@ -199,6 +199,13 @@ All green → tag `stage-0` → start Stage 1.
 - New `kbai/` package skeleton: `analytics`, `embed`, `eval`, `graph`, `instrumentation`, `voice_profile`.
 - `note_hits` schema preserved; new `query_log` and `retrieval_events` tables additive.
 
+**Stage 1 partial verification** (✅ 2026-05-10):
+- pyproject.toml declares `kbai`, `minivinnymcp`, `perplexitymcp`, `writeagentmcp` as installable packages (not yet installed).
+- `connect_suggest` 5 categories + helpers physically live in `kbai/analytics/connect_suggest.py`. `vault_connect_suggest.py` is now a 150-line CLI wrapper that re-exports for backward compat.
+- `_find_note_file` deduplicated — both servers shim to `kbai/storage/note_io.py::find_note_file`. 9 new tests cover path-input, node-metadata, rglob fallback, and missing-file cases.
+- **104/104 tests passing**, no regression.
+- **Deferred to Claude Code**: 1.2 (graph_loader/vault_search physical moves), 1.4 (assemble_context decomposition), 1.5 (trace verification). These need a fresh-context session for safety.
+
 ---
 
 ## Stages 1–6 — outline (detail expanded as we get there)
@@ -210,10 +217,10 @@ All green → tag `stage-0` → start Stage 1.
 - Add `pyproject.toml`; kill `sys.path.insert(0, vault_root)` hacks.
 - Dedupe `_find_note_file` into `kbai/storage/note_io.py`.
 - MCP servers shrink to thin adapters (each tool body ≤ 5 lines).
-- ☐ Item 1.1 — pyproject + package init
-- ☐ Item 1.2 — graph + embed + parser moves
-- ☐ Item 1.3 — note_io dedup
-- ☐ Item 1.4 — server thin-shim refactor
+- ☑ Item 1.1 — pyproject.toml metadata declared (no `pip install -e` yet — Stage 1.4 will trigger)
+- ◐ Item 1.2 — partial: connect_suggest impls physically moved into `kbai/analytics/`. Graph/embed/parser moves deferred to Code session (heavy file shuffles)
+- ☑ Item 1.3 — `_find_note_file` deduped; both servers shim to `kbai/storage/note_io.py`
+- ☐ Item 1.4 — `_assemble_context_impl` decomposition into `kbai/retrieve/{dense,ppr,path,assembler}.py` (heavy refactor — defer to Code)
 - ☐ Item 1.5 — baseline traces match within 1% (Item 7 runner is the check)
 
 ### Stage 2 — typed contracts

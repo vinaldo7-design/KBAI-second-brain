@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kbai"
+version = "0.1.0"
+description = "Mini Vinny / KBAI — multi-agent personal knowledge system over an Obsidian vault"
+requires-python = ">=3.10"
+authors = [{ name = "Vinay Nair" }]
+license = { text = "MIT" }
+dependencies = [
+  "mcp>=1.0.0",
+  "networkx>=3.0",
+  "pyyaml>=6.0",
+  "sentence-transformers>=3.0",
+  "numpy>=1.26",
+  "sqlite-vec",
+  "requests>=2.31",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0"]
+
+[tool.setuptools.packages.find]
+include = ["kbai*", "minivinnymcp*", "perplexitymcp*", "writeagentmcp*"]
+exclude = [
+  "tests*",
+  "07-attachments*",
+  "00-Captures*",
+  "01-Ideas*",
+  "02-Learning*",
+  "03-Projects*",
+  "04-Substack*",
+  "05-Personal*",
+  "06-Maps*",
+  "Templates*",
+  "claude*",
+  ".obsidian*",
+  ".trash*",
+  ".pytest_cache*",
+  "__pycache__*",
+]
+
+# NOTE — Stage 1: this file declares package metadata so future `pip install -e .`
+# resolves Mini Vinny / Perplexity / Write Agent / kbai as proper packages.
+# Currently NOT installed; servers still use sys.path hacks at module top.
+# Stage 1 item 1.4 (assemble_context refactor) will trigger the install + remove
+# the sys.path lines from the MCP server entrypoints.
