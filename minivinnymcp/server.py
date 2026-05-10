@@ -275,118 +275,24 @@ def _assemble_context_impl(
     char_budget: int = 12000,
     mode: str = "standard",
 ) -> dict:
-    """Full hybrid retrieval pipeline: vector seed → Personalized PageRank over
-    typed graph → char budget cap.
-    - mode='standard' (default): excludes contradicts + mentioned edges
-    - mode='sparring': includes contradicts; excludes mentioned
-    - mode='exhaustive': deep audit, allows mentioned edges (low-signal flagged)"""
+    """Legacy mode= entry point → kbai.retrieve.assembler (Stage 1.4).
+    Signature unchanged; MCP tools and eval runner call this without modification."""
+    from kbai.retrieve.assembler import assemble_context as _assemble
     if mode not in RETRIEVAL_MODES:
         mode = "standard"
     g = _get_graph_exhaustive() if mode == "exhaustive" else _get_graph()
-    model = _get_model()
-
-    # Tier 1: vector seed
-    qvec = model.encode(QUERY_PREFIX + query, normalize_embeddings=True)
-    db = sqlite3.connect(_DB_PATH)
-    db.enable_load_extension(True)
-    sqlite_vec.load(db)
-    db.enable_load_extension(False)
-    rows = db.execute(
-        """
-        SELECT v.note_id, v.distance, n.title, n.summary, n.filepath
-        FROM note_vectors v
-        JOIN notes n ON n.id = v.note_id
-        WHERE v.embedding MATCH ? AND k = ?
-        ORDER BY v.distance
-        """,
-        (serialize_embedding(qvec), seed_k),
-    ).fetchall()
-    db.close()
-
-    seed_meta: dict[str, dict] = {}
-    seed_scores: dict[str, float] = {}
-    for nid, dist, title, summary, fp in rows:
-        sim = max(0.0, 1.0 - float(dist))
-        seed_scores[nid] = sim
-        seed_meta[nid] = {"title": title, "summary": summary, "filepath": fp}
-
-    # Tier 2: PPR over typed graph seeded by dense retrieval scores.
-    # Mode-gated edge exclusion (cognitive routing precursor).
-    if mode == "standard":
-        exclude = {"contradicts", "mentioned"}
-    elif mode == "sparring":
-        exclude = {"mentioned"}
-    else:  # exhaustive
-        exclude = set()
-    ppr_scores = g.ppr_expand(seed_scores, exclude_types=exclude)
-
-    # Build ranked list: top 50 by PPR score, skip broken nodes
-    ranked = sorted(
-        ((nid, score) for nid, score in ppr_scores.items() if g.exists(nid)),
-        key=lambda x: -x[1],
-    )[:50]
-
-    # Char budget: read full content top-down until exhausted
-    results: list[dict] = []
-    chars_used = 0
-    for i, (nid, ppr) in enumerate(ranked):
-        node = g.node(nid) or {}
-        if nid in seed_meta:
-            title = seed_meta[nid]["title"]
-            summary = seed_meta[nid]["summary"]
-            source = "seed"
-        else:
-            title = node.get("title")
-            summary = node.get("summary")
-            source = "ppr"
-
-        note_file = _find_note_file(nid, node)
-        content = None
-        if note_file and chars_used < char_budget:
-            raw = note_file.read_text(encoding="utf-8")
-            remaining = char_budget - chars_used
-            if len(raw) <= remaining:
-                content = raw
-                chars_used += len(raw)
-            elif i < 3:
-                content = raw[:remaining]
-                chars_used += remaining
-
-        results.append({
-            "note_id": nid,
-            "title": title,
-            "summary": summary,
-            "content": content,
-            "composite_score": round(ppr, 4),
-            "source": source,
-            "via_edge": None,
-            "parent": None,
-        })
-
-    # Path attribution for top 15 PPR-sourced notes
-    seed_ids = list(seed_meta.keys())
-    ppr_targets = [r["note_id"] for r in results[:15] if r["source"] == "ppr"]
-    if mode == "standard":
-        path_exclude = {"contradicts", "referenced-in", "untyped", "mentioned"}
-    elif mode == "sparring":
-        path_exclude = {"referenced-in", "untyped", "mentioned"}
-    else:  # exhaustive — admit mentioned edges; still drop pure-structural noise
-        path_exclude = {"referenced-in", "untyped"}
-    attributions = g.path_attributions(seed_ids, ppr_targets, exclude_types=path_exclude)
-    for r in results:
-        r["reasoning_path"] = (
-            attributions.get(r["note_id"]) if r["source"] == "ppr" else None
-        )
-
-    # Instrumentation: record note hits for future relevance learning
-    _record_hits(query, results, mode)
-
-    return {
-        "query": query,
-        "notes": results,
-        "chars_used": chars_used,
-        "char_budget": char_budget,
-    }
+    return _assemble(
+        query=query,
+        db_path=_DB_PATH,
+        vault_root=_vault_root,
+        graph=g,
+        model=_get_model(),
+        mode=mode,
+        seed_k=seed_k,
+        char_budget=char_budget,
+        top_k=50,
+        attr_top_n=15,
+    )
 
 
 @app.tool()
@@ -414,116 +320,32 @@ def retrieve_assemble(
     return _assemble_context_impl(query, seed_k, char_budget, mode)
 
 
-def _assemble_context_with_profile(
+def _retrieve_with_profile(
     query: str,
     profile_id: str,
     seed_k: int = 5,
-    char_budget: int = 6000,
     top_k: int = 10,
+    char_budget: int = 0,
 ) -> dict:
-    """Profile-aware retrieval. Parallel to _assemble_context_impl but driven
-    by a CognitiveProfile (Stage 5.5+). Used by council_retrieve and by the
-    future profile-aware retrieve_assemble (Stage 5.5.3, Code session).
-
-    Returns a dict with the same shape as assemble_context, plus profile_id.
-    Truncated to `top_k` notes (council mode wants tight per-profile lists).
-    """
-    from kbai.cognitive_routing import apply_profile, load_profile
-
+    """Profile-aware entry point → kbai.retrieve.assembler (Stage 5.5.3).
+    Replaces the deleted _assemble_context_with_profile. char_budget=0 keeps
+    content=None for council callers; pass char_budget>0 for content-loading callers."""
+    from kbai.cognitive_routing import load_profile
+    from kbai.retrieve.assembler import assemble_context as _assemble
     profile = load_profile(profile_id)
-    g = (
-        _get_graph_exhaustive()
-        if profile.mention_policy == "exhaustive"
-        else _get_graph()
+    g = _get_graph_exhaustive() if profile.mention_policy == "exhaustive" else _get_graph()
+    return _assemble(
+        query=query,
+        db_path=_DB_PATH,
+        vault_root=_vault_root,
+        graph=g,
+        model=_get_model(),
+        profile=profile,
+        seed_k=seed_k,
+        char_budget=char_budget,
+        top_k=top_k,
+        attr_top_n=None,
     )
-
-    base_weights = dict(g.taxonomy_weights)
-    effective = apply_profile(profile, base_weights, base_exclude_types=set())
-
-    model = _get_model()
-    qvec = model.encode(QUERY_PREFIX + query, normalize_embeddings=True)
-    db = sqlite3.connect(_DB_PATH)
-    db.enable_load_extension(True)
-    sqlite_vec.load(db)
-    db.enable_load_extension(False)
-    rows = db.execute(
-        """
-        SELECT v.note_id, v.distance, n.title, n.summary, n.filepath
-        FROM note_vectors v
-        JOIN notes n ON n.id = v.note_id
-        WHERE v.embedding MATCH ? AND k = ?
-        ORDER BY v.distance
-        """,
-        (serialize_embedding(qvec), seed_k),
-    ).fetchall()
-    db.close()
-
-    seed_meta: dict[str, dict] = {}
-    seed_scores: dict[str, float] = {}
-    for nid, dist, title, summary, fp in rows:
-        sim = max(0.0, 1.0 - float(dist))
-        seed_scores[nid] = sim
-        seed_meta[nid] = {"title": title, "summary": summary, "filepath": fp}
-
-    # Profile-driven PPR — exclude_types AND weight overrides applied.
-    ppr_scores = g.ppr_expand(
-        seed_scores,
-        exclude_types=effective["effective_exclude_types"],
-        weight_overrides=profile.edge_weight_overrides,
-    )
-
-    ranked = sorted(
-        ((nid, score) for nid, score in ppr_scores.items() if g.exists(nid)),
-        key=lambda x: -x[1],
-    )[:top_k]
-
-    results: list[dict] = []
-    chars_used = 0
-    for nid, ppr in ranked:
-        node = g.node(nid) or {}
-        if nid in seed_meta:
-            title = seed_meta[nid]["title"]
-            summary = seed_meta[nid]["summary"]
-            source = "seed"
-        else:
-            title = node.get("title")
-            summary = node.get("summary")
-            source = "ppr"
-        results.append({
-            "note_id": nid,
-            "title": title,
-            "summary": summary,
-            "content": None,  # council pulls compact summaries; full content is /about's job
-            "composite_score": round(ppr, 4),
-            "source": source,
-            "via_edge": None,
-            "parent": None,
-        })
-
-    # Path attribution — restricted to semantic edges, profile-aware.
-    seed_ids = list(seed_meta.keys())
-    ppr_targets = [r["note_id"] for r in results if r["source"] == "ppr"]
-    path_exclude = {"referenced-in", "untyped"}
-    if profile.contradiction_policy == "suppress":
-        path_exclude.add("contradicts")
-    if profile.mention_policy == "ignore":
-        path_exclude.add("mentioned")
-    attributions = g.path_attributions(seed_ids, ppr_targets, exclude_types=path_exclude)
-    for r in results:
-        r["reasoning_path"] = (
-            attributions.get(r["note_id"]) if r["source"] == "ppr" else None
-        )
-
-    # Reuse existing instrumentation; record under the profile_id as `mode`.
-    _record_hits(query, results, f"profile:{profile_id}")
-
-    return {
-        "query": query,
-        "profile_id": profile_id,
-        "notes": results,
-        "chars_used": chars_used,
-        "char_budget": char_budget,
-    }
 
 
 @app.tool()
@@ -538,7 +360,7 @@ def cognition_retrieve_as(
     Note: this is the single-profile version; for multi-profile council see
     council_retrieve."""
     try:
-        return _assemble_context_with_profile(
+        return _retrieve_with_profile(
             query=query, profile_id=profile_id, seed_k=seed_k, top_k=top_k
         )
     except FileNotFoundError as e:
@@ -566,7 +388,7 @@ def council_retrieve(
 
     def _retrieve_fn(q: str, pid: str, k: int) -> list[ContextNote]:
         try:
-            out = _assemble_context_with_profile(
+            out = _retrieve_with_profile(
                 query=q, profile_id=pid, seed_k=seed_k, top_k=k,
             )
         except FileNotFoundError:

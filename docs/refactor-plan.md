@@ -205,7 +205,7 @@ All green → tag `stage-0` → start Stage 1.
 - Council differentiation proven on synthetic graph: weight_overrides demonstrably re-rank PPR (test_skeptic_admits_contradicts_and_boosts_E, test_explorer_boost_raises_C).
 - Live smoke test ran council_retrieve against the real vault graph successfully.
 - New `council_events` SQLite table — feedback signal accumulating from `/council` calls.
-- `_assemble_context_impl` (the existing single-profile entry point) was NOT touched. Stage 5.5.3 in Code can proceed cleanly.
+- `_assemble_context_impl` was NOT touched in this session. Stage 1.4+5.5.3 unified it in the subsequent Code session (see verification below).
 
 **Stage 1 partial verification** (✅ 2026-05-10):
 - pyproject.toml declares `kbai`, `minivinnymcp`, `perplexitymcp`, `writeagentmcp` as installable packages (not yet installed).
@@ -213,6 +213,14 @@ All green → tag `stage-0` → start Stage 1.
 - `_find_note_file` deduplicated — both servers shim to `kbai/storage/note_io.py::find_note_file`. 9 new tests cover path-input, node-metadata, rglob fallback, and missing-file cases.
 - **104/104 tests passing**, no regression.
 - **Deferred to Claude Code**: 1.2 (graph_loader/vault_search physical moves), 1.4 (assemble_context decomposition), 1.5 (trace verification). These need a fresh-context session for safety.
+
+**Stage 1.4 + 5.5.3 combined verification** (✅ 2026-05-10):
+- **153/153 tests passing** (no regression).
+- `kbai/retrieve/{dense,ppr,path,assembler}.py` extracted. `assembler.assemble_context` is the single retrieval entry point for both legacy `mode=` and new `profile_id=` callers.
+- `_assemble_context_impl` reduced to a 12-line wrapper; `_assemble_context_with_profile` deleted; replaced by `_retrieve_with_profile` (11 lines). `council_retrieve` and `cognition_retrieve_as` now call the unified assembler.
+- `kbai/cognitive_routing/profiles/exhaustive.yaml` added (auto-discovered by registry glob).
+- **Trace verification**: 30 (mode × query) top-10 ID lists are byte-identical before/after refactor. All composite scores within 1% (in practice: exact match). Before-traces stored at `/tmp/before-full.json`; diff script confirms PASS.
+- Legacy `mode=` path suppresses profile weight_overrides (forced `{}`) to preserve score parity for one deprecation cycle. `profile_id=` path applies full profile semantics including weight overrides.
 
 ---
 
@@ -228,8 +236,8 @@ All green → tag `stage-0` → start Stage 1.
 - ☑ Item 1.1 — pyproject.toml metadata declared (no `pip install -e` yet — Stage 1.4 will trigger)
 - ◐ Item 1.2 — partial: connect_suggest impls physically moved into `kbai/analytics/`. Graph/embed/parser moves deferred to Code session (heavy file shuffles)
 - ☑ Item 1.3 — `_find_note_file` deduped; both servers shim to `kbai/storage/note_io.py`
-- ☐ Item 1.4 — `_assemble_context_impl` decomposition into `kbai/retrieve/{dense,ppr,path,assembler}.py` (heavy refactor — defer to Code)
-- ☐ Item 1.5 — baseline traces match within 1% (Item 7 runner is the check)
+- ☑ Item 1.4 — `_assemble_context_impl` decomposed into `kbai/retrieve/{dense,ppr,path,assembler}.py`; server.py wrappers ≤12 lines each
+- ☑ Item 1.5 — baseline traces verified: 30 (mode×query) top-10 ID lists IDENTICAL, scores within 1%
 
 ### Stage 2 — typed contracts
 - `kbai/contracts.py` Pydantic models: RetrievalResult, Context, Note, Edge,
@@ -287,9 +295,10 @@ class CognitiveProfile(BaseModel):
 
 - ☐ 5.5.1 — `kbai/cognitive_routing/{profile.py, registry.py, applier.py}`
 - ☐ 5.5.2 — Profile registry: YAML files at `kbai/cognitive_routing/profiles/*.yaml`
-- ☐ 5.5.3 — Refactor `_assemble_context_impl` to take `profile_id` (default `"default"`).
-  Old `mode` arg maps to profile (`"standard"→"default"`, `"sparring"→"skeptic"`)
-  for one deprecation cycle.
+- ☑ 5.5.3 — `_assemble_context_impl` and `_assemble_context_with_profile` merged into ONE
+  code path via `kbai/retrieve/assembler.assemble_context`. `mode=` maps to profile for
+  graph/exclude logic only (weight overrides suppressed on legacy path for score parity).
+  `_assemble_context_with_profile` deleted; replaced by `_retrieve_with_profile`.
 - ☐ 5.5.4 — Apply overrides to PPR transition matrix + path_exclude set
 - ☐ 5.5.5 — New tools: `cognition_list_profiles`, `cognition_get_profile`, `cognition_retrieve_as`
 - ☐ 5.5.6 — Slash command `/think <profile> <query>`

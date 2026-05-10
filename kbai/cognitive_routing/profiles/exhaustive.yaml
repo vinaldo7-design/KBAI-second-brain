@@ -1,0 +1,16 @@
+profile_id: exhaustive
+display_name: Exhaustive
+schema_version: 1
+edge_weight_overrides: {}
+contradiction_policy: allow
+mention_policy: exhaustive
+path_length_preference: deep
+abstraction_preference: balanced
+restart_bias_tags: {}
+confidence_threshold: 0.0
+notes: |
+  Deep-audit lens. Admits all edge types including mentioned and contradicts,
+  so the PPR walk surfaces weakly-connected notes that standard/sparring miss.
+  Returned results include low-signal (mentioned-only) neighbours.
+  Maps from legacy mode="exhaustive". Callers must supply the exhaustive graph
+  (VaultGraph loaded with include_mentioned=True).
