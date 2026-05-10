@@ -340,6 +340,46 @@ They share the same retrieval primitive.
   with Jaccard divergence_score. 8 tests (identical/disjoint/partial/three-profile/shape/registration).
 - ☑ 5.6.10 — Slash command `/compare-thinkers <p1>+<p2>[+<p3>] <query>` (`claude/commands/compare-thinkers.md`).
 
+### Stage 9 — UX layer (personal slash commands + fuzzy resolution)
+
+Goal: make the vault feel like a personal assistant, not a retrieval API.
+Three deliverables: fuzzy note resolution, recent-activity tools, and a personal command suite.
+
+#### 9.1 — Fuzzy note resolution (`kbai/storage/note_resolver.py`)
+- ☑ `resolve_note_ref(query, vault_search_fn, exists_fn) -> dict`
+  Four tiers: exact / fuzzy(>=0.7) / ambiguous(0.4-0.7) / no_match(<0.4)
+- ☑ 15 tests (`test_note_resolver.py`) — all tiers, boundary conditions, spy test
+
+#### 9.2 — Recent-activity MCP tool
+- ☑ `recent_notes(limit, since_ts, topic) -> list[dict]` in `minivinnymcp/server.py`
+  Walks vault, skips system dirs (.obsidian/.trash/Templates/07-attachments)
+  Returns `{note_id, title, modified_ts, modified_iso, summary}`
+- ☑ 16 tests (`test_recent_notes.py`) — ordering, since_ts, topic, limit, skip-dirs, MCP registration
+
+#### 9.3 — Personal slash command suite (10 new commands)
+- ☑ `/find` — vault_search top_k=5, compact table, wait for pick
+- ☑ `/recent [N]` — recent_notes(limit=N), relative timestamps (Xm/Xh/Xd ago)
+- ☑ `/today` — recent_notes(since_ts=midnight), "Nothing touched today" fallback
+- ☑ `/touched <topic>` — recent_notes(limit=20, topic=...), topic substring filter
+- ☑ `/morning` — 5 recent + summaries + council suggestion (experimental read-only briefing)
+- ☑ `/pressure-test <note>` — Step 0 resolve → sparring challenge → council if contradicts → edit suggestions
+- ☑ `/verify <claim>` — research_verify_claim, verdict/confidence/evidence render
+- ☑ `/cluster-research <map_id>` — 14-day guard → research_cluster → apply on confirm
+- ☑ `/connect` — analytics_connect_suggest, 5 categories, preview only
+- ☑ `/capture <idea>` — assemble_context → draft note proposal, preview only, no writes
+
+#### 9.4 — Fuzzy Step 0 on 6 existing commands
+- ☑ `about.md` — Step 0 added (resolve before get_note_with_context)
+- ☑ `research.md` — Step 0 added (resolve before cost guard)
+- ☑ `ops.md` — Step 0 added
+- ☑ `analogies.md` — Step 0 added
+- ☑ `paths.md` — Step 0 added (resolve both IDs independently)
+- ☑ `challenge.md` — Step 0 added
+
+Note: `/morning` is marked experimental — it chains multiple tool calls and relies on
+`get_note_with_context` returning summaries. If note summaries are sparse, enrich via
+`/research` on high-hit notes before relying on morning briefing.
+
 ### Stage 6 — eval harness production
 - Wire `eval/run_retrieval_eval.py` into pre-push hook (mandatory).
 - GitHub Actions PR gate: MRR drop > 5% blocks merge.

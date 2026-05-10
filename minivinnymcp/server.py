@@ -490,6 +490,45 @@ def cognition_compare_profiles(
     return result.model_dump()
 
 
+_SKIP_DIRS = {".obsidian", ".trash", "Templates", "07-attachments", "__pycache__", ".git"}
+
+
+@app.tool()
+def recent_notes(limit: int = 10, since_ts: float | None = None, topic: str | None = None) -> list[dict]:
+    """Return recently modified vault notes, newest first.
+
+    Args:
+        limit:    Max notes to return (default 10).
+        since_ts: Unix timestamp lower bound (inclusive). None = no lower bound.
+        topic:    If set, filter to notes whose filename or first heading contains
+                  this string (case-insensitive).
+    """
+    results = []
+    for md_file in _vault_root.rglob("*.md"):
+        # Skip system directories
+        if any(part in _SKIP_DIRS for part in md_file.parts):
+            continue
+        try:
+            mtime = md_file.stat().st_mtime
+        except OSError:
+            continue
+        if since_ts is not None and mtime < since_ts:
+            continue
+        note_id = md_file.stem
+        if topic and topic.lower() not in note_id.lower():
+            continue
+        results.append({
+            "note_id": note_id,
+            "title": note_id.replace("-", " ").title(),
+            "modified_ts": mtime,
+            "modified_iso": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(mtime)),
+            "summary": None,
+        })
+
+    results.sort(key=lambda x: x["modified_ts"], reverse=True)
+    return results[:limit]
+
+
 @app.tool()
 def analytics_connect_suggest(categories: list[str] | None = None) -> dict:
     """Read-only link-suggestion analytics over the vault graph. Returns ranked
