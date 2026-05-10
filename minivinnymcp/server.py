@@ -68,16 +68,9 @@ def _get_pagerank() -> dict[str, float]:
 
 
 def _find_note_file(note_id: str, node: dict) -> Path | None:
-    """Resolve a note to its filesystem path. Tries node metadata first, then vault scan."""
-    for key in ("filepath", "file_path", "path"):
-        fp = node.get(key)
-        if fp:
-            p = _vault_root / fp
-            if p.exists():
-                return p
-    for p in _vault_root.rglob(f"{note_id}.md"):
-        return p
-    return None
+    """Thin shim over kbai.storage.note_io.find_note_file (Stage 1 dedup)."""
+    from kbai.storage.note_io import find_note_file
+    return find_note_file(note_id, _vault_root, node)
 
 
 def _record_hits(query: str, results: list[dict], mode: str) -> None:

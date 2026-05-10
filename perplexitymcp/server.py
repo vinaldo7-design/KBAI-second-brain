@@ -59,14 +59,11 @@ Do not include any extra keys or commentary. The top-level value MUST be an obje
 # --- Note resolution ------------------------------------------------------
 
 def _find_note_file(note_id: str) -> Path | None:
-    """Resolve note_id to filesystem path. Accepts bare id, relative path, or absolute path."""
-    if "/" in note_id or note_id.endswith(".md"):
-        p = (_VAULT_ROOT / note_id) if not Path(note_id).is_absolute() else Path(note_id)
-        if p.exists():
-            return p
-    for p in _VAULT_ROOT.rglob(f"{note_id}.md"):
-        return p
-    return None
+    """Thin shim over kbai.storage.note_io.find_note_file (Stage 1 dedup)."""
+    import sys
+    sys.path.insert(0, str(_VAULT_ROOT))
+    from kbai.storage.note_io import find_note_file
+    return find_note_file(note_id, _VAULT_ROOT)
 
 
 def _load_graph() -> dict | None:
