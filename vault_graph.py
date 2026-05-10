@@ -10,8 +10,9 @@ Emits a single JSON file with three top-level keys:
     edges      — typed directed edges between notes
     validation — orphans, broken links, schema drift
 
-Edge types (closed set):
+Edge types (closed set, see vault_taxonomy.yaml):
     builds-on, builds-toward, contradicts, analogous-to,
+    exemplifies, challenges, operationalises,
     referenced-in, untyped, mentioned
 """
 
@@ -32,11 +33,17 @@ SKIP_DIRS = {"Templates", "07-attachments", ".obsidian", ".trash"}
 SKIP_FILES = {"CLAUDE.md", "CLAUDE-static.md", "README.md"}
 
 # Maps a section heading (lowercased, stripped) to an edge type.
+# This is a fallback — vault_taxonomy.yaml is canonical and is loaded at runtime
+# by load_taxonomy(). Keep this dict in sync with the yaml so the parser still
+# works if the yaml file is missing.
 TYPED_LINK_SECTIONS = {
     "builds on": "builds-on",
     "builds toward": "builds-toward",
     "contradicts": "contradicts",
     "analogous to": "analogous-to",
+    "exemplifies": "exemplifies",
+    "challenges": "challenges",
+    "operationalises": "operationalises",
     "referenced in maps": "referenced-in",
 }
 

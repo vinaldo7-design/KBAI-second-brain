@@ -24,7 +24,14 @@ _TAXONOMY_PATH = _vault_root / "vault_taxonomy.yaml"
 
 _model: SentenceTransformer | None = None
 _graph: VaultGraph | None = None
+_graph_exhaustive: VaultGraph | None = None
 _pagerank: dict[str, float] | None = None
+
+# Retrieval modes (Stage 0 item 3 — formalised cognitive routing precursor).
+# - standard:   contradicts + mentioned excluded from PPR walk + path attribution
+# - sparring:   contradicts allowed; mentioned still excluded
+# - exhaustive: deep audit; mentioned edges loaded into graph and walked
+RETRIEVAL_MODES = ("standard", "sparring", "exhaustive")
 
 
 def _get_model() -> SentenceTransformer:
@@ -39,6 +46,14 @@ def _get_graph() -> VaultGraph:
     if _graph is None:
         _graph = VaultGraph.load(str(_GRAPH_PATH))
     return _graph
+
+
+def _get_graph_exhaustive() -> VaultGraph:
+    """Loaded with include_mentioned=True. Used only by mode='exhaustive'."""
+    global _graph_exhaustive
+    if _graph_exhaustive is None:
+        _graph_exhaustive = VaultGraph.load(str(_GRAPH_PATH), include_mentioned=True)
+    return _graph_exhaustive
 
 
 def _get_pagerank() -> dict[str, float]:
@@ -66,35 +81,17 @@ def _find_note_file(note_id: str, node: dict) -> Path | None:
 
 
 def _record_hits(query: str, results: list[dict], mode: str) -> None:
-    """Fire-and-forget: append surfaced notes to note_hits for future relevance learning."""
-    query_hash = hashlib.md5(query.encode()).hexdigest()[:12]
-    ts = int(time.time())
-    try:
-        db = sqlite3.connect(_DB_PATH)
-        db.execute(
-            """CREATE TABLE IF NOT EXISTS note_hits (
-                query_hash TEXT,
-                note_id    TEXT,
-                rank       INTEGER,
-                mode       TEXT,
-                ts         INTEGER
-            )"""
-        )
-        db.executemany(
-            "INSERT INTO note_hits VALUES (?,?,?,?,?)",
-            [(query_hash, r["note_id"], i, mode, ts) for i, r in enumerate(results)],
-        )
-        db.commit()
-        db.close()
-    except Exception:
-        pass  # never block the main pipeline on instrumentation failure
+    """Fire-and-forget: thin shim over kbai.instrumentation.record_note_hits.
+    Preserves the legacy note_hits schema; also captures query text into
+    query_log so the golden-set sampler can recover queries by hash."""
+    from kbai.instrumentation import record_note_hits
+    record_note_hits(_DB_PATH, query=query, results=results, mode=mode)
 
 
 app = FastMCP("mini-vinny")
 
 
-@app.tool()
-def vault_search(query: str, top_k: int = 5) -> list[dict]:
+def _vault_search_impl(query: str, top_k: int = 5) -> list[dict]:
     """Semantic search over vault note summaries."""
     qvec = _get_model().encode(QUERY_PREFIX + query, normalize_embeddings=True)
 
@@ -125,6 +122,18 @@ def vault_search(query: str, top_k: int = 5) -> list[dict]:
         }
         for nid, dist, title, summary, fp in rows
     ]
+
+
+@app.tool()
+def vault_search(query: str, top_k: int = 5) -> list[dict]:
+    """[legacy alias of retrieve_search] Semantic search over vault note summaries."""
+    return _vault_search_impl(query, top_k)
+
+
+@app.tool()
+def retrieve_search(query: str, top_k: int = 5) -> list[dict]:
+    """Semantic search over vault note summaries."""
+    return _vault_search_impl(query, top_k)
 
 
 @app.tool()
@@ -224,8 +233,7 @@ def audit_taxonomy(check_type: str, against_type: str) -> list[dict]:
     return results
 
 
-@app.tool()
-def get_note_with_context(note_id: str) -> dict:
+def _get_note_with_context_impl(note_id: str) -> dict:
     """Read a note's full markdown content plus its typed graph neighbourhood.
     Tier 3 retrieval — use after vault_search or graph_expand have identified a note."""
     g = _get_graph()
@@ -257,17 +265,31 @@ def get_note_with_context(note_id: str) -> dict:
 
 
 @app.tool()
-def assemble_context(
+def get_note_with_context(note_id: str) -> dict:
+    """[legacy alias of notes_get_with_context] Read a note + typed neighbourhood."""
+    return _get_note_with_context_impl(note_id)
+
+
+@app.tool()
+def notes_get_with_context(note_id: str) -> dict:
+    """Read a note's full markdown content plus its typed graph neighbourhood."""
+    return _get_note_with_context_impl(note_id)
+
+
+def _assemble_context_impl(
     query: str,
     seed_k: int = 5,
     char_budget: int = 12000,
     mode: str = "standard",
 ) -> dict:
     """Full hybrid retrieval pipeline: vector seed → Personalized PageRank over
-    typed graph → char budget cap. mode='standard' excludes contradicts edges
-    from the PPR walk; mode='sparring' includes them for challenge/counterargument
-    queries. Primary synthesis entry point."""
-    g = _get_graph()
+    typed graph → char budget cap.
+    - mode='standard' (default): excludes contradicts + mentioned edges
+    - mode='sparring': includes contradicts; excludes mentioned
+    - mode='exhaustive': deep audit, allows mentioned edges (low-signal flagged)"""
+    if mode not in RETRIEVAL_MODES:
+        mode = "standard"
+    g = _get_graph_exhaustive() if mode == "exhaustive" else _get_graph()
     model = _get_model()
 
     # Tier 1: vector seed
@@ -296,8 +318,13 @@ def assemble_context(
         seed_meta[nid] = {"title": title, "summary": summary, "filepath": fp}
 
     # Tier 2: PPR over typed graph seeded by dense retrieval scores.
-    # contradicts excluded in standard mode — only activated under sparring.
-    exclude = {"contradicts"} if mode == "standard" else set()
+    # Mode-gated edge exclusion (cognitive routing precursor).
+    if mode == "standard":
+        exclude = {"contradicts", "mentioned"}
+    elif mode == "sparring":
+        exclude = {"mentioned"}
+    else:  # exhaustive
+        exclude = set()
     ppr_scores = g.ppr_expand(seed_scores, exclude_types=exclude)
 
     # Build ranked list: top 50 by PPR score, skip broken nodes
@@ -346,11 +373,12 @@ def assemble_context(
     # Path attribution for top 15 PPR-sourced notes
     seed_ids = list(seed_meta.keys())
     ppr_targets = [r["note_id"] for r in results[:15] if r["source"] == "ppr"]
-    path_exclude = (
-        {"contradicts", "referenced-in", "untyped", "mentioned"}
-        if mode == "standard"
-        else {"referenced-in", "untyped", "mentioned"}
-    )
+    if mode == "standard":
+        path_exclude = {"contradicts", "referenced-in", "untyped", "mentioned"}
+    elif mode == "sparring":
+        path_exclude = {"referenced-in", "untyped", "mentioned"}
+    else:  # exhaustive — admit mentioned edges; still drop pure-structural noise
+        path_exclude = {"referenced-in", "untyped"}
     attributions = g.path_attributions(seed_ids, ppr_targets, exclude_types=path_exclude)
     for r in results:
         r["reasoning_path"] = (
@@ -366,6 +394,41 @@ def assemble_context(
         "chars_used": chars_used,
         "char_budget": char_budget,
     }
+
+
+@app.tool()
+def assemble_context(
+    query: str,
+    seed_k: int = 5,
+    char_budget: int = 12000,
+    mode: str = "standard",
+) -> dict:
+    """[legacy alias of retrieve_assemble] Full hybrid retrieval pipeline."""
+    return _assemble_context_impl(query, seed_k, char_budget, mode)
+
+
+@app.tool()
+def retrieve_assemble(
+    query: str,
+    seed_k: int = 5,
+    char_budget: int = 12000,
+    mode: str = "standard",
+) -> dict:
+    """Full hybrid retrieval pipeline: vector seed → Personalized PageRank over
+    typed graph → char budget cap. mode='standard' excludes contradicts edges
+    from the PPR walk; mode='sparring' includes them for challenge/counterargument
+    queries. Primary synthesis entry point."""
+    return _assemble_context_impl(query, seed_k, char_budget, mode)
+
+
+@app.tool()
+def analytics_connect_suggest(categories: list[str] | None = None) -> dict:
+    """Read-only link-suggestion analytics over the vault graph. Returns ranked
+    candidates per category. Does NOT mutate the vault — apply via Write Agent.
+    Categories: orphan_rescue, missing_bidir, tag_cluster_gaps, force_fit_retype,
+    low_centrality_high_substance. Pass None for all categories."""
+    from kbai.analytics.connect_suggest import connect_suggest
+    return connect_suggest(_get_graph(), categories)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,12 @@
+{
+  "_comment": "Stage 0 stub. Add this block to mcpServers in claude_desktop_config.json once Stage 3 makes the Write Agent functional.",
+  "mcpServers": {
+    "write-agent": {
+      "command": "python",
+      "args": ["-m", "writeagentmcp.server"],
+      "env": {
+        "VAULT_ROOT": "/path/to/vault"
+      }
+    }
+  }
+}
