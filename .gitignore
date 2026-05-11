@@ -34,3 +34,26 @@ env/
 
 # OS
 .DS_Store
+
+# Scratch / untitled / personal noise in vault root
+Untitled*
+ggg.md
+life shit.md
+.trash/
+
+# Volatile local state — cursor positions, panel layouts, machine-local settings
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.claude/settings.local.json
+
+# Test cache
+.pytest_cache/
+
+# Stage 5.6 / Stage 9 runtime DBs (regenerable)
+06-Maps/perplexity-research.db
+06-Maps/instrumentation.db
+06-Maps/voice-profiles/
+
+# Build / packaging
+build/
+dist/

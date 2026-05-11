@@ -1,306 +1,365 @@
-# Mini Vinny
+# Mini Vinny / KBAI
 
-A personal AI knowledge agent built on top of an Obsidian second brain. Combines a typed knowledge graph with local semantic search and Personalized PageRank retrieval to power graph-aware synthesis via Claude — with optional Perplexity Deep Research as an external annotator.
+A personal AI knowledge agent over an Obsidian vault. Four agent roles, one
+typed graph, two fidelity axes (voice and **thinking**). Designed to make
+me think with my own writing as the prior — not to be a chatbot, not a RAG
+demo.
 
-Built by [@vinaynair](https://github.com/vinaynair). Companion to the [Substack](https://substack.com) essay series on AI governance, architectural restraint, and building minimum capable systems.
-
----
-
-## What It Does
-
-The vault is an Obsidian knowledge graph — atomic notes connected by typed edges encoding semantic relationships (`builds-on`, `contradicts`, `analogous-to`, etc.). Mini Vinny is the AI layer on top: it retrieves structurally coherent context from the graph using a hybrid pipeline (dense embedding seed → typed-graph PPR walk → semantic-path attribution) and passes it to Claude for synthesis, sparring, or essay drafting.
-
-Two MCP servers, each scoped to one concern:
-
-**`mini-vinny`** — vault retrieval. Semantic search, typed graph traversal, PPR-based context assembly, taxonomy auditing.
-
-**`perplexity-research`** — external annotator. Calls Perplexity Deep Research on a single note, returns structured findings (sources, claim checks, cross-links, open questions) for explicit user review before any patch lands.
-
-Strict separation between the two: vault is authoritative for your own thinking; Perplexity adds external citations and current developments without ever rewriting your prose.
+Built by [@vinaynair](https://github.com/vinaynair). Local-first.
+Privacy-preserving where possible. Opinionated about boundaries.
 
 ---
 
-## Architecture
+## What it is
 
-```
-┌────────────────────┐  ┌────────────────────┐
-│   mini-vinny MCP   │  │ perplexity-research│
-│                    │  │       MCP          │
-│ - vault_search     │  │                    │
-│ - graph_expand     │  │ - research_note    │
-│ - audit_taxonomy   │  │ - apply_research   │
-│ - get_note_with    │  │                    │
-│   _context         │  └─────────┬──────────┘
-│ - assemble_context │            │
-└─────────┬──────────┘            │
-          │                       │
-          ▼                       ▼
-┌─────────────────────┐  ┌──────────────────┐
-│  06-Maps/           │  │  Perplexity API  │
-│  ├ vault-graph.json │  │  sonar-deep-     │
-│  ├ vault-embeddings │  │  research        │
-│  │   .db (sqlite-   │  └──────────────────┘
-│  │   vec + hits)    │
-│  └ perplexity-      │
-│    research.db      │
-└─────────────────────┘
-```
+The vault is the substrate. Notes are markdown with YAML frontmatter and
+typed wikilinks (`builds-on`, `contradicts`, `analogous-to`, `exemplifies`,
+`challenges`, `operationalises`, plus structural `referenced-in`, `untyped`,
+`mentioned`). The graph IS the vocabulary; structured links are how meaning
+travels.
 
----
+On top of the vault sit four agents with clean scopes:
 
-## Build phases
-
-**Phase 1 — Typed graph parser** (`vault_graph.py`, `vault_graph_loader.py`)
-Parses Obsidian markdown into a typed JSON graph. Notes become nodes; wikilinks under typed headings become directed edges with semantic types. Queryable via networkx — neighbours, centrality, paths, edge distribution, orphan detection.
-
-**Phase 2 — Local semantic search** (`vault_embed.py`, `vault_search.py`)
-Embeds note summaries with `BAAI/bge-small-en-v1.5` (384-dim, ~33MB, fully offline). Stored in `sqlite-vec`. Vocabulary-agnostic retrieval over summaries.
-
-**Phase 3 — Graph self-analysis** (`vault_connect_suggest.py`)
-Surfaces missing connections: orphan rescue, missing bidirectional edges, tag-cluster gaps, force-fit re-typing candidates. Triage list, not action list.
-
-**Phase 4 — MCP servers**
-
-*Milestone 1* — `vault_search` exposed via MCP.
-
-*Milestone 2* — `graph_expand`, `audit_taxonomy`. Edge weights driven by `vault_taxonomy.yaml`.
-
-*Milestone 3* — `get_note_with_context`, `assemble_context` (vector seed + 1-hop expansion + composite ranking).
-
-*Milestone 3.5* — **PPR upgrade.** Replaces 1-hop expansion with edge-type-aware Personalized PageRank seeded by dense-retrieval scores. Adds intent-aware path attribution (`reasoning_path` field on top-15 results) using semantic-density Dijkstra over inverted taxonomy weights. Adds `mode="standard"|"sparring"` to gate `contradicts` edges in/out of the walk. Cheap usage instrumentation (`note_hits` table) accumulates query→note co-occurrence data for future TERAG-style soft priors.
-
-*Milestone 3.6* — **Perplexity research MCP.** Separate package (`perplexitymcp/`) calling Perplexity Deep Research. Two tools (`research_note`, `apply_research`) with strict provenance discipline — findings go into clearly-marked `## External research (Perplexity, YYYY-MM-DD)` sections, never overwriting existing prose. Vault cross-link auto-matching via fuzzy title resolution. Sidecar SQLite log tracks per-note research history for cost-aware re-call decisions.
-
----
-
-## MCP Tool Reference
-
-### `mini-vinny`
-
-| Tool | Purpose |
+| Role | Owns |
 |---|---|
-| `vault_search(query, top_k)` | Pure semantic search over note summaries. Cosine similarity ranking. |
-| `graph_expand(note_id, max_hops)` | Typed graph traversal from a note. Returns neighbours sorted by edge weight. |
-| `audit_taxonomy(check_type, against_type)` | Score every edge of `check_type` by cosine similarity to `against_type`'s description. Returns ranked retype candidates. |
-| `get_note_with_context(note_id)` | Full markdown content + immediate typed edge list. Tier-3 retrieval. |
-| `assemble_context(query, seed_k, char_budget, mode)` | Hybrid pipeline. Vector seed → PPR walk over typed graph → semantic-path attribution → char-budget-capped context. `mode="sparring"` includes `contradicts` edges. |
+| **Mini Vinny** | Vault retrieval, graph reasoning, cognitive routing |
+| **Perplexity** | External research, claim verification, no writes |
+| **Write Agent** | The only mutator — every vault write is journaled |
+| **Claude** | Orchestration, voice rendering, human-in-the-loop gates |
 
-### `perplexity-research`
+Two independent fidelity axes layer on top:
 
-| Tool | Purpose |
-|---|---|
-| `research_note(note_id, mode, cluster_hops)` | Call Perplexity Deep Research on a note. Returns structured findings with vault cross-link auto-matching. **Does not modify the note.** |
-| `apply_research(note_id, sources, claim_checks, cross_links, open_questions, raw_summary, include_raw_summary, researched_at)` | Append selected findings to the note as a marked section. Original prose untouched. |
+- **Voice fidelity** (rendering) — same content, different expression.
+- **Thinking fidelity** (retrieval) — same graph, different traversal.
+  Five functional cognitive profiles: `default`, `explorer`, `operator`,
+  `builder`, `skeptic`, plus `exhaustive` for deep audits.
 
----
-
-## Slash Commands
-
-Lives at `~/.claude/commands/` (mirrored in this repo at `claude/commands/`). Each is a self-contained micro-prompt that encodes the right tool sequence per intent.
-
-| Command | What it does |
-|---|---|
-| `/about <note-id>` | Explain a note. PPR biased toward `builds-on`, `exemplifies`, `operationalises`. |
-| `/challenge <note-id>` | Pressure-test. PPR in `sparring` mode, prioritises `contradicts`/`challenges`. |
-| `/ops <note-id>` | Operationalise. Biased toward worked examples and concrete steps. |
-| `/analogies <note-id>` | Cross-domain analogies via `analogous-to` edges. |
-| `/paths <id1> <id2>` | Show the shortest semantic chain between two notes. |
-| `/research <note-id>` | Perplexity Deep Research with cost guard, compact menu, selective apply. |
-| `/audit-edges <type1> <type2>` | Run `audit_taxonomy`, present top retype candidates. |
-| `/voice <name> <query>` | Apply a voice from the voice library to the response. |
-| `/voices` | List available voices with their dimensions and combination hints. |
-
----
-
-## Voice System
-
-Modular, combinable response styling. Voices live at `~/.claude/voices/` (mirrored in this repo at `claude/voices/`). Each voice file declares dimensions (length, structure, register, persona, density), style rules, anti-patterns, and exemplars.
-
-| Voice | Description |
-|---|---|
-| `naval` | Short aphoristic compression, first-principle assertions |
-| `tharoor` | Long erudite argument with multi-clause sentences and historical reference |
-| `bourdain` | Vernacular first-person observation, deeply specific |
-| `clarkson` | Hyperbolic provocation with parenthetical asides |
-| `vinay` | *(reserved)* — pulled live from vault notes tagged `voice-exemplar: true` |
-
-**Single voice:** `/voice naval brief me on governance capital`
-
-**Combination:** `/voice naval+bourdain spar against mastery-trap` — fuses two voices creatively. Combinations are not mechanical merges; they pick dimensions from each voice (e.g. naval's compression + bourdain's observation persona) for the strongest hybrid.
-
-**Adding a voice:** drop a new `.md` file in `claude/voices/` matching the existing format. The slash command picks it up automatically — no code changes.
-
-Voice affects **how** responses are written, not **what** gets retrieved. It sits in front of the PPR/path-attribution pipeline as the final rendering layer.
-
----
-
-## Edge Taxonomy
-
-Defined in `vault_taxonomy.yaml` — the single source of truth for edge types, weights, and collapse rules. Edit the YAML to add or modify types; no code changes required.
-
-| Type | Weight | Meaning |
-|------|--------|---------|
-| `builds-on` | 1.5 | A logically depends on B |
-| `builds-toward` | 1.5 | Reverse of builds-on (collapsed at load time) |
-| `analogous-to` | 1.3 | Same structure across different domains |
-| `contradicts` | 1.2 | Substantive incompatible claims |
-| `exemplifies` | 0.85 | A is a concrete domain instance of abstract principle B |
-| `operationalises` | 0.85 | A is how B becomes practice |
-| `challenges` | 0.80 | A complicates B without full contradiction |
-| `referenced-in` | 0.8 | Note appears in a map (structural, not semantic) |
-| `untyped` | 0.6 | Not yet classified |
-| `mentioned` | 0.3 | Name-dropped without relationship |
-
-Weights act as **transition probabilities** in the PPR walk. High-weight semantic edges propagate relevance; low-weight structural edges contribute less. The taxonomy IS the epistemic prior on what kinds of relationships should carry attention.
-
----
-
-## How retrieval works (first principles)
-
-`assemble_context` runs a four-stage pipeline:
-
-1. **Vector seed.** Encode the query with BGE-small. Cosine-similarity-rank against all note summaries in `sqlite-vec`. Take top `seed_k` as the personalization vector.
-
-2. **Personalized PageRank walk.** Build a weighted DiGraph from the typed graph using taxonomy weights as edge weights. In `standard` mode, drop `contradicts` edges from the walk. Run PPR with `α=0.85` and the seed scores as personalization. The stationary distribution captures both proximity-to-seeds and structural importance in one pass — replacing the hand-tuned 60/40 split of the older composite ranker.
-
-3. **Semantic path attribution.** For top-15 PPR-ranked nodes, run single-source Dijkstra from each seed using **inverted taxonomy weights as edge costs** (so high-weight semantic edges become cheap to traverse). Structural edges (`referenced-in`, `untyped`, `mentioned`) are excluded entirely. The result: each retrieved note carries a `reasoning_path` showing how it connects back to a seed via typed edges. The LLM can narrate it as logic instead of as graph plumbing.
-
-4. **Char-budget cap + instrumentation.** Read full content top-down until the char budget exhausts. Append a row per surfaced note to `note_hits` for future relevance learning. Return the result.
-
----
-
-## Setup
-
-**Requirements**
-- Python 3.11+
-- Conda recommended for environment management
-
-**Install**
-```bash
-git clone https://github.com/vinaldo7-design/KBAI-second-brain.git
-cd KBAI-second-brain
-
-conda create -n minivinnymcp python=3.11 -y
-conda activate minivinnymcp
-
-pip install -r requirements.txt
-pip install -r minivinnymcp/requirements.txt
-pip install -r perplexitymcp/requirements.txt
-```
-
-**Point at your own vault**
-```bash
-export VAULT_ROOT="/path/to/your/obsidian/vault"
-
-python vault_graph.py $VAULT_ROOT      # Build typed graph
-python vault_embed.py $VAULT_ROOT      # Build vector index
-python vault_search.py "your query"    # Test semantic search
-```
-
-**Note structure required** — typed links section with headings matching `vault_taxonomy.yaml`:
-
-```markdown
-## Links
-
-### Builds on
-- [[another-note]] — annotation
-
-### Contradicts
-- [[opposing-note]] — why it opposes
-```
-
-**Wire up Claude Desktop**
-```bash
-# Test the suite
-pytest minivinnymcp/tests/ perplexitymcp/tests/ -v
-
-# Edit the snippets with your Python path + vault path
-# minivinnymcp/claude_desktop_config_snippet.json
-# perplexitymcp/claude_desktop_config_snippet.json   (also: PERPLEXITY_API_KEY)
-
-# Merge into ~/Library/Application Support/Claude/claude_desktop_config.json
-# Restart Claude Desktop — both servers appear under connectors
-```
-
-**Slash commands and voices** are version-controlled in this repo at `claude/commands/` and `claude/voices/`. To activate them in Claude Code, symlink (or copy) into `~/.claude/`:
-
-```bash
-# One-time setup (symlinks track repo updates automatically)
-ln -s "$(pwd)/claude/commands" ~/.claude/commands
-ln -s "$(pwd)/claude/voices"   ~/.claude/voices
-
-# Or copy if you prefer divergence between repo + active versions
-cp claude/commands/*.md ~/.claude/commands/
-cp claude/voices/*.md   ~/.claude/voices/
-```
-
-Reload Claude Code (or restart) to pick them up.
-
----
-
-## Repository Structure
-
-```
-.
-├── vault_graph.py              # Vault parser → typed JSON graph
-├── vault_graph_loader.py       # networkx query layer + ppr_expand + path_attributions
-├── vault_connect_suggest.py    # Graph self-analysis + connection suggestions
-├── vault_embed.py              # Summary embedder (BGE-small → sqlite-vec)
-├── vault_search.py             # Semantic search CLI
-├── vault_taxonomy.yaml         # Edge type definitions (single source of truth)
-├── requirements.txt
-│
-├── minivinnymcp/               # Vault retrieval MCP
-│   ├── server.py               # 5 tools: search, expand, audit, get_note, assemble
-│   ├── requirements.txt
-│   ├── claude_desktop_config_snippet.json
-│   └── tests/
-│       ├── test_vault_search.py
-│       └── test_graph_tools.py        # 27 tests covering PPR, paths, instrumentation
-│
-├── perplexitymcp/              # External research MCP
-│   ├── server.py               # 2 tools: research_note, apply_research
-│   ├── requirements.txt
-│   ├── claude_desktop_config_snippet.json
-│   └── tests/
-│       └── test_perplexity.py         # 21 tests with mocked API
-│
-└── claude/                     # User-global Claude assets (symlink to ~/.claude/)
-    ├── commands/               # 9 slash commands (about, challenge, ops, etc.)
-    └── voices/                 # 4 voice archetypes + README
-```
-
----
-
-## Stack
-
-- **Graph:** `networkx` over `vault-graph.json` (taxonomy-weighted DiGraph)
-- **Vector search:** `sqlite-vec` + `sentence-transformers` (`BAAI/bge-small-en-v1.5`, 384-dim)
-- **MCP servers:** `mcp` Python SDK (FastMCP pattern)
-- **PPR:** `nx.pagerank` with personalization vector + edge weight gating
-- **External research:** Perplexity Sonar Deep Research API
-- **LLM:** Anthropic Claude (Sonnet 4.6) via Claude Desktop
-- **Vault:** Obsidian (markdown + wikilinks)
+The flagship feature is **Council Mode** — running the same query through
+three profiles in parallel (explorer + operator + skeptic), then
+synthesizing with consensus / disagreement structure made explicit.
 
 ---
 
 ## Status
 
-- ✅ Phase 1 — Typed graph parser + query layer
-- ✅ Phase 2 — Local semantic search (sqlite-vec + BGE-small)
-- ✅ Phase 3 — Graph self-analysis (vault_connect_suggest.py)
-- ✅ Phase 4 Milestone 1 — `vault_search` MCP tool
-- ✅ Phase 4 Milestone 2 — `graph_expand` + `audit_taxonomy`
-- ✅ Phase 4 Milestone 3 — `get_note_with_context` + `assemble_context`
-- ✅ Phase 4 Milestone 3.5 — PPR retrieval + path attribution + `note_hits` instrumentation
-- ✅ Phase 4 Milestone 3.6 — Perplexity research MCP server (`research_note`, `apply_research`)
-- ✅ Slash command suite (9 commands) + CLAUDE.md tool discipline section
-- ✅ Voice library (4 archetypes + `/voice`, `/voices` commands, modular + combinable)
-- 🔨 Phase 4 Milestone 4 — `vinay` voice from vault `voice-exemplar: true` notes + auto-routing for non-slash queries
-- 📋 Phase 5 candidates — TERAG soft-prior from `note_hits`, Perplexity cluster mode, AGRAG cost-penalised subgraph selection
+- **22 slash commands** live.
+- **16 MCP tools** across three servers (mini-vinny, perplexity-research,
+  write-agent stub).
+- **164 tests** passing.
+- Stages 0, 1, 2, 4, 5, 5.5, 5.6, 9 shipped. Stage 3 (Write Agent live
+  mutations) deferred until usage demand surfaces. Stage 6/7/8
+  (eval harness + calibration) blocked on accumulated `council_events`
+  data — accumulating organically as the system is used.
+
+See [`docs/refactor-plan.md`](docs/refactor-plan.md) for the full stage
+plan and verification stamps.
 
 ---
 
-## Licence
+## Quick start
 
-MIT
+Requires Python 3.10+ and an Obsidian vault.
+
+```bash
+git clone https://github.com/vinaldo7-design/KBAI-second-brain.git
+cd KBAI-second-brain
+
+python -m venv .venv && source .venv/bin/activate
+pip install -r minivinnymcp/requirements.txt
+pip install -r perplexitymcp/requirements.txt
+pip install -r writeagentmcp/requirements.txt
+pip install pydantic pytest
+
+# Build the typed graph from your vault
+python vault_graph.py /path/to/vault
+
+# Build the embedding index
+python vault_embed.py
+
+# Run the test suite
+VAULT_ROOT=/path/to/vault pytest \
+  minivinnymcp/tests/ perplexitymcp/tests/ writeagentmcp/tests/ -q
+```
+
+### Wiring into Claude Desktop
+
+Three MCP servers, configured in
+`~/Library/Application Support/Claude/claude_desktop_config.json`:
+
+```jsonc
+{
+  "mcpServers": {
+    "mini-vinny": {
+      "command": "/path/to/python",
+      "args": ["-m", "minivinnymcp.server"],
+      "env": { "VAULT_ROOT": "/path/to/vault" }
+    },
+    "perplexity-research": {
+      "command": "/path/to/python",
+      "args": ["-m", "perplexitymcp.server"],
+      "env": {
+        "VAULT_ROOT": "/path/to/vault",
+        "PERPLEXITY_API_KEY": "pplx-…",
+        "PERPLEXITY_MODEL": "sonar-deep-research"
+      }
+    },
+    "write-agent": {
+      "command": "/path/to/python",
+      "args": ["-m", "writeagentmcp.server"],
+      "env": { "VAULT_ROOT": "/path/to/vault" }
+    }
+  }
+}
+```
+
+Snippets in each server's `claude_desktop_config_snippet.json`. Restart
+Claude Desktop after edits — MCP tool list is cached at process start.
+
+### Slash commands
+
+Symlink the versioned commands and voices into your home `~/.claude/`:
+
+```bash
+ln -s "$PWD/claude/commands" ~/.claude/commands
+ln -s "$PWD/claude/voices"   ~/.claude/voices
+```
+
+---
+
+## Slash commands
+
+22 total, organised by intent.
+
+### Discovery
+
+| Command | What it does |
+|---|---|
+| `/find <fuzzy>` | Semantic search; returns top-5 candidates with summaries |
+| `/recent [N]` | Last N notes by modified time (default 10) |
+| `/today` | Notes touched today |
+| `/touched <topic>` | Recent notes filtered by topic |
+| `/morning` | Daily orientation: recent + a /council suggestion *(experimental)* |
+
+### Read / explain
+
+| Command | What it does |
+|---|---|
+| `/about <fuzzy>` | Explain a note + its graph connections |
+| `/analogies <fuzzy>` | Cross-domain parallels |
+| `/ops <fuzzy>` | Operational how-to from a principle note |
+| `/paths <id1> <id2>` | Show how two notes connect through the graph |
+
+### Pressure-test / sparring
+
+| Command | What it does |
+|---|---|
+| `/challenge <fuzzy>` | Counterarguments via skeptic-mode retrieval |
+| `/council <query>` | 3 cognitive profiles + synthesizer; flagship |
+| `/compare-thinkers <p1>+<p2> <query>` | Side-by-side multi-profile compare |
+| `/pressure-test <fuzzy>` | Auto-escalates challenge → council |
+
+### External research
+
+| Command | What it does |
+|---|---|
+| `/research <fuzzy>` | Perplexity Deep Research on one note |
+| `/cluster-research <map-id>` | Map-level cross-cutting research |
+| `/verify <claim>` | Cheap fact-check of a single claim |
+
+### Maintenance
+
+| Command | What it does |
+|---|---|
+| `/audit-edges <type1> <type2>` | Triage edges that may be the wrong type |
+| `/connect <fuzzy>` | Suggest new typed links |
+| `/capture <text>` | Quick idea capture (preview-only until Stage 3) |
+
+### Voice / routing
+
+| Command | What it does |
+|---|---|
+| `/voice <name> <query>` | Apply a voice (orthogonal to retrieval) |
+| `/voices` | List available voices |
+| `/ask <query>` | Deterministic intent router |
+
+Detailed user guide: [`docs/operating-manual.md`](docs/operating-manual.md).
+
+---
+
+## Cognitive profiles (thinking fidelity)
+
+Same graph, different traversal. Edge weights and policies in
+`kbai/cognitive_routing/profiles/*.yaml`.
+
+| Profile | Boosts | Use for |
+|---|---|---|
+| `default` | (none) | Balanced retrieval |
+| `explorer` | `analogous-to`, `exemplifies` | Cross-domain parallels |
+| `operator` | `operationalises`, `exemplifies` | Concrete how-to |
+| `builder` | `builds-on`, `builds-toward` | Genealogy, lineage |
+| `skeptic` | `contradicts`, `challenges` | Counterarguments |
+| `exhaustive` | (admits `mentioned`) | Deep audits |
+
+**No person-named profiles in v1.** A profile named after a person is a
+claim to model a mind. Until calibration (Stage 8) earns one from real
+`council_events` data, only functional lenses ship.
+
+---
+
+## Voice library
+
+Modular and combinable via `+`.
+
+| Voice | Style |
+|---|---|
+| `naval` | Aphoristic compression |
+| `tharoor` | Long erudite argument |
+| `bourdain` | Vernacular observation |
+| `clarkson` | Hyperbolic provocation |
+| `vinay` | Reserved — pulls live from notes tagged `voice-exemplar: true` |
+
+`/voice naval+bourdain explain X` picks dimensions from each rather than
+mechanically merging.
+
+---
+
+## Repository layout
+
+```
+.
+├── kbai/                         # Core library (importable)
+│   ├── analytics/                # Connect-suggest read functions
+│   ├── cognitive_routing/        # Profiles, registry, applier
+│   │   └── profiles/             # YAML profile definitions
+│   ├── council/                  # Council Mode retrieval + overlap
+│   ├── embed/                    # Reindex hooks
+│   ├── eval/                     # Eval scaffolding + sampler
+│   ├── graph/                    # Reindex hooks
+│   ├── instrumentation/          # note_hits, council_events logs
+│   ├── retrieve/                 # dense, ppr, path, assembler
+│   ├── storage/                  # note_io, note_resolver
+│   ├── voice_profile/            # Voice exemplar hashing + cache
+│   └── contracts.py              # Pydantic models for all boundaries
+│
+├── minivinnymcp/                 # Mini Vinny MCP server (read-only)
+├── perplexitymcp/                # Perplexity research MCP server
+├── writeagentmcp/                # Write Agent (stub-only until Stage 3)
+│
+├── claude/
+│   ├── commands/                 # 22 slash commands (mirrored to ~/.claude/)
+│   └── voices/                   # 4 voice archetypes
+│
+├── docs/
+│   ├── refactor-plan.md          # Master plan with stage checkboxes
+│   ├── operating-manual.md       # User guide for daily use
+│   └── stage0-notes.md           # Stage 0 retrospective
+│
+├── eval/                         # Golden-set queries (drafts)
+├── scripts/                      # Pre-push hooks
+│
+├── vault_graph.py                # Vault → typed JSON graph builder
+├── vault_graph_loader.py         # NetworkX wrapper, PPR, paths
+├── vault_embed.py                # BGE → sqlite-vec indexer
+├── vault_search.py               # Embedding search CLI
+├── vault_connect_suggest.py      # Thin CLI over kbai/analytics
+├── vault_taxonomy.yaml           # Closed edge type set
+└── pyproject.toml                # Package metadata (declarative)
+```
+
+---
+
+## Architecture highlights
+
+### Personalized PageRank with edge-type-aware weights
+
+`assemble_context` (now decomposed into `kbai/retrieve/{dense,ppr,path,
+assembler}.py`) runs:
+
+1. Dense vector seed via BGE-small over note summaries.
+2. Edge-type-aware Personalized PageRank (α=0.85), seeded by dense scores.
+3. Path attribution via Dijkstra over inverted taxonomy weights, so
+   high-semantic edges (`builds-on`, `analogous-to`) are preferred over
+   structural ones (`referenced-in`).
+
+Cognitive profiles modify the PPR transition matrix via `weight_overrides`
+— same algorithm, different walk topology.
+
+### Council Mode
+
+The same query runs through 3 profiles in parallel. Returns
+`CouncilEvidence` with consensus / unanimous / unique-to overlap analysis.
+Claude synthesizes per the `/council` slash-command rules:
+
+- Consensus first.
+- Each lens's unique contribution.
+- Skeptic must speak.
+- Disagreement called out explicitly.
+- A recommendation that names how the debate sharpened it.
+
+Every invocation logs to `council_events` — the dataset that makes future
+profile calibration (Stage 8) possible.
+
+### Marked-section discipline
+
+Perplexity output never touches the main body of a note. It lives only
+under `## External research (Perplexity, YYYY-MM-DD)` sections appended
+below `---`. The boundary is enforced architecturally.
+
+### Single-writer invariant
+
+Mini Vinny and Perplexity contain no file-write code. The Write Agent is
+the only mutator and journals every change. Currently in stub mode;
+Stage 3 turns on real mutations when usage demands it.
+
+### Two fidelity axes
+
+Voice changes how an answer reads. Cognitive profiles change what is
+retrieved. They never overlap.
+
+---
+
+## Testing
+
+```bash
+PYTEST=/path/to/.venv/bin/pytest
+
+# Full suite
+$PYTEST minivinnymcp/tests/ perplexitymcp/tests/ writeagentmcp/tests/ -q
+```
+
+Test taxonomy spans:
+
+- L1 unit (single module, no I/O)
+- L2 integration (module ↔ storage adapter)
+- L3 contract (MCP adapter → tool result schema validates against
+  `kbai/contracts.py` Pydantic models)
+- L4 retrieval eval (planned for Stage 6)
+
+Pre-push eval hook stub at `scripts/pre-push-eval.sh`. GitHub Actions
+workflow stub at `.github/workflows/retrieval-eval.yml`.
+
+---
+
+## What this is not
+
+- Not a chatbot. The system is designed to make you disagree with yourself.
+- Not a RAG demo. Retrieval is graph-shaped, typed, and lensed by
+  cognitive profile.
+- Not a productivity tool. No tasks, no kanban, no calendar. Just
+  thinking with your own notes as the prior.
+- Not finished. The architecture is. The calibration isn't — that's a
+  function of usage time, not code.
+
+---
+
+## Companion writing
+
+Substack essay series on architectural restraint, AI governance, and
+building minimum capable systems. The vault is the staging ground; the
+essays are the published artefacts.
+
+---
+
+## License
+
+MIT.
