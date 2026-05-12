@@ -222,7 +222,18 @@ class WriteReceipt(BaseModel):
 
     model_config = _MODEL_CFG
 
-    status: Literal["stub", "applied", "dryrun", "rejected", "error"] = "stub"
+    status: Literal[
+        "stub",
+        "applied",
+        "dryrun",
+        "dry_run",
+        "rejected",
+        "error",
+        "already_present",
+        "patched",
+        "no_section",
+        "missing_file",
+    ] = "stub"
     tool: str
     note_id: str | None = None
     applied: bool = False

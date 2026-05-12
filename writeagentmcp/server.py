@@ -25,6 +25,7 @@ sys.path.insert(0, str(_VAULT_ROOT))
 from kbai.embed.reindex_hooks import update_note_embeddings  # noqa: E402
 from kbai.graph.reindex_hooks import update_note_edges  # noqa: E402
 from kbai.storage.note_creator import create_note  # noqa: E402
+from kbai.storage.research_appender import append_research_section  # noqa: E402
 
 app = FastMCP("write-agent")
 
@@ -60,27 +61,11 @@ def write_create_note(
 def write_append_research_section(
     note_id: str,
     payload: dict,
-    dryrun: bool = True,
+    dryrun: bool = False,
 ) -> dict:
-    """STAGE 0 STUB: previews appending a Perplexity research section.
-    Validates input, returns a stub receipt, never writes. Real impl lands in Item 2."""
-    if not isinstance(note_id, str) or not note_id:
-        return {"error": "note_id must be a non-empty string"}
-    if not isinstance(payload, dict):
-        return {"error": "payload must be a dict"}
-    expected_keys = {"sources", "claim_checks", "cross_links", "open_questions"}
-    reindex_hint_embed = update_note_embeddings(note_id)
-    reindex_hint_graph = update_note_edges(note_id)
-    return _stub_receipt(
-        tool="write_append_research_section",
-        note_id=note_id,
-        target_section="## External research (Perplexity, YYYY-MM-DD)",
-        payload_keys=sorted(payload.keys()),
-        recognised_keys=sorted(expected_keys & set(payload.keys())),
-        dryrun=dryrun,
-        reindex_hint_embed=reindex_hint_embed,
-        reindex_hint_graph=reindex_hint_graph,
-    )
+    """Append a dated 'External research (Perplexity, YYYY-MM-DD)' section to a note.
+    Idempotent per day. Returns a WriteReceipt."""
+    return append_research_section(_VAULT_ROOT, note_id, payload, dryrun).model_dump()
 
 
 @app.tool()
