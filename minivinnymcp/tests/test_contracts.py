@@ -223,19 +223,23 @@ def test_analytics_connect_suggest_output_validates():
 
 
 def test_write_stub_output_validates():
+    # Stage 3: write_append_research_section is real. With a non-existent
+    # note_id it returns status='error' but the receipt shape still
+    # validates against the WriteReceipt contract.
     from writeagentmcp.server import write_append_research_section
-    out = write_append_research_section("some-note", {"sources": []})
+    out = write_append_research_section("some-note-that-does-not-exist-xyz", {"sources": []})
     wr = WriteReceipt(**out)
-    assert wr.status == "stub"
+    assert wr.status in ("error", "applied", "already_present")
     assert wr.applied is False
 
 
 def test_apply_link_suggestions_stub_output_validates():
+    # Stage 3: real implementation. With non-existent source the receipt
+    # is still well-formed (aggregate status=applied, per-row missing_file).
     from writeagentmcp.server import write_apply_link_suggestions
     out = write_apply_link_suggestions([
-        {"source": "a", "target": "b", "edge_type": "builds-on"},
+        {"source": "nonexistent-source-xyz", "target": "b", "edge_type": "builds-on"},
     ])
-    # write_apply_link_suggestions returns a slightly different shape (no note_id);
-    # WriteReceipt's note_id is optional so it still validates
     wr = WriteReceipt(**out)
     assert wr.tool == "write_apply_link_suggestions"
+    assert wr.status in ("applied", "error")
