@@ -234,11 +234,12 @@ def test_write_stub_output_validates():
 
 
 def test_apply_link_suggestions_stub_output_validates():
+    # Stage 3: real implementation. With non-existent source the receipt
+    # is still well-formed (aggregate status=applied, per-row missing_file).
     from writeagentmcp.server import write_apply_link_suggestions
     out = write_apply_link_suggestions([
-        {"source": "a", "target": "b", "edge_type": "builds-on"},
+        {"source": "nonexistent-source-xyz", "target": "b", "edge_type": "builds-on"},
     ])
-    # write_apply_link_suggestions returns a slightly different shape (no note_id);
-    # WriteReceipt's note_id is optional so it still validates
     wr = WriteReceipt(**out)
     assert wr.tool == "write_apply_link_suggestions"
+    assert wr.status in ("applied", "error")
