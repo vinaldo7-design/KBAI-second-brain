@@ -19,6 +19,9 @@ EDGE_HEADING: dict[str, str] = {
     "builds-toward": "### Builds toward",
     "contradicts": "### Contradicts",
     "analogous-to": "### Analogous to",
+    "exemplifies": "### Exemplifies",
+    "challenges": "### Challenges",
+    "operationalises": "### Operationalises",
     "referenced-in-maps": "### Referenced in Maps",
 }
 

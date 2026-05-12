@@ -222,17 +222,20 @@ def apply_link_suggestions(
         )
 
     now = _now_iso()
-    applied_any = any(
-        r.get("status") == "patched" and not r.get("dryrun") for r in results
+    applied_count = sum(
+        1 for r in results if r.get("status") == "patched" and not r.get("dryrun")
     )
     return WriteReceipt(
-        status="applied",
+        status="dryrun" if dryrun else "applied",
         tool=_TOOL,
-        applied=applied_any,
+        applied=applied_count > 0,
         dryrun=dryrun,
         ts=now,
         applied_at=now if not dryrun else None,
-        counts=counts,
+        applied_count=applied_count,
+        already_present=counts["already_present"],
+        no_section=counts["no_section"],
+        missing_file=counts["missing_file"],
+        rejected_count=counts["invalid"],
         results=results,
-        total=len(suggestions),
     )
