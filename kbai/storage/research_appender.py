@@ -42,11 +42,10 @@ def _normalise_payload(payload) -> ResearchPayload | None:
     if isinstance(payload, ResearchPayload):
         return payload
     if isinstance(payload, dict):
-        # note_id is required by ResearchPayload; populate placeholder if absent
         data = dict(payload)
         data.setdefault("note_id", "")
         try:
-            return ResearchPayload(**data)
+            return ResearchPayload.model_validate(data)
         except Exception:
             return None
     return None
@@ -61,26 +60,19 @@ def _fmt_source(s) -> str:
 def _fmt_claim(c) -> str:
     snippet = c.claim_snippet if hasattr(c, "claim_snippet") else c.get("claim_snippet", "")
     verdict = c.verdict if hasattr(c, "verdict") else c.get("verdict", "uncertain")
-    confidence = None
-    if hasattr(c, "model_extra") and c.model_extra:
-        confidence = c.model_extra.get("confidence")
-    if confidence is None and isinstance(c, dict):
-        confidence = c.get("confidence")
-    tail = f" (confidence: {confidence})" if confidence is not None else ""
-    return f"- {snippet} — {verdict}{tail}"
+    return f"- [{verdict}] {snippet}"
 
 
 def _fmt_cross_link(cl) -> str:
-    vault_id = None
-    hint = ""
     if hasattr(cl, "vault_note_id"):
         vault_id = cl.vault_note_id
-        hint = cl.hint_text or ""
+        reason = cl.reason or ""
     else:
         vault_id = cl.get("vault_note_id")
-        hint = cl.get("hint_text") or ""
+        reason = cl.get("reason") or ""
     if vault_id:
-        return f"- [[{vault_id}]]"
+        return f"- [[{vault_id}]] — {reason}" if reason else f"- [[{vault_id}]]"
+    hint = cl.hint_text if hasattr(cl, "hint_text") else cl.get("hint_text", "")
     return f"- {hint}"
 
 
@@ -94,27 +86,32 @@ def _render_section(payload: ResearchPayload, date_str: str) -> str:
     lines: list[str] = [f"## External research (Perplexity, {date_str})", ""]
 
     if payload.sources:
-        lines.append("**Sources**")
+        lines.append("### Sources")
         for s in payload.sources:
             lines.append(_fmt_source(s))
         lines.append("")
 
     if payload.claim_checks:
-        lines.append("**Claim checks**")
+        lines.append("### Claim checks")
         for c in payload.claim_checks:
             lines.append(_fmt_claim(c))
         lines.append("")
 
     if payload.cross_links:
-        lines.append("**Cross-links**")
+        lines.append("### Cross-links")
         for cl in payload.cross_links:
             lines.append(_fmt_cross_link(cl))
         lines.append("")
 
     if payload.open_questions:
-        lines.append("**Open questions**")
+        lines.append("### Open questions")
         for q in payload.open_questions:
             lines.append(_fmt_question(q))
+        lines.append("")
+
+    if payload.raw_summary:
+        lines.append("### Summary")
+        lines.append(payload.raw_summary)
         lines.append("")
 
     return "\n".join(lines).rstrip() + "\n"
