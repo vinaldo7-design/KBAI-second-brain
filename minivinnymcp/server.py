@@ -530,6 +530,36 @@ def recent_notes(limit: int = 10, since_ts: float | None = None, topic: str | No
 
 
 @app.tool()
+def imagine(
+    seed: str,
+    mode: str = "fracture",
+    depth: int = 2,
+    k: int = 5,
+) -> dict:
+    """Propose new research domains by reading cluster shape around a seed
+    note. Returns an ImaginationEvidence bundle — cluster signature + a
+    synthesizer prompt for Claude to consume via the /imagine slash command.
+
+    Reasons over *absence*: what's structurally missing from a cluster.
+
+    Modes (complete compass coverage):
+      extend       sideways  — neighbouring domains that continue the direction
+      fracture     adversarial — rival traditions attacking load-bearing nodes
+      bridge       cross-cluster — distant fields with isomorphic structure
+      deepen       downward — mechanisms underneath the abstract claims
+      historicise  backward — intellectual lineages implicitly inherited
+
+    Args:
+        seed: anchor note_id (or map id)
+        mode: one of extend|fracture|bridge|deepen|historicise
+        depth: BFS hops (default 2)
+        k: number of domains to request (default 5)
+    """
+    from kbai.imagination import imagine as _imagine
+    return _imagine(_get_graph(), seed=seed, mode=mode, depth=depth, k=k)
+
+
+@app.tool()
 def analytics_connect_suggest(categories: list[str] | None = None) -> dict:
     """Read-only link-suggestion analytics over the vault graph. Returns ranked
     candidates per category. Does NOT mutate the vault — apply via Write Agent.
