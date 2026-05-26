@@ -29,8 +29,10 @@ import yaml
 
 # --- Configuration ------------------------------------------------------------
 
-SKIP_DIRS = {"Templates", "07-attachments", ".obsidian", ".trash"}
-SKIP_FILES = {"CLAUDE.md", "CLAUDE-static.md", "README.md"}
+SKIP_DIRS = {"Templates", "07-attachments", ".obsidian", ".trash", "claude", "docs"}
+SKIP_FILES = {"CLAUDE.md", "CLAUDE-static.md", "README.md",
+              "vault-manifest.md", "connect-suggestions.md",
+              "Untitled.md", "ggg.md"}
 
 # Maps a section heading (lowercased, stripped) to an edge type.
 # This is a fallback — vault_taxonomy.yaml is canonical and is loaded at runtime
