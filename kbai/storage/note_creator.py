@@ -27,6 +27,7 @@ from kbai.embed.reindex_hooks import update_note_embeddings
 from kbai.graph.reindex_hooks import update_note_edges
 from kbai.schema import CANONICAL_FIELD_ORDER, validate_frontmatter
 from kbai.storage.write_journal import record_mutation
+from kbai.templates import render_body
 
 
 _TOOL = "write_create_note"
@@ -146,6 +147,13 @@ def create_note(
         )
     except yaml.YAMLError as e:
         return _error_receipt(f"frontmatter is not YAML-serialisable: {e}", note_id)
+
+    # Phase 6a: empty body → render the canonical skeleton for this type.
+    # Non-empty body flows through verbatim (backward-compatible).
+    if body == "":
+        body = render_body(
+            fm["type"], title=str(fm.get("title", "")), summary=str(fm.get("summary", "")),
+        )
 
     content = f"---\n{yaml_block}---\n\n{body}"
 

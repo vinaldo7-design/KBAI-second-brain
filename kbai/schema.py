@@ -23,6 +23,16 @@ DEPRECATED_FRONTMATTER: frozenset[str] = frozenset({"domain", "attachments"})
 # Status — CLAUDE-static.md §6: "Status: seedling | evergreen only"
 ALLOWED_STATUSES: frozenset[str] = frozenset({"seedling", "evergreen"})
 
+# Lifecycle stage — orthogonal to status. Optional field; carries type-specific
+# lifecycle that previously leaked into `status` (capture's `unprocessed`,
+# learning's `processing`, essay's `draft`). Phase 6 introduces this to
+# preserve those distinctions without collapsing them to seedling.
+ALLOWED_LIFECYCLE_STAGES: frozenset[str] = frozenset({
+    "unprocessed", "promoted", "discarded",   # capture
+    "processing", "integrated",               # learning
+    "draft", "published",                     # essay
+})
+
 # Note types — CLAUDE-static.md §4 (templates table) + §6 (concept).
 # `quick-capture` is a template name, not a type value (its template sets
 # `type: capture`), so it is not listed here.
@@ -46,7 +56,7 @@ TAG_PREFIX_LENS = "lens/"
 # fields outside this tuple are appended after, preserving insertion order.
 CANONICAL_FIELD_ORDER: tuple[str, ...] = (
     "id", "title", "created", "updated",
-    "type", "status", "summary", "tags",
+    "type", "status", "lifecycle_stage", "summary", "tags",
 )
 
 
@@ -63,6 +73,7 @@ def validate_frontmatter(fm: dict) -> str | None:
       - `summary` non-empty
       - `status` ∈ ALLOWED_STATUSES
       - `type` ∈ ALLOWED_TYPES
+      - `lifecycle_stage` (if present and non-empty) ∈ ALLOWED_LIFECYCLE_STAGES
       - every tag starts with TAG_PREFIX_TOPIC or TAG_PREFIX_LENS
       - every lens suffix (after TAG_PREFIX_LENS) ∈ ALLOWED_LENSES
     """
@@ -90,6 +101,14 @@ def validate_frontmatter(fm: dict) -> str | None:
         return (
             f"type {note_type!r} not in allowed set: {sorted(ALLOWED_TYPES)}"
         )
+
+    if "lifecycle_stage" in fm and fm["lifecycle_stage"] is not None:
+        ls = fm["lifecycle_stage"]
+        if ls not in ALLOWED_LIFECYCLE_STAGES:
+            return (
+                f"lifecycle_stage {ls!r} not in allowed set: "
+                f"{sorted(ALLOWED_LIFECYCLE_STAGES)}"
+            )
 
     tags = fm.get("tags")
     if not isinstance(tags, list):

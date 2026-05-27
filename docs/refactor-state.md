@@ -22,10 +22,19 @@ Single source of truth for edge taxonomy (`vault_taxonomy.yaml`) and frontmatter
 | 3 | `section_patcher.py` reads `EDGE_HEADING` from yaml | ✅ shipped | `kbai/storage/section_patcher.py`; case-insensitive regex covers existing notes |
 | 4 | `kbai/schema.py` single source + validator gate | ✅ shipped | `kbai/schema.py::validate_frontmatter`; both `vault_graph.py` and `note_creator.py` import from here |
 | 5 | `apply_research` delegates to journalled writer | ✅ shipped | `perplexitymcp/server.py::apply_research` → `kbai/storage/research_appender.py::append_research_section` |
-| 6 | Body template consolidation | 📐 planned | `docs/phase-6-plan.md`; five decision points pending |
+| 6 | Body template consolidation | ✅ shipped (6a–6c) | `kbai/templates/`, `kbai/templates.py`, `kbai/storage/note_creator.py` empty-body branch, `scripts/regenerate_obsidian_templates.py`, `kbai/schema.py::ALLOWED_LIFECYCLE_STAGES`, regenerated `Templates/*.md` (gitignored), `Templates/quick-capture.md` deleted, CLAUDE-static.md §4 updated |
 
-Tests at close of Phase 5: **274 passing** (was 75 at start of session).
-Commit: `85edddb` on `main`.
+Tests at close of Phase 6: **289 passing** (was 274 at end of Phase 5, 75 at start of the arc).
+Commit shipping Phases 1–5: `85edddb` on `main`. Phase 6 changes pending commit.
+
+**Phase 6 vault-content migrations explicitly deferred** (not in code scope):
+1. **Heading-case rewrite** — existing notes with `### Referenced in Maps` etc. vs canonical `### Referenced in maps`. Cosmetic only — Phase 3's case-insensitive regex covers correctness. Run preview:
+   ```bash
+   grep -rnE '^### (Referenced in Maps|Builds On|Builds Toward|Contradicts|Analogous To|Exemplifies|Challenges|Operationalises)$' 00-Captures/ 01-Ideas/ 02-Learning/ 04-Substack/ 05-Personal/ 06-Maps/ 2>/dev/null | wc -l
+   ```
+2. **Status-value backfill** — existing capture/learning/essay notes have `status: unprocessed|processing|draft` (pre-Phase-4 vocabulary). The new `lifecycle_stage` field is the migration target: rewrite `status: unprocessed` → `status: seedling, lifecycle_stage: unprocessed`, etc. Validator only gates new writes; existing drift is silently tolerated.
+
+**`/capture` workflow regression flagged** (Path A in 6b): the old slash command embedded a single `### Builds on` link from the closest neighbour. The prune dropped that. Restoring it means routing through `write_apply_link_suggestions` after `write_create_note` — one extra MCP call per `/capture`. Not done; awaiting explicit go.
 
 ### Multi-agent refactor (2026-05-12, prior session)
 
@@ -100,7 +109,19 @@ Asserts the post-Phase-2 default view reproduces pre-refactor PPR / PageRank sco
 /Users/vinaynair/opt/anaconda3/envs/minivinnymcp/bin/python -m pytest \
     minivinnymcp/tests/ writeagentmcp/tests/ perplexitymcp/tests/ -q
 ```
-274 tests at session close 2026-05-27. Run before committing any structural change.
+289 tests at Phase 6 close (was 274 at Phase 5 close). Run before committing any structural change.
+
+### Template skeleton audit (Phase 6)
+
+```bash
+/Users/vinaynair/opt/anaconda3/envs/minivinnymcp/bin/python -m pytest writeagentmcp/tests/test_templates.py -v
+```
+Drift detectors for the kbai/templates/ ↔ schema/yaml relationship. If any skeleton goes out of sync with `ALLOWED_TYPES`, `EDGE_HEADING`, `ALLOWED_STATUSES`, or `ALLOWED_LIFECYCLE_STAGES`, these fail.
+
+```bash
+/Users/vinaynair/opt/anaconda3/envs/minivinnymcp/bin/python scripts/regenerate_obsidian_templates.py
+```
+Idempotent. Run after editing any `kbai/templates/*.md`. Output should be "unchanged: ..." if the working tree is in sync.
 
 ### Vault content audits (no writes)
 
@@ -140,4 +161,4 @@ The pattern that worked for the drift-elimination arc:
 
 ---
 
-*Last updated: 2026-05-27, session close after Phase 5 of drift-elimination arc.*
+*Last updated: 2026-05-27, session close after Phase 6 of drift-elimination arc — the six-phase initiative is now code-complete; two vault-content migrations explicitly deferred.*

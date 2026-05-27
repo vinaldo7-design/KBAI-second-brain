@@ -18,6 +18,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from kbai import schema
 from kbai.schema import (
     ALLOWED_LENSES,
+    ALLOWED_LIFECYCLE_STAGES,
     ALLOWED_STATUSES,
     ALLOWED_TYPES,
     REQUIRED_FRONTMATTER,
@@ -175,6 +176,30 @@ def test_drift_allowed_lenses_accept_set_equals_schema():
         err = validate_frontmatter(fm)
         assert err is not None and "lens" in err.lower(), (
             f"validator accepted non-schema lens {lens!r}"
+        )
+
+
+def test_drift_allowed_lifecycle_stages_accept_set_equals_schema():
+    """lifecycle_stage is optional. When present-and-non-null, the value must
+    be in ALLOWED_LIFECYCLE_STAGES; otherwise the validator ignores it."""
+    # Absent → valid.
+    fm = _valid_fm()
+    assert "lifecycle_stage" not in fm
+    assert validate_frontmatter(fm) is None
+    # Explicit None → valid (treated as absent).
+    assert validate_frontmatter(_valid_fm() | {"lifecycle_stage": None}) is None
+    # Every schema-allowed value → valid.
+    for stage in ALLOWED_LIFECYCLE_STAGES:
+        assert (
+            validate_frontmatter(_valid_fm() | {"lifecycle_stage": stage}) is None
+        ), f"validator rejected schema-allowed lifecycle_stage {stage!r}"
+    # Anything not in the set → rejected with a lifecycle_stage-specific error.
+    for bad in ("seedling", "evergreen", "nonsense", "WIP"):
+        if bad in ALLOWED_LIFECYCLE_STAGES:
+            continue
+        err = validate_frontmatter(_valid_fm() | {"lifecycle_stage": bad})
+        assert err is not None and "lifecycle_stage" in err.lower(), (
+            f"validator accepted non-schema lifecycle_stage {bad!r}"
         )
 
 
