@@ -9,6 +9,7 @@ def ppr_rank(
     exclude_types: set[str],
     weight_overrides: dict[str, float],
     cap: int = 50,
+    include_mentioned: bool = False,
 ) -> list[tuple[str, float]]:
     """Run PPR seeded by dense scores and return sorted [(note_id, score)].
 
@@ -18,6 +19,7 @@ def ppr_rank(
         seed_scores,
         exclude_types=exclude_types,
         weight_overrides=weight_overrides,
+        include_mentioned=include_mentioned,
     )
     return sorted(
         ((nid, score) for nid, score in ppr_scores.items() if graph.exists(nid)),

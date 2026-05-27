@@ -172,7 +172,9 @@ def test_ppr_expand_returns_all_nodes():
     g = VaultGraph.load(str(GRAPH_PATH))
     seeds = {"mastery-trap": 0.9, "governance-capital-day1": 0.7}
     scores = g.ppr_expand(seeds)
-    assert len(scores) == len(g.G.nodes)
+    # PPR walks the default view, not raw self.G. Scores must cover every node
+    # the view exposes — that includes all real notes plus in-view broken markers.
+    assert len(scores) == len(g.view().nodes)
     assert all(0.0 <= v <= 1.0 for v in scores.values())
 
 

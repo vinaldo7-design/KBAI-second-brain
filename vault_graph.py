@@ -52,8 +52,7 @@ TYPED_LINK_SECTIONS = {
 # A generic "## Links" section without typed sub-headings -> untyped edges.
 UNTYPED_LINK_SECTION_NAMES = {"links", "entry points", "connected maps"}
 
-DEPRECATED_FRONTMATTER = {"domain", "attachments"}
-REQUIRED_FRONTMATTER = {"id", "title", "type", "status", "summary", "tags"}
+from kbai.schema import DEPRECATED_FRONTMATTER, REQUIRED_FRONTMATTER  # noqa: E402
 
 FRONTMATTER_RE = re.compile(r"^---\n(.*?)\n---\n(.*)$", re.DOTALL)
 WIKILINK_RE = re.compile(r"\[\[([^\]|#]+?)(?:\|[^\]]+)?(?:#[^\]]+)?\]\]")

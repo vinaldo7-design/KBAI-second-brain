@@ -25,6 +25,7 @@ import yaml
 from kbai.contracts import WriteReceipt
 from kbai.embed.reindex_hooks import update_note_embeddings
 from kbai.graph.reindex_hooks import update_note_edges
+from kbai.schema import CANONICAL_FIELD_ORDER, validate_frontmatter
 from kbai.storage.write_journal import record_mutation
 
 
@@ -43,20 +44,6 @@ _ALLOWED_FOLDERS: frozenset[str] = frozenset(
 )
 
 _KEBAB_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
-
-# Canonical frontmatter field order, mirrored from Templates/idea-note.md.
-# Any extra fields passed by the caller are appended after these, preserving
-# their insertion order.
-_CANONICAL_ORDER: tuple[str, ...] = (
-    "id",
-    "title",
-    "created",
-    "updated",
-    "type",
-    "status",
-    "summary",
-    "tags",
-)
 
 
 def _error_receipt(message: str, note_id: str | None = None) -> WriteReceipt:
@@ -78,8 +65,8 @@ def _ordered_frontmatter(
     user_fields: dict,
     now_iso: str,
 ) -> dict:
-    """Merge user-supplied frontmatter with computed defaults, preserving
-    the canonical field order from Templates/idea-note.md."""
+    """Merge user-supplied frontmatter with computed defaults, preserving the
+    canonical field order from kbai.schema.CANONICAL_FIELD_ORDER."""
     merged: dict = {}
     defaults = {
         "id": note_id,
@@ -88,7 +75,7 @@ def _ordered_frontmatter(
     }
     user_fields = dict(user_fields or {})
     # Step 1: canonical-order fields (defaults overridden by user values if present).
-    for key in _CANONICAL_ORDER:
+    for key in CANONICAL_FIELD_ORDER:
         if key in user_fields:
             merged[key] = user_fields.pop(key)
         elif key in defaults:
@@ -147,6 +134,12 @@ def create_note(
     # --- render -----------------------------------------------------------
     now_iso = _now_iso()
     fm = _ordered_frontmatter(note_id, frontmatter, now_iso)
+
+    # --- schema validation (Phase 4: hard gate before any write_text) -----
+    schema_error = validate_frontmatter(fm)
+    if schema_error is not None:
+        return _error_receipt(schema_error, note_id)
+
     try:
         yaml_block = yaml.safe_dump(
             fm, sort_keys=False, allow_unicode=True

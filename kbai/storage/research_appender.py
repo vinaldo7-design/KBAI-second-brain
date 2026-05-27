@@ -52,28 +52,53 @@ def _normalise_payload(payload) -> ResearchPayload | None:
 
 
 def _fmt_source(s) -> str:
-    title = (s.title or "(untitled)") if hasattr(s, "title") else (s.get("title") or "(untitled)")
-    url = (s.url or "") if hasattr(s, "url") else (s.get("url") or "")
-    return f"- {title}: {url}"
+    if hasattr(s, "title"):
+        title = s.title or "(untitled)"
+        url = s.url or ""
+        summary = s.summary or ""
+        published = s.published
+    else:
+        title = s.get("title") or "(untitled)"
+        url = s.get("url") or ""
+        summary = s.get("summary") or ""
+        published = s.get("published")
+    pub_str = f" (published: {published})" if published else ""
+    tail = f" — {summary}{pub_str}" if (summary or pub_str) else ""
+    return f"- [{title}]({url}){tail}"
 
 
-def _fmt_claim(c) -> str:
-    snippet = c.claim_snippet if hasattr(c, "claim_snippet") else c.get("claim_snippet", "")
-    verdict = c.verdict if hasattr(c, "verdict") else c.get("verdict", "uncertain")
-    return f"- [{verdict}] {snippet}"
+def _fmt_claim(c) -> list[str]:
+    """Returns a list of lines — the headline claim plus any indented evidence."""
+    if hasattr(c, "claim_snippet"):
+        snippet = c.claim_snippet
+        verdict = c.verdict
+        evidence = list(c.evidence or [])
+    else:
+        snippet = c.get("claim_snippet", "")
+        verdict = c.get("verdict", "uncertain")
+        evidence = list(c.get("evidence") or [])
+    lines = [f"- [{verdict}] {snippet}"]
+    for ev in evidence:
+        if isinstance(ev, dict):
+            note = ev.get("note") or "evidence"
+            url = ev.get("url") or ""
+            lines.append(f"  - [{note}]({url})")
+    return lines
 
 
 def _fmt_cross_link(cl) -> str:
     if hasattr(cl, "vault_note_id"):
         vault_id = cl.vault_note_id
         reason = cl.reason or ""
+        hint = cl.hint_text or ""
     else:
         vault_id = cl.get("vault_note_id")
         reason = cl.get("reason") or ""
+        hint = cl.get("hint_text") or ""
     if vault_id:
         return f"- [[{vault_id}]] — {reason}" if reason else f"- [[{vault_id}]]"
-    hint = cl.hint_text if hasattr(cl, "hint_text") else cl.get("hint_text", "")
-    return f"- {hint}"
+    suffix = f" — {reason}" if reason else ""
+    return f"- _{hint}_ (no vault match){suffix}"
 
 
 def _fmt_question(q) -> str:
@@ -94,7 +119,7 @@ def _render_section(payload: ResearchPayload, date_str: str) -> str:
     if payload.claim_checks:
         lines.append("### Claim checks")
         for c in payload.claim_checks:
-            lines.append(_fmt_claim(c))
+            lines.extend(_fmt_claim(c))
         lines.append("")
 
     if payload.cross_links:

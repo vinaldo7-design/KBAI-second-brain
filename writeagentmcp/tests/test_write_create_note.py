@@ -14,13 +14,24 @@ def _vault(tmp_path: Path) -> Path:
     return tmp_path
 
 
+def _valid_fm(title: str = "Test Note", note_type: str = "idea") -> dict:
+    """A frontmatter dict that passes kbai.schema.validate_frontmatter."""
+    return {
+        "title": title,
+        "type": note_type,
+        "status": "seedling",
+        "summary": "a one-sentence summary",
+        "tags": ["topic/test", "lens/academic"],
+    }
+
+
 def test_happy_path_file_created(tmp_path):
     vault = _vault(tmp_path)
     receipt = create_note(
         vault_root=vault,
         folder="01-Ideas",
         note_id="test-note",
-        frontmatter={"title": "Test Note", "type": "idea"},
+        frontmatter=_valid_fm(title="Test Note", note_type="idea"),
         body="## The Idea\nSome content here.",
         dryrun=False,
     )
@@ -41,7 +52,7 @@ def test_dryrun_no_file_written(tmp_path):
         vault_root=vault,
         folder="01-Ideas",
         note_id="dry-note",
-        frontmatter={"title": "Dry Note"},
+        frontmatter=_valid_fm(title="Dry Note"),
         body="body text",
         dryrun=True,
     )
@@ -56,7 +67,7 @@ def test_refuses_invalid_folder(tmp_path):
         vault_root=vault,
         folder="99-Invalid",
         note_id="test-note",
-        frontmatter={"title": "Test"},
+        frontmatter=_valid_fm(),
         body="body",
         dryrun=False,
     )
@@ -72,7 +83,7 @@ def test_refuses_invalid_note_id(tmp_path):
             vault_root=vault,
             folder="01-Ideas",
             note_id=bad_id,
-            frontmatter={"title": "Test"},
+            frontmatter=_valid_fm(),
             body="body",
             dryrun=False,
         )
@@ -91,7 +102,7 @@ def test_refuses_overwrite_existing(tmp_path):
         vault_root=vault,
         folder="01-Ideas",
         note_id="existing-note",
-        frontmatter={"title": "New"},
+        frontmatter=_valid_fm(title="New"),
         body="new body",
         dryrun=False,
     )
@@ -106,7 +117,7 @@ def test_hash_after_is_64_char_hex(tmp_path):
         vault_root=vault,
         folder="01-Ideas",
         note_id="hash-test",
-        frontmatter={"title": "Hash Test"},
+        frontmatter=_valid_fm(title="Hash Test"),
         body="some content",
         dryrun=False,
     )
@@ -122,7 +133,7 @@ def test_journal_row_written(tmp_path):
         vault_root=vault,
         folder="01-Ideas",
         note_id="journal-test",
-        frontmatter={"title": "Journal Test"},
+        frontmatter=_valid_fm(title="Journal Test"),
         body="body",
         dryrun=False,
     )

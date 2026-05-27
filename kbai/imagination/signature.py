@@ -67,8 +67,9 @@ def _collect_subgraph(
 
     edges: list[tuple[str, str, dict[str, Any]]] = []
     seen_keys: set[tuple[str, str, str]] = set()
+    v = graph.view(collapse=True, include_mentioned=False)
     for src in nodes:
-        for _, tgt, data in graph.G.out_edges(src, data=True):
+        for _, tgt, data in v.out_edges(src, data=True):
             if tgt not in nodes:
                 continue
             etype = data.get("type") or "untyped"
@@ -145,19 +146,27 @@ def _load_bearing_nodes(
 def _frontier_nodes(
     graph: VaultGraph,
     nodes: set[str],
-    edges: list[tuple[str, str, dict[str, Any]]],
+    edges: list[tuple[str, str, dict[str, Any]]],  # unused; kept for signature stability
     top_n: int = 5,
 ) -> list[dict[str, Any]]:
-    """Terminal frontier — notes with no outgoing builds-on / builds-toward
-    inside this cluster. These are where the cluster's reasoning has run
-    out of explicit prerequisites; the natural place for `extend` to push."""
-    has_builds_out: set[str] = set()
-    for src, tgt, data in edges:
-        if data.get("type") in ("builds-on", "builds-toward"):
-            has_builds_out.add(src)
+    """Terminal frontier — seed ideas with no ancestor relationship inside this
+    cluster: no outgoing `builds-on` (it acknowledges no ancestors) AND no
+    incoming `builds-toward` (nothing has projected toward it).
 
-    frontier_ids = [nid for nid in nodes if nid not in has_builds_out]
-    # Stable order: by title for determinism in tests
+    Iterates native edges (graph.G, no collapse) so both narration directions
+    of the ancestor edge are visible separately.
+    """
+    has_ancestor_edge: set[str] = set()
+    for src, tgt, data in graph.G.edges(data=True):
+        if src not in nodes or tgt not in nodes:
+            continue
+        etype = data.get("type")
+        if etype == "builds-on":
+            has_ancestor_edge.add(src)  # src acknowledges tgt as ancestor
+        elif etype == "builds-toward":
+            has_ancestor_edge.add(tgt)  # src has projected toward tgt
+
+    frontier_ids = [nid for nid in nodes if nid not in has_ancestor_edge]
     frontier_ids.sort(key=lambda n: ((graph.node(n) or {}).get("title") or n))
 
     out: list[dict[str, Any]] = []

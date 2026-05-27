@@ -13,7 +13,6 @@ sys.path.insert(0, str(_vault_root))
 from perplexitymcp.server import (
     _cluster_expand,
     _extract_json,
-    _format_research_section,
     _match_vault_note,
     _normalize,
     apply_research,
@@ -86,45 +85,6 @@ def test_match_vault_note_no_match():
 
 def test_match_vault_note_empty_graph():
     assert _match_vault_note("anything", None) is None
-
-
-# --- _format_research_section ---
-
-def test_format_section_full():
-    payload = {
-        "sources": [{"title": "T", "url": "https://x.com", "summary": "s", "published": "2024"}],
-        "claim_checks": [{
-            "claim_snippet": "X causes Y",
-            "verdict": "supports",
-            "evidence": [{"url": "https://e.com", "note": "study A"}],
-        }],
-        "cross_links": [{"hint_text": "Z", "vault_note_id": "z-note", "reason": "related"}],
-        "open_questions": [{"question": "What about W?", "reason": "missing"}],
-        "raw_summary": "summary text",
-    }
-    section = _format_research_section(payload, include_raw_summary=True)
-    assert "## External research (Perplexity" in section
-    assert "[T](https://x.com)" in section
-    assert "**supports**" in section
-    assert "[[z-note]]" in section
-    assert "What about W?" in section
-    assert "summary text" in section
-
-
-def test_format_section_excludes_raw_when_disabled():
-    payload = {"sources": [], "claim_checks": [], "cross_links": [], "open_questions": [], "raw_summary": "secret"}
-    section = _format_research_section(payload, include_raw_summary=False)
-    assert "secret" not in section
-
-
-def test_format_section_no_vault_match_marked():
-    payload = {
-        "sources": [], "claim_checks": [],
-        "cross_links": [{"hint_text": "unmatched", "reason": "r"}],
-        "open_questions": [], "raw_summary": "",
-    }
-    section = _format_research_section(payload, include_raw_summary=False)
-    assert "no vault match" in section
 
 
 # --- research_note (mocked API) ---
@@ -210,7 +170,9 @@ def test_apply_research_appends_section():
             sources=[{"title": "T", "url": "u", "summary": "s", "published": None}],
             include_raw_summary=False,
         )
-        assert result.get("status") == "appended"
+        # Post-Phase-5: apply_research delegates to the journalled writer and
+        # returns a WriteReceipt-shaped dict. New status is "applied".
+        assert result.get("status") == "applied"
         new_content = note_file.read_text(encoding="utf-8")
         assert "My own prose." in new_content  # original preserved
         assert "## External research (Perplexity" in new_content
@@ -221,7 +183,9 @@ def test_apply_research_appends_section():
 
 def test_apply_research_unknown_note_errors():
     result = apply_research(note_id="does-not-exist-xyz")
-    assert "error" in result
+    # WriteReceipt error: status=="error", message describes the problem.
+    assert result.get("status") == "error"
+    assert "not found" in (result.get("message") or "").lower()
 
 
 def test_apply_research_does_not_rewrite_body():
@@ -240,6 +204,63 @@ def test_apply_research_does_not_rewrite_body():
         assert idx > 0
         prefix = new_content[:idx]
         assert "Line 1." in prefix and "Line 2." in prefix and "Line 3." in prefix
+    finally:
+        note_file.unlink(missing_ok=True)
+
+
+def test_apply_research_records_journal_row():
+    """Phase 5: single-writer invariant. apply_research must journal via the
+    canonical writer — confirm a mutation row exists for the call."""
+    import sqlite3
+    note_file = _vault_root / "00-Captures" / "test-apply-journal.md"
+    note_file.write_text("# Note\n\nbody.\n", encoding="utf-8")
+    try:
+        result = apply_research(
+            note_id="test-apply-journal",
+            sources=[{"title": "S", "url": "u"}],
+            include_raw_summary=False,
+        )
+        journal_id = result.get("journal_id")
+        assert journal_id is not None, f"no journal_id in receipt: {result}"
+
+        conn = sqlite3.connect(str(_vault_root / "06-Maps" / "write-journal.db"))
+        conn.row_factory = sqlite3.Row
+        row = conn.execute(
+            "SELECT * FROM mutations WHERE id = ?", (journal_id,)
+        ).fetchone()
+        conn.close()
+        assert row is not None
+        assert row["tool"] == "write_append_research_section"
+        assert row["note_id"] == "test-apply-journal"
+        assert row["status"] == "applied"
+        assert row["dryrun"] == 0
+        assert row["hash_after"] is not None
+    finally:
+        note_file.unlink(missing_ok=True)
+
+
+def test_apply_research_idempotent_same_day():
+    """Inherited from the journalled writer: calling twice in one UTC day
+    no-ops the second call rather than appending a duplicate section.
+    Pre-Phase-5 perplexitymcp would have appended twice."""
+    note_file = _vault_root / "00-Captures" / "test-apply-idem.md"
+    note_file.write_text("# Note\n\nbody.\n", encoding="utf-8")
+    try:
+        first = apply_research(
+            note_id="test-apply-idem",
+            sources=[{"title": "S", "url": "u"}],
+            include_raw_summary=False,
+        )
+        assert first.get("status") == "applied"
+        content_after_first = note_file.read_text(encoding="utf-8")
+
+        second = apply_research(
+            note_id="test-apply-idem",
+            sources=[{"title": "S", "url": "u"}],
+            include_raw_summary=False,
+        )
+        assert second.get("status") == "already_present"
+        assert note_file.read_text(encoding="utf-8") == content_after_first
     finally:
         note_file.unlink(missing_ok=True)
 

@@ -1,5 +1,6 @@
-"""Stage 0 item 3: synthetic graph proves mentioned edges are excluded from
-standard/sparring PPR walks but admitted in exhaustive mode."""
+"""Stage 0 item 3 (re-cast for Phase 2b): mentioned-edge handling is now a
+query-time concern. Construction preserves every edge in self.G; the default
+view drops mentioned, the include_mentioned=True view keeps them."""
 
 import os
 import sys
@@ -14,8 +15,7 @@ from vault_graph_loader import VaultGraph
 
 def _toy_graph_data():
     """A → B (builds-on), A → C (mentioned).
-    C is reachable only via mentioned. In a graph loaded with
-    include_mentioned=False, C should not appear at all."""
+    C is reachable only via the mentioned edge."""
     return {
         "vault_root": str(_vault_root),
         "nodes": [{"id": "A"}, {"id": "B"}, {"id": "C"}],
@@ -26,43 +26,50 @@ def _toy_graph_data():
     }
 
 
-def test_mentioned_dropped_in_default_load():
-    g = VaultGraph(_toy_graph_data())  # include_mentioned defaults to False
-    # The mentioned edge is filtered at construction; A has no out-edge to C.
+def test_construction_preserves_mentioned_in_raw_graph():
+    g = VaultGraph(_toy_graph_data())
     a_targets = {t for _, t, _ in g.G.out_edges("A", data=True)}
+    assert "B" in a_targets
+    assert "C" in a_targets  # mentioned edge stored at construction
+
+
+def test_default_view_drops_mentioned():
+    g = VaultGraph(_toy_graph_data())
+    v = g.view(collapse=True, include_mentioned=False)
+    a_targets = {t for _, t, _ in v.out_edges("A", data=True)}
+    assert "B" in a_targets
     assert "C" not in a_targets
+
+
+def test_mentioned_view_includes_mentioned():
+    g = VaultGraph(_toy_graph_data())
+    v = g.view(collapse=True, include_mentioned=True)
+    a_targets = {t for _, t, _ in v.out_edges("A", data=True)}
     assert "B" in a_targets
-
-
-def test_mentioned_present_in_exhaustive_load():
-    g = VaultGraph(_toy_graph_data(), include_mentioned=True)
-    a_targets = {t for _, t, _ in g.G.out_edges("A", data=True)}
     assert "C" in a_targets
-    assert "B" in a_targets
 
 
-def test_ppr_does_not_reach_mentioned_only_node_in_standard():
+def test_ppr_default_does_not_reach_mentioned_only_node():
     g = VaultGraph(_toy_graph_data())
     scores = g.ppr_expand({"A": 1.0})
-    # C is not in the graph → not in scores
-    assert "C" not in scores or scores["C"] == 0.0
+    # Default view excludes mentioned → C unreachable from A
+    assert scores["A"] > scores.get("C", 0.0)
+    assert scores["B"] > scores.get("C", 0.0)
 
 
-def test_ppr_reaches_mentioned_node_in_exhaustive():
-    g = VaultGraph(_toy_graph_data(), include_mentioned=True)
-    # Even excluding mentioned at the walk level should leave C orphaned, but
-    # exhaustive mode admits it (empty exclude set).
-    scores = g.ppr_expand({"A": 1.0}, exclude_types=set())
+def test_ppr_with_include_mentioned_reaches_mentioned_node():
+    g = VaultGraph(_toy_graph_data())
+    scores = g.ppr_expand({"A": 1.0}, include_mentioned=True, exclude_types=set())
     assert "C" in scores
     assert scores["C"] > 0.0
 
 
-def test_ppr_excludes_mentioned_when_walk_filtered():
-    """Even with mentioned edges in the graph, gating them at the walk level
-    (as standard mode does) should make C unreachable from A."""
-    g = VaultGraph(_toy_graph_data(), include_mentioned=True)
-    scores = g.ppr_expand({"A": 1.0}, exclude_types={"mentioned"})
-    # C now has no inbound edge → score is just the PPR teleport baseline
-    # (not zero in absolute terms, but A and B should both score higher).
+def test_ppr_include_mentioned_but_excluded_at_walk_level():
+    """When mentioned edges are loaded into the view but explicitly excluded
+    at the walk level, C drops out of reachability again."""
+    g = VaultGraph(_toy_graph_data())
+    scores = g.ppr_expand(
+        {"A": 1.0}, include_mentioned=True, exclude_types={"mentioned"}
+    )
     assert scores["A"] > scores.get("C", 0.0)
     assert scores["B"] > scores.get("C", 0.0)

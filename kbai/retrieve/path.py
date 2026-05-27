@@ -22,6 +22,11 @@ def path_attribute(
     seed_ids: list[str],
     ppr_targets: list[str],
     path_exclude_types: set[str],
+    include_mentioned: bool = False,
 ) -> dict[str, str | None]:
     """Return {note_id: reasoning_path} for each target."""
-    return graph.path_attributions(seed_ids, ppr_targets, exclude_types=path_exclude_types)
+    return graph.path_attributions(
+        seed_ids, ppr_targets,
+        exclude_types=path_exclude_types,
+        include_mentioned=include_mentioned,
+    )

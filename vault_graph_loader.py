@@ -30,6 +30,7 @@ from __future__ import annotations
 
 import json
 import sys
+from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal, Optional
@@ -65,11 +66,18 @@ class EdgeResult:
 
 
 class VaultGraph:
-    """MultiDiGraph wrapper with vault-specific queries."""
+    """MultiDiGraph wrapper with vault-specific queries.
 
-    def __init__(self, data: dict, include_mentioned: bool = False):
+    Construction preserves every edge in its native form: no collapse, no
+    mentioned-filter, no reversal. Transforms (collapse_to from the yaml,
+    mentioned-filter) happen at query time via `view(collapse, include_mentioned)`.
+
+    Defaults across query methods are `collapse=True, include_mentioned=False`
+    so existing call-sites behave identically to the pre-2b loader.
+    """
+
+    def __init__(self, data: dict):
         self.data = data
-        self.include_mentioned = include_mentioned
         self.G: nx.MultiDiGraph = nx.MultiDiGraph()
 
         vault_root = Path(data.get("vault_root", "."))
@@ -79,33 +87,24 @@ class VaultGraph:
             et: float(meta.get("default_weight", 1.0))
             for et, meta in _edge_types.items()
         }
-        _collapse_map: dict[str, str] = {
+        self._collapse_map: dict[str, str] = {
             et: meta["collapse_to"]
             for et, meta in _edge_types.items()
             if meta.get("collapse_to")
         }
+        self._view_cache: dict[tuple[bool, bool], nx.MultiDiGraph] = {}
 
         for node in data["nodes"]:
             self.G.add_node(node["id"], **node)
 
         for edge in data["edges"]:
-            if not include_mentioned and edge["type"] == "mentioned":
-                continue
-
             src = edge["source"]
             tgt = edge["target"]
             etype = edge["type"]
             target_exists = edge.get("target_exists", True)
 
-            if etype in _collapse_map:
-                src, tgt = tgt, src
-                etype = _collapse_map[etype]
-                target_exists = True  # new target is original source, always present
-
-            # Dangling target (broken edge) — add marker node so traversal still works.
-            if not target_exists:
-                if tgt not in self.G:
-                    self.G.add_node(tgt, id=tgt, _broken=True)
+            if not target_exists and tgt not in self.G:
+                self.G.add_node(tgt, id=tgt, _broken=True)
 
             self.G.add_edge(
                 src, tgt,
@@ -118,6 +117,60 @@ class VaultGraph:
     def load(cls, path: str = DEFAULT_GRAPH_PATH, **kwargs) -> "VaultGraph":
         with open(path, encoding="utf-8") as f:
             return cls(json.load(f), **kwargs)
+
+    # --- Views ---------------------------------------------------------
+
+    def view(
+        self,
+        collapse: bool = True,
+        include_mentioned: bool = False,
+    ) -> nx.MultiDiGraph:
+        """Cached MultiDiGraph view of self.G with the requested transforms.
+
+        collapse=True applies yaml-declared collapse_to rules (reverses
+        source/target and relabels the edge type).
+        include_mentioned=False drops `mentioned` edges from the view.
+
+        Defaults reproduce the pre-2b loader's constructed-graph semantics
+        byte-for-byte: collapsed + no mentioned.
+        """
+        key = (collapse, include_mentioned)
+        cached = self._view_cache.get(key)
+        if cached is not None:
+            return cached
+
+        view = nx.MultiDiGraph()
+        # Carry non-broken nodes from self.G unconditionally. Broken-target
+        # marker nodes are only added when an edge in *this view* targets them
+        # — matches pre-2b semantics where broken markers only existed for
+        # edges that survived the construction-time filter.
+        for nid, ndata in self.G.nodes(data=True):
+            if not ndata.get("_broken"):
+                view.add_node(nid, **ndata)
+
+        for src, tgt, edata in self.G.edges(data=True):
+            etype = edata.get("type")
+            if not include_mentioned and etype == "mentioned":
+                continue
+            target_exists = edata.get("target_exists", True)
+
+            if collapse and etype in self._collapse_map:
+                src, tgt = tgt, src
+                etype = self._collapse_map[etype]
+                target_exists = True  # new target is original source, always present
+
+            if not target_exists and tgt not in view:
+                view.add_node(tgt, id=tgt, _broken=True)
+
+            view.add_edge(
+                src, tgt,
+                type=etype,
+                annotation=edata.get("annotation"),
+                target_exists=target_exists,
+            )
+
+        self._view_cache[key] = view
+        return view
 
     # --- Node access ---------------------------------------------------
 
@@ -138,13 +191,18 @@ class VaultGraph:
         note_id: str,
         edge_type: Optional[str] = None,
         direction: Literal["out", "in", "both"] = "both",
+        collapse: bool = True,
+        include_mentioned: bool = False,
     ) -> list[EdgeResult]:
         """Return typed edges incident to this note."""
         if note_id not in self.G:
             return []
+        v = self.view(collapse=collapse, include_mentioned=include_mentioned)
+        if note_id not in v:
+            return []
         results: list[EdgeResult] = []
         if direction in ("out", "both"):
-            for _, target, data in self.G.out_edges(note_id, data=True):
+            for _, target, data in v.out_edges(note_id, data=True):
                 if edge_type and data.get("type") != edge_type:
                     continue
                 results.append(EdgeResult(
@@ -153,7 +211,7 @@ class VaultGraph:
                     target_exists=data.get("target_exists", True),
                 ))
         if direction in ("in", "both"):
-            for source, _, data in self.G.in_edges(note_id, data=True):
+            for source, _, data in v.in_edges(note_id, data=True):
                 if edge_type and data.get("type") != edge_type:
                     continue
                 results.append(EdgeResult(
@@ -165,24 +223,34 @@ class VaultGraph:
 
     # --- Centrality ----------------------------------------------------
 
-    def _simple_digraph(self) -> nx.DiGraph:
-        """Collapse the multigraph into a weighted DiGraph for centrality."""
+    def _simple_digraph(
+        self,
+        collapse: bool = True,
+        include_mentioned: bool = False,
+    ) -> nx.DiGraph:
+        """Flatten the requested view's multi-edges into a weighted DiGraph
+        for centrality. Defaults reproduce pre-2b behaviour."""
+        v = self.view(collapse=collapse, include_mentioned=include_mentioned)
         simple = nx.DiGraph()
-        for source, target, _ in self.G.edges(data=True):
+        for source, target, _ in v.edges(data=True):
             if simple.has_edge(source, target):
                 simple[source][target]["weight"] += 1
             else:
                 simple.add_edge(source, target, weight=1)
-        for node in self.G.nodes:
+        for node in v.nodes:
             if node not in simple:
                 simple.add_node(node)
         return simple
 
     def most_central(
-        self, n: int = 10, by: str = "pagerank",
+        self,
+        n: int = 10,
+        by: str = "pagerank",
+        collapse: bool = True,
+        include_mentioned: bool = False,
     ) -> list[tuple[str, float]]:
         """Top-n nodes by centrality measure."""
-        simple = self._simple_digraph()
+        simple = self._simple_digraph(collapse=collapse, include_mentioned=include_mentioned)
 
         if by == "pagerank":
             scores = nx.pagerank(simple, weight="weight")
@@ -211,13 +279,16 @@ class VaultGraph:
         from_note: str,
         to_note: str,
         edge_types: Optional[list[str]] = None,
+        collapse: bool = True,
+        include_mentioned: bool = False,
     ) -> Optional[list[str]]:
         """Shortest directed path between two notes, optionally restricted to edge types."""
         if from_note not in self.G or to_note not in self.G:
             return None
+        v = self.view(collapse=collapse, include_mentioned=include_mentioned)
         if edge_types:
             sub = nx.DiGraph()
-            for source, target, data in self.G.edges(data=True):
+            for source, target, data in v.edges(data=True):
                 if data.get("type") in edge_types:
                     sub.add_edge(source, target)
             try:
@@ -225,7 +296,7 @@ class VaultGraph:
             except (nx.NetworkXNoPath, nx.NodeNotFound):
                 return None
         simple = nx.DiGraph()
-        for s, t in self.G.edges():
+        for s, t in v.edges():
             simple.add_edge(s, t)
         try:
             return nx.shortest_path(simple, from_note, to_note)
@@ -234,20 +305,58 @@ class VaultGraph:
 
     # --- Distribution and diagnostics ----------------------------------
 
-    def edge_distribution(self) -> dict[str, int]:
+    def edge_distribution(
+        self,
+        collapse: bool = True,
+        include_mentioned: bool = False,
+    ) -> dict[str, int]:
+        v = self.view(collapse=collapse, include_mentioned=include_mentioned)
         counts: dict[str, int] = {}
-        for _, _, data in self.G.edges(data=True):
+        for _, _, data in v.edges(data=True):
             t = data.get("type", "unknown")
             counts[t] = counts.get(t, 0) + 1
         return dict(sorted(counts.items(), key=lambda kv: -kv[1]))
 
-    def orphans(self) -> list[str]:
-        """Notes with zero in-degree and zero out-degree (typed edges only)."""
+    def graph_stats(self) -> dict:
+        """Raw (post-construction self.G, native types, mentioned included) vs
+        default-view counts (collapsed, mentioned excluded — what queries see).
+        Audit tool: reads self.G directly and the default view directly."""
+        yaml_types = list(self.taxonomy_weights.keys())  # yaml insertion order
+
+        raw_counts: Counter[str] = Counter()
+        for _, _, data in self.G.edges(data=True):
+            raw_counts[data.get("type", "unknown")] += 1
+
+        default_view = self.view(collapse=True, include_mentioned=False)
+        graph_counts: Counter[str] = Counter()
+        for _, _, data in default_view.edges(data=True):
+            graph_counts[data.get("type", "unknown")] += 1
+
+        drift = sorted(
+            (set(raw_counts) | set(graph_counts)) - set(yaml_types)
+        )
+        return {
+            "total_nodes": self.G.number_of_nodes(),
+            "total_edges_raw": self.G.number_of_edges(),
+            "total_edges_graph": default_view.number_of_edges(),
+            "yaml_types": yaml_types,
+            "raw_counts": raw_counts,
+            "graph_counts": graph_counts,
+            "drift_not_in_yaml": drift,
+        }
+
+    def orphans(
+        self,
+        collapse: bool = True,
+        include_mentioned: bool = False,
+    ) -> list[str]:
+        """Notes with zero in-degree and zero out-degree in the requested view."""
+        v = self.view(collapse=collapse, include_mentioned=include_mentioned)
         return sorted([
-            n for n in self.G.nodes
-            if not self.G.nodes[n].get("_broken")
-            and self.G.in_degree(n) == 0
-            and self.G.out_degree(n) == 0
+            n for n in v.nodes
+            if not v.nodes[n].get("_broken")
+            and v.in_degree(n) == 0
+            and v.out_degree(n) == 0
         ])
 
     def ppr_expand(
@@ -256,6 +365,8 @@ class VaultGraph:
         alpha: float = 0.85,
         exclude_types: set[str] | None = None,
         weight_overrides: dict[str, float] | None = None,
+        collapse: bool = True,
+        include_mentioned: bool = False,
     ) -> dict[str, float]:
         """Personalized PageRank seeded by seed_scores (note_id → weight).
         Builds a weighted DiGraph from taxonomy weights, runs PPR, returns
@@ -267,15 +378,17 @@ class VaultGraph:
             exclude_types: edge types gated out of the walk entirely
             weight_overrides: edge type → multiplier applied on top of the
                 taxonomy weight. Used by cognitive profiles (Stage 5.5+).
-                Default behaviour (no overrides) is unchanged.
+            collapse, include_mentioned: select the graph view to walk over.
+                Defaults match the pre-2b loader's constructed-graph semantics.
         """
         exclude_types = exclude_types or set()
         weight_overrides = weight_overrides or {}
+        v = self.view(collapse=collapse, include_mentioned=include_mentioned)
 
         simple = nx.DiGraph()
-        for node in self.G.nodes:
+        for node in v.nodes:
             simple.add_node(node)
-        for source, target, data in self.G.edges(data=True):
+        for source, target, data in v.edges(data=True):
             etype = data.get("type", "untyped")
             if etype in exclude_types:
                 continue
@@ -310,17 +423,20 @@ class VaultGraph:
         target_ids: list[str],
         max_hops: int = 3,
         exclude_types: set[str] | None = None,
+        collapse: bool = True,
+        include_mentioned: bool = False,
     ) -> dict[str, list[dict] | None]:
         """Batch: best semantic path from any seed to each target.
         Uses inverted taxonomy weights as edge costs so high-semantic edges
         (builds-on, analogous-to) are preferred over structural ones.
         exclude_types strips edges that produce plumbing paths, not reasoning chains."""
         exclude_types = exclude_types or {"referenced-in", "untyped", "mentioned"}
+        v = self.view(collapse=collapse, include_mentioned=include_mentioned)
 
         cost_graph = nx.DiGraph()
-        for node in self.G.nodes:
+        for node in v.nodes:
             cost_graph.add_node(node)
-        for src, tgt, data in self.G.edges(data=True):
+        for src, tgt, data in v.edges(data=True):
             etype = data.get("type", "untyped")
             if etype in exclude_types:
                 continue
@@ -363,7 +479,7 @@ class VaultGraph:
             for i in range(len(path) - 1):
                 s, t = path[i], path[i + 1]
                 edge_type, best_w = "untyped", 0.0
-                for _, t2, edata in self.G.out_edges(s, data=True):
+                for _, t2, edata in v.out_edges(s, data=True):
                     if t2 == t:
                         etype = edata.get("type", "untyped")
                         w = self.taxonomy_weights.get(etype, 0.0)
@@ -378,11 +494,14 @@ class VaultGraph:
         self,
         edge_type: Optional[str] = None,
         min_annotation_length: int = 40,
+        collapse: bool = True,
+        include_mentioned: bool = False,
     ) -> list[EdgeResult]:
         """Edges whose annotations are long — candidates where the annotation is
         doing semantic work the edge type isn't. Force-fit diagnostic."""
+        v = self.view(collapse=collapse, include_mentioned=include_mentioned)
         results = []
-        for source, target, data in self.G.edges(data=True):
+        for source, target, data in v.edges(data=True):
             ann = data.get("annotation") or ""
             if len(ann) < min_annotation_length:
                 continue
@@ -423,6 +542,7 @@ USAGE = """Usage:
   python3 vault_graph_loader.py central [N] [--by=pagerank|degree|in_degree|out_degree|betweenness]
   python3 vault_graph_loader.py path <from> <to> [--types=t1,t2]
   python3 vault_graph_loader.py distribution
+  python3 vault_graph_loader.py graph_stats
   python3 vault_graph_loader.py orphans
   python3 vault_graph_loader.py audit [--type=TYPE] [--min-length=N]
 
@@ -492,6 +612,25 @@ def main():
         print(f"Edge distribution ({total} edges):")
         for t, c in d.items():
             print(f"  {t:15s} {c:4}  ({100 * c / total:5.1f}%)")
+
+    elif cmd == "graph_stats":
+        s = g.graph_stats()
+        print(f"Total nodes (raw self.G): {s['total_nodes']}")
+        print(f"Total edges (raw):        {s['total_edges_raw']}")
+        print(f"Total edges (graph):      {s['total_edges_graph']}")
+        print()
+        print("  raw  = self.G — native types, mentioned included, no collapse")
+        print("  graph= default view — collapsed, mentioned excluded (what queries see)")
+        print()
+        print(f"  {'type':18s} {'raw':>6s} {'graph':>6s}")
+        print(f"  {'-'*18} {'-'*6} {'-'*6}")
+        for t in s["yaml_types"]:
+            print(f"  {t:18s} {s['raw_counts'].get(t, 0):6d} {s['graph_counts'].get(t, 0):6d}")
+        drift = s["drift_not_in_yaml"]
+        print()
+        print(f"Edge types in graph/raw but not in vault_taxonomy.yaml (expected 0): {len(drift)}")
+        for t in drift:
+            print(f"  {t:18s} {s['raw_counts'].get(t, 0):6d} {s['graph_counts'].get(t, 0):6d}")
 
     elif cmd == "orphans":
         orphs = g.orphans()

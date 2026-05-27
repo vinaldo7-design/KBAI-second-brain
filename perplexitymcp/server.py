@@ -31,8 +31,6 @@ _API_URL = "https://api.perplexity.ai/chat/completions"
 _MODEL = os.environ.get("PERPLEXITY_MODEL", "sonar-deep-research")
 _TIMEOUT = int(os.environ.get("PERPLEXITY_TIMEOUT", "300"))
 
-_RESEARCH_SECTION_HEADING = "## External research (Perplexity"
-
 _CLUSTER_SYSTEM_PROMPT_PREFIX = (
     "You are researching a CLUSTER of related notes from a personal knowledge base. "
     "Surface cross-cutting themes, contradictions between notes, and external sources "
@@ -270,64 +268,6 @@ def _log_claim_verify(claim_hash: str, verdict: str, confidence: float) -> None:
         pass
 
 
-# --- Section formatting ---------------------------------------------------
-
-def _format_research_section(payload: dict, include_raw_summary: bool) -> str:
-    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    lines = [f"{_RESEARCH_SECTION_HEADING}, {today})", ""]
-
-    sources = payload.get("sources") or []
-    if sources:
-        lines.append("### Sources")
-        for s in sources:
-            title = s.get("title") or "(untitled)"
-            url = s.get("url") or ""
-            summary = s.get("summary") or ""
-            published = s.get("published")
-            pub_str = f" (published: {published})" if published else ""
-            lines.append(f"- [{title}]({url}) — {summary}{pub_str}")
-        lines.append("")
-
-    claims = payload.get("claim_checks") or []
-    if claims:
-        lines.append("### Claim checks")
-        for c in claims:
-            snippet = c.get("claim_snippet") or ""
-            verdict = c.get("verdict") or "uncertain"
-            lines.append(f'- "{snippet}" — verdict: **{verdict}**')
-            for ev in c.get("evidence") or []:
-                lines.append(f"  - [{ev.get('note', 'evidence')}]({ev.get('url', '')})")
-        lines.append("")
-
-    cross = payload.get("cross_links") or []
-    if cross:
-        lines.append("### Cross-links")
-        for cl in cross:
-            vault_id = cl.get("vault_note_id")
-            hint = cl.get("hint_text") or ""
-            reason = cl.get("reason") or ""
-            link = f"[[{vault_id}]]" if vault_id else f"_{hint}_ (no vault match)"
-            lines.append(f"- {link} — {reason}")
-        lines.append("")
-
-    questions = payload.get("open_questions") or []
-    if questions:
-        lines.append("### Open questions")
-        for q in questions:
-            lines.append(f"- {q.get('question', '')} — {q.get('reason', '')}")
-        lines.append("")
-
-    if include_raw_summary and (payload.get("raw_summary") or "").strip():
-        lines.append("> Raw external summary:")
-        lines.append("> ```text")
-        for line in payload["raw_summary"].splitlines():
-            lines.append(f"> {line}")
-        lines.append("> ```")
-        lines.append("")
-
-    return "\n".join(lines).rstrip() + "\n"
-
-
 # --- MCP server -----------------------------------------------------------
 
 app = FastMCP("perplexity-research")
@@ -384,37 +324,25 @@ def apply_research(
     include_raw_summary: bool = True,
     researched_at: str | None = None,
 ) -> dict:
-    """Append findings from research_note to the note as a clearly-marked section.
-    Never rewrites existing prose. If a prior 'External research' section exists,
-    a new dated section is appended below it (not merged)."""
-    note_file = _find_note_file(note_id)
-    if not note_file:
-        return {"error": f"Note '{note_id}' not found under {_VAULT_ROOT}"}
+    """Append research findings to a note. Delegates to the single journalled
+    writer in kbai/storage/research_appender.py — never touches write_text
+    directly. Idempotent per UTC day."""
+    import sys
+    sys.path.insert(0, str(_VAULT_ROOT))
+    from kbai.storage.research_appender import append_research_section
 
     payload = {
+        "note_id": note_id,
         "sources": sources or [],
         "claim_checks": claim_checks or [],
         "cross_links": cross_links or [],
         "open_questions": open_questions or [],
-        "raw_summary": raw_summary,
-    }
-
-    section = _format_research_section(payload, include_raw_summary=include_raw_summary)
-
-    original = note_file.read_text(encoding="utf-8")
-    separator = "\n\n---\n\n" if not original.endswith("\n") else "\n---\n\n"
-    new_content = original.rstrip() + separator + section
-
-    note_file.write_text(new_content, encoding="utf-8")
-
-    return {
-        "note_id": note_id,
-        "applied_at": datetime.now(timezone.utc).isoformat(),
+        # include_raw_summary=False suppresses the summary section by passing
+        # an empty raw_summary; the appender skips empty summaries.
+        "raw_summary": raw_summary if include_raw_summary else "",
         "researched_at": researched_at,
-        "section_chars": len(section),
-        "file": str(note_file.relative_to(_VAULT_ROOT)),
-        "status": "appended",
     }
+    return append_research_section(_VAULT_ROOT, note_id, payload).model_dump()
 
 
 @app.tool()

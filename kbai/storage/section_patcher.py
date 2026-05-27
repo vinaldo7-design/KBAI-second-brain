@@ -1,7 +1,11 @@
-"""Stage 3 item 3 (Step A): extracted from pile_a_patcher.py.
+"""Stage 3 item 3 (Step A): inserts a wikilink under a typed-link section in a
+note body. Returns (new_text, status) — never raises, never touches the
+filesystem.
 
-Inserts a wikilink under a typed-link section in a note body. Returns
-(new_text, status) — never raises, never touches the filesystem.
+Phase 3 (2b sequel): `EDGE_HEADING` is no longer hardcoded. It is derived from
+`vault_taxonomy.yaml` at module load — one source of truth for edge types on
+both the parser side and the writer side. Heading matching is case-insensitive
+so existing notes (sentence-case, title-case, etc.) all resolve.
 
 Status taxonomy:
   patched          — link inserted, new_text differs from input
@@ -11,19 +15,50 @@ Status taxonomy:
 
 from __future__ import annotations
 
+import os
 import re
+from pathlib import Path
+
+import yaml
 
 
-EDGE_HEADING: dict[str, str] = {
-    "builds-on": "### Builds on",
-    "builds-toward": "### Builds toward",
-    "contradicts": "### Contradicts",
-    "analogous-to": "### Analogous to",
-    "exemplifies": "### Exemplifies",
-    "challenges": "### Challenges",
-    "operationalises": "### Operationalises",
-    "referenced-in-maps": "### Referenced in Maps",
-}
+def _taxonomy_path() -> Path:
+    """Find vault_taxonomy.yaml. Prefers $VAULT_ROOT, falls back to a relative
+    path resolved from this module's location."""
+    if env := os.environ.get("VAULT_ROOT"):
+        candidate = Path(env) / "vault_taxonomy.yaml"
+        if candidate.exists():
+            return candidate
+    fallback = Path(__file__).resolve().parent.parent.parent / "vault_taxonomy.yaml"
+    if fallback.exists():
+        return fallback
+    raise FileNotFoundError(
+        "vault_taxonomy.yaml not found (checked $VAULT_ROOT and module-relative path)"
+    )
+
+
+def _load_edge_headings() -> dict[str, str]:
+    """Build {edge_type: '### Heading'} from vault_taxonomy.yaml.
+
+    The yaml stores `section_heading` in lowercase (parser-side convention);
+    here we display it with the first letter uppercased. Edge types without a
+    section_heading (e.g. `untyped`, `mentioned`) are omitted — passing those
+    to `patch_section` correctly returns "no_section".
+    """
+    with open(_taxonomy_path(), encoding="utf-8") as f:
+        data = yaml.safe_load(f) or {}
+
+    headings: dict[str, str] = {}
+    for edge_type, meta in (data.get("edge_types") or {}).items():
+        sh = (meta or {}).get("section_heading")
+        if not sh:
+            continue
+        display = sh[0].upper() + sh[1:]
+        headings[edge_type] = f"### {display}"
+    return headings
+
+
+EDGE_HEADING: dict[str, str] = _load_edge_headings()
 
 
 def patch_section(text: str, edge_type: str, target_stem: str) -> tuple[str, str]:
@@ -37,7 +72,10 @@ def patch_section(text: str, edge_type: str, target_stem: str) -> tuple[str, str
     if heading is None:
         return text, "no_section"
 
-    heading_re = re.compile(rf"^{re.escape(heading)}\s*$", re.MULTILINE)
+    heading_re = re.compile(
+        rf"^{re.escape(heading)}\s*$",
+        re.MULTILINE | re.IGNORECASE,
+    )
     m = heading_re.search(text)
     if not m:
         return text, "no_section"

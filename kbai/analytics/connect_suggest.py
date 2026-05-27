@@ -35,15 +35,17 @@ def tag_set(node: dict) -> set:
 
 
 def has_edge_between(g: VaultGraph, a: str, b: str) -> bool:
-    return g.G.has_edge(a, b) or g.G.has_edge(b, a)
+    v = g.view(collapse=True, include_mentioned=False)
+    return v.has_edge(a, b) or v.has_edge(b, a)
 
 
 def typed_degree(g: VaultGraph, node_id: str) -> int:
+    v = g.view(collapse=True, include_mentioned=False)
     count = 0
-    for _, _, data in g.G.out_edges(node_id, data=True):
+    for _, _, data in v.out_edges(node_id, data=True):
         if data.get("type") not in (None, "untyped", "mentioned"):
             count += 1
-    for _, _, data in g.G.in_edges(node_id, data=True):
+    for _, _, data in v.in_edges(node_id, data=True):
         if data.get("type") not in (None, "untyped", "mentioned"):
             count += 1
     return count
@@ -86,17 +88,21 @@ def orphan_rescue(g: VaultGraph) -> list[dict]:
 
 
 def missing_bidir(g: VaultGraph) -> list[dict]:
-    """A builds-on B implies B should have a builds-toward A. Flag if missing."""
+    """A builds-on B implies B should have a builds-toward A — and vice versa.
+
+    Iterates native edges (g.G, no collapse). For each `A builds-on B`, looks for
+    native `B builds-toward A`; for each `A builds-toward B`, looks for native
+    `B builds-on A`. Operating on the collapsed view would conflate the two
+    narrations and produce false positives (the pre-2b bug).
+    """
+    _REVERSE = {"builds-on": "builds-toward", "builds-toward": "builds-on"}
     results = []
     seen = set()
     for source, target, data in g.G.edges(data=True):
         etype = data.get("type")
-        if etype not in ("builds-on", "builds-toward"):
+        expected_reverse_type = _REVERSE.get(etype)
+        if expected_reverse_type is None:
             continue
-        if etype == "builds-on":
-            expected_reverse_type = "builds-toward"
-        else:
-            expected_reverse_type = "builds-on"
         expected_source, expected_target = target, source
 
         key = (expected_source, expected_target, expected_reverse_type)
@@ -200,8 +206,9 @@ def low_centrality_high_substance(g: VaultGraph) -> list[dict]:
     """Evergreen notes with PageRank below median — well-developed but under-linked."""
     central = g.most_central(n=9999, by="pagerank")
     scores = {nid: score for nid, score in central}
+    v = g.view(collapse=True, include_mentioned=False)
     evergreen = [
-        nid for nid, data in g.G.nodes(data=True)
+        nid for nid, data in v.nodes(data=True)
         if not data.get("_broken")
         and data.get("status") == "evergreen"
         and nid in scores
@@ -214,8 +221,8 @@ def low_centrality_high_substance(g: VaultGraph) -> list[dict]:
     for nid in evergreen:
         score = scores[nid]
         if score < median_score:
-            in_deg = g.G.in_degree(nid)
-            out_deg = g.G.out_degree(nid)
+            in_deg = v.in_degree(nid)
+            out_deg = v.out_degree(nid)
             results.append({
                 "source": nid,
                 "target": None,

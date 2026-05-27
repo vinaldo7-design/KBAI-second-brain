@@ -24,13 +24,12 @@ _TAXONOMY_PATH = _vault_root / "vault_taxonomy.yaml"
 
 _model: SentenceTransformer | None = None
 _graph: VaultGraph | None = None
-_graph_exhaustive: VaultGraph | None = None
 _pagerank: dict[str, float] | None = None
 
 # Retrieval modes (Stage 0 item 3 — formalised cognitive routing precursor).
 # - standard:   contradicts + mentioned excluded from PPR walk + path attribution
 # - sparring:   contradicts allowed; mentioned still excluded
-# - exhaustive: deep audit; mentioned edges loaded into graph and walked
+# - exhaustive: deep audit; mentioned edges walked at query time
 RETRIEVAL_MODES = ("standard", "sparring", "exhaustive")
 
 
@@ -42,26 +41,23 @@ def _get_model() -> SentenceTransformer:
 
 
 def _get_graph() -> VaultGraph:
+    """Single VaultGraph cache. Post-2b the constructor preserves every edge;
+    query-time options (collapse, include_mentioned) select the view."""
     global _graph
     if _graph is None:
         _graph = VaultGraph.load(str(_GRAPH_PATH))
     return _graph
 
 
-def _get_graph_exhaustive() -> VaultGraph:
-    """Loaded with include_mentioned=True. Used only by mode='exhaustive'."""
-    global _graph_exhaustive
-    if _graph_exhaustive is None:
-        _graph_exhaustive = VaultGraph.load(str(_GRAPH_PATH), include_mentioned=True)
-    return _graph_exhaustive
-
-
 def _get_pagerank() -> dict[str, float]:
-    """PageRank over the vault graph, normalised 0–1. Cached after first call."""
+    """PageRank over the default view, normalised 0–1. Cached after first call."""
     global _pagerank
     if _pagerank is None:
         g = _get_graph()
-        scores = nx.pagerank(g._simple_digraph(), weight="weight")
+        scores = nx.pagerank(
+            g._simple_digraph(collapse=True, include_mentioned=False),
+            weight="weight",
+        )
         max_pr = max(scores.values()) if scores else 1.0
         _pagerank = {k: v / max_pr for k, v in scores.items()}
     return _pagerank
@@ -200,7 +196,7 @@ def audit_taxonomy(check_type: str, against_type: str) -> list[dict]:
     against_vec = model.encode(against_desc, normalize_embeddings=True)
 
     results: list[dict] = []
-    for source, target, data in g.G.edges(data=True):
+    for source, target, data in g.view(collapse=True, include_mentioned=False).edges(data=True):
         if data.get("type") != check_type:
             continue
         src_node = g.node(source) or {}
@@ -280,12 +276,11 @@ def _assemble_context_impl(
     from kbai.retrieve.assembler import assemble_context as _assemble
     if mode not in RETRIEVAL_MODES:
         mode = "standard"
-    g = _get_graph_exhaustive() if mode == "exhaustive" else _get_graph()
     return _assemble(
         query=query,
         db_path=_DB_PATH,
         vault_root=_vault_root,
-        graph=g,
+        graph=_get_graph(),
         model=_get_model(),
         mode=mode,
         seed_k=seed_k,
@@ -333,12 +328,11 @@ def _retrieve_with_profile(
     from kbai.cognitive_routing import load_profile
     from kbai.retrieve.assembler import assemble_context as _assemble
     profile = load_profile(profile_id)
-    g = _get_graph_exhaustive() if profile.mention_policy == "exhaustive" else _get_graph()
     return _assemble(
         query=query,
         db_path=_DB_PATH,
         vault_root=_vault_root,
-        graph=g,
+        graph=_get_graph(),
         model=_get_model(),
         profile=profile,
         seed_k=seed_k,

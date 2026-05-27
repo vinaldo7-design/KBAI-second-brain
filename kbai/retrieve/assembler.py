@@ -72,11 +72,18 @@ def assemble_context(
     # Legacy mode path: suppress weight overrides to preserve exact PPR scores.
     weight_overrides = profile.edge_weight_overrides if _profile_explicit else {}
 
+    # Profile.mention_policy = "exhaustive" walks the mentioned-included view;
+    # any other policy walks the default view (mentioned excluded).
+    include_mentioned = profile.mention_policy == "exhaustive"
+
     # ── Dense seed ───────────────────────────────────────────────────────────
     seed_scores, seed_meta = dense_seed(query, db_path, model, seed_k)
 
     # ── PPR ──────────────────────────────────────────────────────────────────
-    ranked = ppr_rank(graph, seed_scores, exclude_types, weight_overrides, cap=top_k)
+    ranked = ppr_rank(
+        graph, seed_scores, exclude_types, weight_overrides,
+        cap=top_k, include_mentioned=include_mentioned,
+    )
 
     # ── Build result list ────────────────────────────────────────────────────
     results: list[dict] = []
@@ -121,7 +128,10 @@ def assemble_context(
     attr_slice = results[:attr_top_n] if attr_top_n is not None else results
     ppr_targets = [r["note_id"] for r in attr_slice if r["source"] == "ppr"]
     path_exclude = path_exclude_from_profile(profile)
-    attributions = path_attribute(graph, seed_ids, ppr_targets, path_exclude)
+    attributions = path_attribute(
+        graph, seed_ids, ppr_targets, path_exclude,
+        include_mentioned=include_mentioned,
+    )
     for r in results:
         r["reasoning_path"] = (
             attributions.get(r["note_id"]) if r["source"] == "ppr" else None
