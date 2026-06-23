@@ -189,9 +189,9 @@ def create_note(
     # must never break the create: wrap it and swallow. The write already
     # succeeded above; the receipt stays status="applied" regardless.
     # update_note_edges is still a no-op stub, so it's left unwrapped.
-    # NOTE / latent issue: link_applier and research_appender call their reindex
-    # hooks unwrapped too — once those hooks do real I/O they need the same
-    # try/except guard. Flagged for a later pass; not touched here.
+    # NOTE / latent issue: link_applier calls its reindex hook unwrapped too —
+    # once that hook does real I/O it needs the same try/except guard. Flagged
+    # for a later pass; not touched here.
     try:
         update_note_embeddings(note_id, vault_root)
     except Exception:  # noqa: BLE001 — hook failure must not fail the write
