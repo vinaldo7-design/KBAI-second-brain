@@ -24,10 +24,10 @@ from pathlib import Path
 
 from kbai.cognitive_routing import apply_profile, load_profile
 from kbai.contracts import CognitiveProfile
-from kbai.retrieve.dense import dense_seed
 from kbai.retrieve.path import path_attribute, path_exclude_from_profile
 from kbai.retrieve.ppr import ppr_rank
 from kbai.retrieve.prune import prune_redundant_paths
+from kbai.retrieve.sparse import hybrid_seed
 
 _MODE_TO_PROFILE: dict[str, str] = {
     "standard": "default",
@@ -77,8 +77,8 @@ def assemble_context(
     # any other policy walks the default view (mentioned excluded).
     include_mentioned = profile.mention_policy == "exhaustive"
 
-    # ── Dense seed ───────────────────────────────────────────────────────────
-    seed_scores, seed_meta = dense_seed(query, db_path, model, seed_k)
+    # ── Hybrid seed (dense + BM25, RRF-fused; dense-only if no FTS index) ─────
+    seed_scores, seed_meta = hybrid_seed(query, db_path, model, seed_k)
 
     # ── PPR ──────────────────────────────────────────────────────────────────
     ranked = ppr_rank(

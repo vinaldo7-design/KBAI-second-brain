@@ -79,6 +79,11 @@ def init_db(db: sqlite3.Connection) -> None:
         )
         """
     )
+    # BM25 keyword index over summaries (hybrid retrieval, slice 3). Kept in sync
+    # with the vector index by embed_note, so both refresh on the same write.
+    db.execute(
+        "CREATE VIRTUAL TABLE IF NOT EXISTS notes_fts USING fts5(note_id UNINDEXED, summary)"
+    )
     db.commit()
 
 
@@ -159,6 +164,12 @@ def embed_note(
         db.execute(
             "INSERT INTO note_vectors (note_id, embedding) VALUES (?, ?)",
             (note_id, serialize_embedding(vec)),
+        )
+        # Keep the BM25 keyword index in sync (hybrid retrieval, slice 3).
+        db.execute("DELETE FROM notes_fts WHERE note_id = ?", (note_id,))
+        db.execute(
+            "INSERT INTO notes_fts (note_id, summary) VALUES (?, ?)",
+            (note_id, summary),
         )
         db.commit()
         return True
