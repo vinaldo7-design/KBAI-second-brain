@@ -43,10 +43,10 @@ synthesizing with consensus / disagreement structure made explicit.
 
 - **21 slash commands** live.
 - MCP tools across two servers: **mini-vinny** (16 read-only tools) and
-  **write-agent** (3 live, journaled mutators).
+  **write-agent** (2 live, journaled mutators).
 - **316 tests** passing.
 - The Write Agent is **live**: real journaled mutations (`write_create_note`,
-  `write_append_research_section`, `write_apply_link_suggestions`), each body
+  `write_apply_link_suggestions`), each body
   ≤5 lines delegating into `kbai/storage/`.
 - Frontmatter is structurally enforced on write. Deferred-tool discovery and
   embed-on-write freshness are in place.
@@ -240,7 +240,7 @@ mechanically merging.
 │   └── contracts.py              # Pydantic models for all boundaries
 │
 ├── minivinnymcp/                 # Mini Vinny MCP server (read-only, 16 tools)
-├── writeagentmcp/                # Write Agent MCP server (live, 3 journaled mutators)
+├── writeagentmcp/                # Write Agent MCP server (live, 2 journaled mutators)
 │
 ├── claude/
 │   ├── commands/                 # Slash-command snapshot (canonical copy lives in ~/.claude/)
@@ -300,10 +300,9 @@ profile calibration possible.
 ### Single-writer invariant
 
 Mini Vinny contains no file-write code. The Write Agent is the only mutator
-and journals every change. It is **live**: `write_create_note`,
-`write_append_research_section`, and `write_apply_link_suggestions` perform
-real, journaled mutations, each delegating into
-`kbai/storage/{note_creator,research_appender,link_applier,write_journal}`.
+and journals every change. It is **live**: `write_create_note` and
+`write_apply_link_suggestions` perform real, journaled mutations, each
+delegating into `kbai/storage/{note_creator,link_applier,write_journal}`.
 
 ### Structurally enforced frontmatter
 
