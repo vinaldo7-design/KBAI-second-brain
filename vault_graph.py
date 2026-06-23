@@ -29,7 +29,12 @@ import yaml
 
 # --- Configuration ------------------------------------------------------------
 
-SKIP_DIRS = {"Templates", "07-attachments", ".obsidian", ".trash", "claude", "docs"}
+SKIP_DIRS = {"Templates", "07-attachments", ".obsidian", ".trash", "claude", "docs",
+             # code packages — infrastructure, not vault content. kbai/templates/*.md
+             # in particular are skeletons, not notes; parsing them injected 7 bogus
+             # nodes (placeholder summaries) into the graph and broke vault_embed.
+             "kbai", "minivinnymcp", "writeagentmcp", "perplexitymcp", "scripts",
+             "eval", "__pycache__"}
 SKIP_FILES = {"CLAUDE.md", "CLAUDE-static.md", "README.md",
               "vault-manifest.md", "connect-suggestions.md",
               "Untitled.md", "ggg.md"}

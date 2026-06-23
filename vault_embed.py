@@ -56,7 +56,12 @@ def main():
         raise SystemExit(f"Missing {GRAPH_JSON}. Run vault_graph.py first.")
 
     data = json.loads(GRAPH_JSON.read_text())
-    nodes_with_summary = [n for n in data["nodes"] if n.get("summary")]
+    # Only embed notes whose summary is a non-empty STRING. Defensive: a node whose
+    # summary parsed as a dict/None (e.g. a stray non-note file) is skipped, not crashed on.
+    nodes_with_summary = [
+        n for n in data["nodes"]
+        if isinstance(n.get("summary"), str) and n["summary"].strip()
+    ]
     skipped_no_summary = len(data["nodes"]) - len(nodes_with_summary)
 
     print(f"Loading model {MODEL_NAME} (first run downloads ~33MB)...")
