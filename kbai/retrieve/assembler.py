@@ -27,6 +27,7 @@ from kbai.contracts import CognitiveProfile
 from kbai.retrieve.dense import dense_seed
 from kbai.retrieve.path import path_attribute, path_exclude_from_profile
 from kbai.retrieve.ppr import ppr_rank
+from kbai.retrieve.prune import prune_redundant_paths
 
 _MODE_TO_PROFILE: dict[str, str] = {
     "standard": "default",
@@ -84,6 +85,12 @@ def assemble_context(
         graph, seed_scores, exclude_types, weight_overrides,
         cap=top_k, include_mentioned=include_mentioned,
     )
+
+    # ── Prune the redundant tail (PathRAG: redundancy, not insufficiency) ─────
+    # Conservative: drops only notes below 5% of the top PPR score, always keeps
+    # seeds, never below keep_min. With top_k<=10 (council/profile path) this is
+    # a no-op; it only trims the long legacy-mode tail (top_k=50).
+    ranked = prune_redundant_paths(ranked, list(seed_meta.keys()))
 
     # ── Build result list ────────────────────────────────────────────────────
     results: list[dict] = []
