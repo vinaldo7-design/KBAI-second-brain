@@ -1,13 +1,14 @@
 """perplexity-mcp — Perplexity Deep Research as an annotator for the vault.
 
-Four tools (Stage 4 — research split):
+Three tools (read/fetch only — never writes the vault):
   research_note          — single-note deep research (no writes)
   research_cluster       — cluster-level cross-cutting research (no writes)
   research_verify_claim  — narrow fact-check on a specific claim text
-  apply_research         — append findings to the note as a clearly-marked section
 
-Discipline: never silently rewrites existing prose. All Perplexity-derived
-content lives under "## External research (Perplexity, YYYY-MM-DD)".
+Single-writer invariant: perplexity NEVER mutates the vault. To append findings
+to a note, use write-agent's write_append_research_section front door — the only
+sanctioned vault writer. All Perplexity-derived content lives under
+"## External research (Perplexity, YYYY-MM-DD)".
 """
 
 import json
@@ -277,8 +278,9 @@ app = FastMCP("perplexity-research")
 def research_note(note_id: str, mode: str = "single", cluster_hops: int = 1) -> dict:
     """Call Perplexity Deep Research on a vault note. Returns structured findings
     with sources, claim_checks, cross_links, open_questions. Does NOT modify
-    the note — use apply_research to patch findings in. mode='cluster' is
-    reserved for future expansion; currently behaves like 'single'."""
+    the note — use write-agent's write_append_research_section to patch findings
+    in. mode='cluster' is reserved for future expansion; currently behaves like
+    'single'."""
     note_file = _find_note_file(note_id)
     if not note_file:
         return {"error": f"Note '{note_id}' not found under {_VAULT_ROOT}"}
@@ -311,38 +313,6 @@ def research_note(note_id: str, mode: str = "single", cluster_hops: int = 1) -> 
         "open_questions": payload.get("open_questions") or [],
         "raw_summary": payload.get("raw_summary") or "",
     }
-
-
-@app.tool()
-def apply_research(
-    note_id: str,
-    sources: list[dict] | None = None,
-    claim_checks: list[dict] | None = None,
-    cross_links: list[dict] | None = None,
-    open_questions: list[dict] | None = None,
-    raw_summary: str = "",
-    include_raw_summary: bool = True,
-    researched_at: str | None = None,
-) -> dict:
-    """Append research findings to a note. Delegates to the single journalled
-    writer in kbai/storage/research_appender.py — never touches write_text
-    directly. Idempotent per UTC day."""
-    import sys
-    sys.path.insert(0, str(_VAULT_ROOT))
-    from kbai.storage.research_appender import append_research_section
-
-    payload = {
-        "note_id": note_id,
-        "sources": sources or [],
-        "claim_checks": claim_checks or [],
-        "cross_links": cross_links or [],
-        "open_questions": open_questions or [],
-        # include_raw_summary=False suppresses the summary section by passing
-        # an empty raw_summary; the appender skips empty summaries.
-        "raw_summary": raw_summary if include_raw_summary else "",
-        "researched_at": researched_at,
-    }
-    return append_research_section(_VAULT_ROOT, note_id, payload).model_dump()
 
 
 @app.tool()
