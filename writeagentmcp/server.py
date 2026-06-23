@@ -1,15 +1,14 @@
 """writeagentmcp — the only component permitted to mutate the vault.
 
-Stage 3 goes live incrementally:
-  Item 1 — write_create_note (real)
-  Item 2 — write_append_research_section (real)
-  Item 3 — write_apply_link_suggestions (real)
+Exposes two tools:
+  write_create_note (real)
+  write_apply_link_suggestions (real)
 
 Every real tool body is ≤5 lines and delegates straight into
-kbai/storage/{note_creator,research_appender,link_applier,write_journal}.
+kbai/storage/{note_creator,link_applier,write_journal}.
 
-Single-writer invariant: minivinnymcp and perplexitymcp must NEVER call
-these tools or call write_text on vault files. All mutations land here.
+Single-writer invariant: minivinnymcp must NEVER call these tools or call
+write_text on vault files. All mutations land here.
 """
 
 import os
@@ -23,7 +22,6 @@ sys.path.insert(0, str(_VAULT_ROOT))
 
 from kbai.storage.link_applier import apply_link_suggestions  # noqa: E402
 from kbai.storage.note_creator import create_note  # noqa: E402
-from kbai.storage.research_appender import append_research_section  # noqa: E402
 
 app = FastMCP("write-agent")
 
@@ -38,17 +36,6 @@ def write_create_note(
 ) -> dict:
     """Create a new vault note. Refuses to overwrite. Returns a WriteReceipt."""
     return create_note(_VAULT_ROOT, folder, note_id, frontmatter, body, dryrun).model_dump()
-
-
-@app.tool()
-def write_append_research_section(
-    note_id: str,
-    payload: dict,
-    dryrun: bool = False,
-) -> dict:
-    """Append a dated 'External research (Perplexity, YYYY-MM-DD)' section to a note.
-    Idempotent per day. Returns a WriteReceipt."""
-    return append_research_section(_VAULT_ROOT, note_id, payload, dryrun).model_dump()
 
 
 @app.tool()

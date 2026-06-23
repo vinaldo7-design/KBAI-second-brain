@@ -1,4 +1,4 @@
-"""Stage 3 transitional shim: all three write tools are now real (Items 1-3).
+"""Stage 3 transitional shim: both write tools are now real.
 The exhaustive real tests live in test_write_real.py (Item 6). This file
 only checks that the server exposes the expected tool surface."""
 
@@ -20,6 +20,6 @@ def test_server_exposes_expected_tools():
     names = set(tm._tools.keys())
     assert {
         "write_create_note",
-        "write_append_research_section",
         "write_apply_link_suggestions",
     } <= names
+    assert "write_append_research_section" not in names

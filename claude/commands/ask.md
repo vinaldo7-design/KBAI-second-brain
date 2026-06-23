@@ -15,7 +15,6 @@ Apply these rules in order (first match wins):
 | "how do I X" / "operationalize X" / "make X concrete" | **ops** |
 | "council X" / "what should I do about X" / ambiguous trade-off | **council** |
 | "deep audit X" / "exhaustive search X" / "include mentioned" | **exhaustive** |
-| "research X" where X matches note-id format | **research** |
 | "compare X" / "X vs Y" / profile1+profile2 in query | **compare** |
 | "paths from A to B" / "connect A B" | **paths** |
 | anything else | **about** (default) |
@@ -33,8 +32,6 @@ Print one line: `routed as intent: <intent>`
 **council**: Call `mcp__mini-vinny__council_retrieve(query=X, top_k=10)`. Synthesize per the /council rules: one paragraph per lens, one synthesis paragraph, one Skeptic note mandatory.
 
 **exhaustive**: Call `mcp__mini-vinny__cognition_retrieve_as(query=X, profile_id="exhaustive", top_k=15)`. Flag any low-signal (mentioned-only) notes explicitly.
-
-**research**: Call `mcp__perplexity-research__research_note(note_id=X)`. Present sources, claim checks, open questions. Do not write to the note unless asked.
 
 **compare**: Parse profile spec (split on `+`), extract query remainder. Call `mcp__mini-vinny__cognition_compare_profiles(query=<query>, profile_ids=[...], top_k=10)`. Render a compact side-by-side table and divergence score.
 

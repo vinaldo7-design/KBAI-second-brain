@@ -113,7 +113,7 @@ def test_research_payload_full_roundtrip():
 
 def test_write_receipt_stub_shape():
     wr = WriteReceipt(
-        tool="write_append_research_section",
+        tool="write_apply_link_suggestions",
         note_id="x",
         status="stub",
         applied=False,
@@ -220,17 +220,6 @@ def test_analytics_connect_suggest_output_validates():
     out = analytics_connect_suggest(categories=["missing_bidir"])
     for row in out.get("missing_bidir", [])[:5]:
         SuggestionEntry(**row)
-
-
-def test_write_stub_output_validates():
-    # Stage 3: write_append_research_section is real. With a non-existent
-    # note_id it returns status='error' but the receipt shape still
-    # validates against the WriteReceipt contract.
-    from writeagentmcp.server import write_append_research_section
-    out = write_append_research_section("some-note-that-does-not-exist-xyz", {"sources": []})
-    wr = WriteReceipt(**out)
-    assert wr.status in ("error", "applied", "already_present")
-    assert wr.applied is False
 
 
 def test_apply_link_suggestions_stub_output_validates():

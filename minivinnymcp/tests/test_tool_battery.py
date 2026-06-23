@@ -74,7 +74,6 @@ _MINI_VINNY = [
 ]
 
 _WRITE_AGENT = [
-    "mcp__write-agent__write_append_research_section",
     "mcp__write-agent__write_apply_link_suggestions",
     "mcp__write-agent__write_create_note",
 ]
