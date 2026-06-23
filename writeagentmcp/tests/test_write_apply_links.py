@@ -101,13 +101,17 @@ def test_already_present_count_and_file_unchanged(tmp_path):
 # --- no_section ------------------------------------------------------------
 
 def test_no_section_handled_gracefully(tmp_path):
+    # Post-Task-2: patch_section is create-if-missing, so a *headed* edge type
+    # whose heading is absent (e.g. operationalises) is now CREATED, not skipped.
+    # no_section is therefore reserved for headingless types (untyped / mentioned)
+    # — exercise that genuine path here.
     vault = _vault(tmp_path)
     note = _make_note(vault, "source-note")
     original = note.read_bytes()
 
     result = apply_link_suggestions(
         vault,
-        [{"source": "source-note", "target": "wherever", "edge_type": "operationalises"}],
+        [{"source": "source-note", "target": "wherever", "edge_type": "mentioned"}],
     )
     data = result.model_dump()
 

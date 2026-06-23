@@ -40,6 +40,15 @@ At least one connection outside the domain this came from.
 ### Analogous to
 - 
 
+### Exemplifies
+- 
+
+### Challenges
+- 
+
+### Operationalises
+- 
+
 ### Referenced in maps
 - 
 

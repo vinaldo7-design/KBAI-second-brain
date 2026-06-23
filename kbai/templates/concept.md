@@ -40,6 +40,12 @@ Where this concept shows up in other thinkers or domains.
 ### Exemplifies
 - 
 
+### Challenges
+- 
+
+### Operationalises
+- 
+
 ### Referenced in maps
 - 
 
