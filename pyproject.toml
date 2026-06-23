@@ -23,7 +23,7 @@ dependencies = [
 dev = ["pytest>=7.0"]
 
 [tool.setuptools.packages.find]
-include = ["kbai*", "minivinnymcp*", "perplexitymcp*", "writeagentmcp*"]
+include = ["kbai*", "minivinnymcp*", "writeagentmcp*"]
 exclude = [
   "tests*",
   "07-attachments*",
@@ -43,7 +43,7 @@ exclude = [
 ]
 
 # NOTE — Stage 1: this file declares package metadata so future `pip install -e .`
-# resolves Mini Vinny / Perplexity / Write Agent / kbai as proper packages.
+# resolves Mini Vinny / Write Agent / kbai as proper packages.
 # Currently NOT installed; servers still use sys.path hacks at module top.
 # Stage 1 item 1.4 (assemble_context refactor) will trigger the install + remove
 # the sys.path lines from the MCP server entrypoints.

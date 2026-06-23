@@ -23,7 +23,6 @@ On top of the vault sit four agents with clean scopes:
 | Role | Owns |
 |---|---|
 | **Mini Vinny** | Vault retrieval, graph reasoning, cognitive routing |
-| **Perplexity** | External research, claim verification, no writes |
 | **Write Agent** | The only mutator — every vault write is journaled |
 | **Claude** | Orchestration, voice rendering, human-in-the-loop gates |
 
@@ -43,8 +42,7 @@ synthesizing with consensus / disagreement structure made explicit.
 ## Status
 
 - **22 slash commands** live.
-- **16 MCP tools** across three servers (mini-vinny, perplexity-research,
-  write-agent stub).
+- MCP tools across two servers (mini-vinny, write-agent stub).
 - **164 tests** passing.
 - Stages 0, 1, 2, 4, 5, 5.5, 5.6, 9 shipped. Stage 3 (Write Agent live
   mutations) deferred until usage demand surfaces. Stage 6/7/8
@@ -66,7 +64,6 @@ cd KBAI-second-brain
 
 python -m venv .venv && source .venv/bin/activate
 pip install -r minivinnymcp/requirements.txt
-pip install -r perplexitymcp/requirements.txt
 pip install -r writeagentmcp/requirements.txt
 pip install pydantic pytest
 
@@ -78,12 +75,12 @@ python vault_embed.py
 
 # Run the test suite
 VAULT_ROOT=/path/to/vault pytest \
-  minivinnymcp/tests/ perplexitymcp/tests/ writeagentmcp/tests/ -q
+  minivinnymcp/tests/ writeagentmcp/tests/ -q
 ```
 
 ### Wiring into Claude Desktop
 
-Three MCP servers, configured in
+Two MCP servers, configured in
 `~/Library/Application Support/Claude/claude_desktop_config.json`:
 
 ```jsonc
@@ -93,15 +90,6 @@ Three MCP servers, configured in
       "command": "/path/to/python",
       "args": ["-m", "minivinnymcp.server"],
       "env": { "VAULT_ROOT": "/path/to/vault" }
-    },
-    "perplexity-research": {
-      "command": "/path/to/python",
-      "args": ["-m", "perplexitymcp.server"],
-      "env": {
-        "VAULT_ROOT": "/path/to/vault",
-        "PERPLEXITY_API_KEY": "pplx-…",
-        "PERPLEXITY_MODEL": "sonar-deep-research"
-      }
     },
     "write-agent": {
       "command": "/path/to/python",
@@ -157,14 +145,6 @@ ln -s "$PWD/claude/voices"   ~/.claude/voices
 | `/council <query>` | 3 cognitive profiles + synthesizer; flagship |
 | `/compare-thinkers <p1>+<p2> <query>` | Side-by-side multi-profile compare |
 | `/pressure-test <fuzzy>` | Auto-escalates challenge → council |
-
-### External research
-
-| Command | What it does |
-|---|---|
-| `/research <fuzzy>` | Perplexity Deep Research on one note |
-| `/cluster-research <map-id>` | Map-level cross-cutting research |
-| `/verify <claim>` | Cheap fact-check of a single claim |
 
 ### Maintenance
 
@@ -242,7 +222,6 @@ mechanically merging.
 │   └── contracts.py              # Pydantic models for all boundaries
 │
 ├── minivinnymcp/                 # Mini Vinny MCP server (read-only)
-├── perplexitymcp/                # Perplexity research MCP server
 ├── writeagentmcp/                # Write Agent (stub-only until Stage 3)
 │
 ├── claude/
@@ -299,15 +278,9 @@ Claude synthesizes per the `/council` slash-command rules:
 Every invocation logs to `council_events` — the dataset that makes future
 profile calibration (Stage 8) possible.
 
-### Marked-section discipline
-
-Perplexity output never touches the main body of a note. It lives only
-under `## External research (Perplexity, YYYY-MM-DD)` sections appended
-below `---`. The boundary is enforced architecturally.
-
 ### Single-writer invariant
 
-Mini Vinny and Perplexity contain no file-write code. The Write Agent is
+Mini Vinny contains no file-write code. The Write Agent is
 the only mutator and journals every change. Currently in stub mode;
 Stage 3 turns on real mutations when usage demands it.
 
@@ -324,7 +297,7 @@ retrieved. They never overlap.
 PYTEST=/path/to/.venv/bin/pytest
 
 # Full suite
-$PYTEST minivinnymcp/tests/ perplexitymcp/tests/ writeagentmcp/tests/ -q
+$PYTEST minivinnymcp/tests/ writeagentmcp/tests/ -q
 ```
 
 Test taxonomy spans:

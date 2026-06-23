@@ -107,9 +107,9 @@ Asserts the post-Phase-2 default view reproduces pre-refactor PPR / PageRank sco
 
 ```bash
 /Users/vinaynair/opt/anaconda3/envs/minivinnymcp/bin/python -m pytest \
-    minivinnymcp/tests/ writeagentmcp/tests/ perplexitymcp/tests/ -q
+    minivinnymcp/tests/ writeagentmcp/tests/ -q
 ```
-289 tests at Phase 6 close (was 274 at Phase 5 close). Run before committing any structural change.
+Run before committing any structural change. (Perplexity MCP server removed 2026-06-23; its test suite is gone.)
 
 ### Template skeleton audit (Phase 6)
 

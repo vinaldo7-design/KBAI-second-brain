@@ -63,8 +63,3 @@ def test_minivinny_shim_uses_unified_helper():
     import minivinnymcp.server as mv
     # Make sure import works and the function is callable
     assert callable(mv._find_note_file)
-
-
-def test_perplexity_shim_uses_unified_helper():
-    import perplexitymcp.server as pp
-    assert callable(pp._find_note_file)

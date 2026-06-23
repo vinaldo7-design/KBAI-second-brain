@@ -14,8 +14,6 @@ Personal command reference for day-to-day vault use.
 | `/touched <topic>` | topic substring | 20 most recent notes whose filename contains topic |
 | `/morning` | — | 5 recent notes + summaries + council suggestion *(experimental)* |
 | `/pressure-test <note>` | note-id or free text | Sparring challenge + optional council + edit checklist |
-| `/verify <claim>` | free text claim | Perplexity verdict + confidence + evidence |
-| `/cluster-research <map>` | map note-id or title | 14-day guard → Perplexity cluster research → apply on confirm |
 | `/connect` | — | Missing-link suggestions in 5 categories, preview only |
 | `/capture <idea>` | free text | Draft note proposal with links, no vault write |
 
@@ -33,16 +31,6 @@ Personal command reference for day-to-day vault use.
 | `/council <query>` | free text | Multi-lens council: one paragraph per cognitive profile |
 | `/ask <query>` | free text | Intent router: classifies query and calls the right tool sequence |
 | `/compare-thinkers <p1>+<p2> <query>` | profiles + query | Side-by-side profile comparison with divergence score |
-
----
-
-## Research commands
-
-| Command | Arguments | What it does |
-|---|---|---|
-| `/research <note>` | note-id or free text | Perplexity Deep Research on a note (~$0.05–0.20, 14-day guard) |
-| `/verify <claim>` | free text claim | Fact-check a single claim (cheaper than full research) |
-| `/cluster-research <map>` | map note-id | Research an entire map cluster at once |
 
 ---
 
@@ -77,7 +65,7 @@ All commands that accept a note-id now include Step 0 fuzzy resolution:
 | ambiguous | 0.4 ≤ top score < 0.7 | Print candidates, ask user to pick |
 | no_match | top score < 0.4 | Print error, stop |
 
-Commands with fuzzy resolution: `/about`, `/research`, `/ops`, `/analogies`, `/paths`, `/challenge`, `/pressure-test`.
+Commands with fuzzy resolution: `/about`, `/ops`, `/analogies`, `/paths`, `/challenge`, `/pressure-test`.
 
 ---
 
@@ -98,16 +86,7 @@ Used by `/council`, `/compare-thinkers`, and `cognition_retrieve_as`.
 ## Tool hierarchy
 
 ```
-Vault (Mini Vinny tools)  >  web  >  Perplexity
+Vault (Mini Vinny tools)  >  web
 ```
 
 For any question about Vinay's own thinking, the vault is authoritative.
-Perplexity adds external citations — never rewrites vault prose.
-
----
-
-## Cost guards
-
-- Perplexity `research_note` / `research_cluster`: ~$0.05–0.20 per call. 14-day cooldown per note.
-- `research_verify_claim`: cheaper single-claim check, no cooldown.
-- Check `06-Maps/perplexity-research.db` before triggering research manually.
