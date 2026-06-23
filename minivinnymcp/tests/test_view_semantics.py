@@ -4,7 +4,8 @@ Three concerns:
   1. Raw view (collapse=False) exposes builds-toward edges with their true
      native count and includes mentioned edges when requested.
   2. The default view (collapse=True, include_mentioned=False) reproduces
-     PageRank / PPR scores byte-for-byte against a pre-refactor fixture.
+     PageRank / PPR scores byte-for-byte against a FROZEN structural graph
+     fixture (decoupled from the live vault — see GRAPH_PATH).
   3. missing_bidir now checks native reverse types — no false positives.
   4. _frontier_nodes uses native types: no incoming builds-toward AND no
      outgoing builds-on.
@@ -24,7 +25,12 @@ sys.path.insert(0, str(_vault_root))
 
 from vault_graph_loader import VaultGraph
 
-GRAPH_PATH = _vault_root / "06-Maps" / "vault-graph.json"
+# Parity is checked against a FROZEN structural graph fixture (note ids + edge
+# topology, all prose stripped), NOT the live vault graph — so adding/renaming/
+# migrating notes never breaks these tests. They guard the loader's
+# PPR/PageRank/collapse logic; regenerate the fixture only when that logic
+# *intentionally* changes, never to chase a corpus change.
+GRAPH_PATH = Path(__file__).parent / "fixtures" / "parity_graph.json"
 FIXTURE_PATH = Path(__file__).parent / "fixtures" / "ppr_baseline.json"
 
 

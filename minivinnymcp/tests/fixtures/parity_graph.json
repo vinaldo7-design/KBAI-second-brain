@@ -1,0 +1,5233 @@
+{
+  "vault_root": "FIXTURE",
+  "nodes": [
+    {
+      "id": "cycle of suffering",
+      "type": null
+    },
+    {
+      "id": "acemoglu-task-exposure",
+      "type": "idea"
+    },
+    {
+      "id": "actuarial-vs-clinical-judgment",
+      "type": "idea"
+    },
+    {
+      "id": "agi-labour-restructure-thesis",
+      "type": "idea"
+    },
+    {
+      "id": "anti-fragility-via-expertise",
+      "type": "idea"
+    },
+    {
+      "id": "antifragile-expertise-as-optionality",
+      "type": "idea"
+    },
+    {
+      "id": "architectural-restraint",
+      "type": "idea"
+    },
+    {
+      "id": "articulation-as-constitutive",
+      "type": "concept"
+    },
+    {
+      "id": "atomicity-as-compression-discipline",
+      "type": "idea"
+    },
+    {
+      "id": "auden-more-loving-one",
+      "type": "concept"
+    },
+    {
+      "id": "automation-bias",
+      "type": "idea"
+    },
+    {
+      "id": "bachelard-memory-as-architecture",
+      "type": "concept"
+    },
+    {
+      "id": "barthes-lover-position",
+      "type": "concept"
+    },
+    {
+      "id": "bell-hooks-love-as-practice",
+      "type": "concept"
+    },
+    {
+      "id": "below-sea-level-underfunding-trap",
+      "type": "idea"
+    },
+    {
+      "id": "bisociation-mode-mixing-as-creativity-engine",
+      "type": "idea"
+    },
+    {
+      "id": "bitter-lesson-inversion-at-user-scale",
+      "type": "idea"
+    },
+    {
+      "id": "boym-restorative-reflective-nostalgia",
+      "type": "concept"
+    },
+    {
+      "id": "brynjolfsson-j-curve",
+      "type": "idea"
+    },
+    {
+      "id": "calibration-over-threshold",
+      "type": "idea"
+    },
+    {
+      "id": "carson-eros-gap",
+      "type": "concept"
+    },
+    {
+      "id": "classification-trees",
+      "type": "idea"
+    },
+    {
+      "id": "cognitive-fit-theory",
+      "type": "idea"
+    },
+    {
+      "id": "compliance-theatre-critique",
+      "type": "idea"
+    },
+    {
+      "id": "computer-vision-hierarchy",
+      "type": "idea"
+    },
+    {
+      "id": "context-engineering-as-structural-discipline",
+      "type": "idea"
+    },
+    {
+      "id": "context-window-quality-vs-size-divergence",
+      "type": "idea"
+    },
+    {
+      "id": "darwin-godel-machine",
+      "type": "idea"
+    },
+    {
+      "id": "data-debt-as-political-failure",
+      "type": "idea"
+    },
+    {
+      "id": "data-debt-as-skill-gap",
+      "type": "idea"
+    },
+    {
+      "id": "data-debt-as-wrong-question",
+      "type": "idea"
+    },
+    {
+      "id": "data-network-effects-weaker",
+      "type": "idea"
+    },
+    {
+      "id": "divergence-theorem",
+      "type": "idea"
+    },
+    {
+      "id": "edge-taxonomy-encodes-priors",
+      "type": "idea"
+    },
+    {
+      "id": "einstellung-effect",
+      "type": "idea"
+    },
+    {
+      "id": "ensemble-methods",
+      "type": "idea"
+    },
+    {
+      "id": "epistemically-honest-cycles",
+      "type": "idea"
+    },
+    {
+      "id": "explainability-guided-feature-reduction-is-circular",
+      "type": "idea"
+    },
+    {
+      "id": "explainability-tools",
+      "type": "idea"
+    },
+    {
+      "id": "externalities-as-economics",
+      "type": "idea"
+    },
+    {
+      "id": "first-mover-governance-disadvantage",
+      "type": "idea"
+    },
+    {
+      "id": "fisher-hauntology-lost-futures",
+      "type": "concept"
+    },
+    {
+      "id": "five-quotes-framework",
+      "type": "idea"
+    },
+    {
+      "id": "forcing-function-as-design-primitive",
+      "type": "idea"
+    },
+    {
+      "id": "garbage-in-garbage-out-empirical-floor",
+      "type": "idea"
+    },
+    {
+      "id": "garbage-in-garbage-out-thesis",
+      "type": "idea"
+    },
+    {
+      "id": "generative-encoding-over-external-retrieval",
+      "type": "idea"
+    },
+    {
+      "id": "geopolitical-risk-fourth-pressure",
+      "type": "idea"
+    },
+    {
+      "id": "goodharts-law",
+      "type": "idea"
+    },
+    {
+      "id": "governance-capital-day1",
+      "type": "idea"
+    },
+    {
+      "id": "governance-capital",
+      "type": "idea"
+    },
+    {
+      "id": "graph-rag-fidelity-vs-scale-tradeoff",
+      "type": "idea"
+    },
+    {
+      "id": "hyperagents",
+      "type": "idea"
+    },
+    {
+      "id": "imposed-vs-discovered-structure",
+      "type": "idea"
+    },
+    {
+      "id": "jameson-nostalgia-mode",
+      "type": "concept"
+    },
+    {
+      "id": "jevons-paradox-ai-compute",
+      "type": "idea"
+    },
+    {
+      "id": "knowledge-compression-translation-problem",
+      "type": "idea"
+    },
+    {
+      "id": "lacan-real-symbolic",
+      "type": "concept"
+    },
+    {
+      "id": "laing-divided-self",
+      "type": "concept"
+    },
+    {
+      "id": "langer-discursive-presentational",
+      "type": "concept"
+    },
+    {
+      "id": "legibility-bias",
+      "type": "idea"
+    },
+    {
+      "id": "linkedin-recommends-past-not-target",
+      "type": "idea"
+    },
+    {
+      "id": "lispector-being-misread",
+      "type": "concept"
+    },
+    {
+      "id": "logistic-regression-ann",
+      "type": "idea"
+    },
+    {
+      "id": "manual-curation-scaling-ceiling",
+      "type": "idea"
+    },
+    {
+      "id": "mastery-trap",
+      "type": "idea"
+    },
+    {
+      "id": "meaningful-learning",
+      "type": "idea"
+    },
+    {
+      "id": "merleau-ponty-bodily-knowing",
+      "type": "concept"
+    },
+    {
+      "id": "metacognition-loop3",
+      "type": "idea"
+    },
+    {
+      "id": "metcalfes-law-for-ideas",
+      "type": "idea"
+    },
+    {
+      "id": "metrics-as-managed-social-technology",
+      "type": "idea"
+    },
+    {
+      "id": "mixed-session-residue",
+      "type": "idea"
+    },
+    {
+      "id": "mode-mixing-as-creative-fuel",
+      "type": "idea"
+    },
+    {
+      "id": "model-commoditisation-foundation-dependence",
+      "type": "idea"
+    },
+    {
+      "id": "monte-carlo-thinking-strategic-llms",
+      "type": "idea"
+    },
+    {
+      "id": "murdoch-love-as-perception",
+      "type": "concept"
+    },
+    {
+      "id": "nostalgia-etymology-pathology",
+      "type": "concept"
+    },
+    {
+      "id": "preference-revealed-not-described",
+      "type": "idea"
+    },
+    {
+      "id": "prompt-engineering-epistemological-interface",
+      "type": "idea"
+    },
+    {
+      "id": "proust-involuntary-memory",
+      "type": "concept"
+    },
+    {
+      "id": "proust-loving-inaccessible",
+      "type": "concept"
+    },
+    {
+      "id": "proxy-laundering-trap",
+      "type": "idea"
+    },
+    {
+      "id": "rilke-two-solitudes",
+      "type": "concept"
+    },
+    {
+      "id": "scale-before-purpose-trap",
+      "type": "idea"
+    },
+    {
+      "id": "scaling-laws-capability-thesis",
+      "type": "idea"
+    },
+    {
+      "id": "schumacher-principle",
+      "type": "idea"
+    },
+    {
+      "id": "sehnsucht-saudade-hiraeth",
+      "type": "concept"
+    },
+    {
+      "id": "sensitivity-specificity",
+      "type": "idea"
+    },
+    {
+      "id": "separate-executor-from-adversary",
+      "type": "idea"
+    },
+    {
+      "id": "soft-constraints-vs-capability-removal",
+      "type": "idea"
+    },
+    {
+      "id": "spec-as-source-of-truth",
+      "type": "idea"
+    },
+    {
+      "id": "summary-as-minimum-description-length",
+      "type": "idea"
+    },
+    {
+      "id": "sustainability-ai-thesis",
+      "type": "idea"
+    },
+    {
+      "id": "switching-costs-lock-in",
+      "type": "idea"
+    },
+    {
+      "id": "symbiosis-paradox-entry-condition",
+      "type": "idea"
+    },
+    {
+      "id": "symbolic-ai-reasoning-critique",
+      "type": "idea"
+    },
+    {
+      "id": "tacit-knowledge-escapes-legibility",
+      "type": "idea"
+    },
+    {
+      "id": "three-tier-retrieval-architecture",
+      "type": "idea"
+    },
+    {
+      "id": "tsvetaeva-loving-too-much",
+      "type": "concept"
+    },
+    {
+      "id": "typed-edges-as-semantic-grammar",
+      "type": "idea"
+    },
+    {
+      "id": "vault-as-cognitive-instrument",
+      "type": "idea"
+    },
+    {
+      "id": "vault-as-cyclic-directed-graph",
+      "type": "idea"
+    },
+    {
+      "id": "vault-as-essay-staging-ground",
+      "type": "idea"
+    },
+    {
+      "id": "vault-as-labelled-directed-multigraph",
+      "type": "idea"
+    },
+    {
+      "id": "vault-design-lesson-hpe-projects",
+      "type": "idea"
+    },
+    {
+      "id": "voice-lock-in-ship-of-theseus",
+      "type": "idea"
+    },
+    {
+      "id": "weil-attention-love",
+      "type": "concept"
+    },
+    {
+      "id": "winnicott-false-self",
+      "type": "concept"
+    },
+    {
+      "id": "wittgenstein-limits-of-language",
+      "type": "concept"
+    },
+    {
+      "id": "writing-as-graph-resolution",
+      "type": "idea"
+    },
+    {
+      "id": "zettelkasten-and-second-brain",
+      "type": "idea"
+    },
+    {
+      "id": "acemoglu-brynjolfsson-productivity-session",
+      "type": "learning"
+    },
+    {
+      "id": "ai-business-concepts",
+      "type": "learning"
+    },
+    {
+      "id": "blanchard-tfp-deepseek-session",
+      "type": "learning"
+    },
+    {
+      "id": "causal-ML-landscape",
+      "type": "learning"
+    },
+    {
+      "id": "causal-design-automation-vs-human",
+      "type": "learning"
+    },
+    {
+      "id": "correlation-vs-causation",
+      "type": "learning"
+    },
+    {
+      "id": "dag-directed-acyclic-graph",
+      "type": "learning"
+    },
+    {
+      "id": "dama-data-quality-dimensions",
+      "type": "learning"
+    },
+    {
+      "id": "double-ml",
+      "type": "learning"
+    },
+    {
+      "id": "four-causal-identification-strategies",
+      "type": "learning"
+    },
+    {
+      "id": "interpretability-vs-explainability",
+      "type": "learning"
+    },
+    {
+      "id": "knowledge-based-AI-and-semantic-reasoning",
+      "type": "learning"
+    },
+    {
+      "id": "lime",
+      "type": "learning"
+    },
+    {
+      "id": "ml-model-fundamentals",
+      "type": "learning"
+    },
+    {
+      "id": "module-2-working-method",
+      "type": "learning"
+    },
+    {
+      "id": "niresh-rajah-ai-data-foundation",
+      "type": "learning"
+    },
+    {
+      "id": "pca-principal-component-analysis",
+      "type": "learning"
+    },
+    {
+      "id": "pdf-and-cdf",
+      "type": "learning"
+    },
+    {
+      "id": "pearl-vs-rubin",
+      "type": "learning"
+    },
+    {
+      "id": "pearls-ladder",
+      "type": "learning"
+    },
+    {
+      "id": "second-brain-system-build-session",
+      "type": "learning"
+    },
+    {
+      "id": "selective-labels-feedback-loop",
+      "type": "learning"
+    },
+    {
+      "id": "session-close-2026-04-23-phase1-substrate-build",
+      "type": "learning"
+    },
+    {
+      "id": "session-close-2026-05-01-phase2-shipped",
+      "type": "session-log"
+    },
+    {
+      "id": "session-close-2026-05-08-taxonomy-v2-phase4-forks-m1",
+      "type": "learning"
+    },
+    {
+      "id": "session-close-2026-05-10-ppr-perplexity-voice",
+      "type": "learning"
+    },
+    {
+      "id": "session-close-2026-05-12-multi-agent-refactor-stage9",
+      "type": "learning"
+    },
+    {
+      "id": "session-close-2026-05-27-phase-6-templates",
+      "type": "learning"
+    },
+    {
+      "id": "session-close-2026-05-27-phases-1-5-drift-refactor",
+      "type": "learning"
+    },
+    {
+      "id": "shap",
+      "type": "learning"
+    },
+    {
+      "id": "validation-protocol-imbalanced-classifier",
+      "type": "learning"
+    },
+    {
+      "id": "hyperagent-conversation-protocol",
+      "type": "project"
+    },
+    {
+      "id": "module-2-assessment-state",
+      "type": "project"
+    },
+    {
+      "id": "module-2-audit-log",
+      "type": "project"
+    },
+    {
+      "id": "module-2-locked-answers-FINAL-v2",
+      "type": "project"
+    },
+    {
+      "id": "module-2-locked-answers-final",
+      "type": "project"
+    },
+    {
+      "id": "module-2-locked-answers",
+      "type": "project"
+    },
+    {
+      "id": "second-brain-working-contract",
+      "type": "project"
+    },
+    {
+      "id": "essay-1-mastery-trap-outline",
+      "type": "essay"
+    },
+    {
+      "id": "acceptance-as-emotional-velocity",
+      "type": "personal"
+    },
+    {
+      "id": "ai-governance-canon-map",
+      "type": "map"
+    },
+    {
+      "id": "causal-inference-ml-map",
+      "type": "map"
+    },
+    {
+      "id": "hpe-sustainability-work-map",
+      "type": "map"
+    },
+    {
+      "id": "love-as-encounter",
+      "type": "map"
+    },
+    {
+      "id": "oxford-dipai-module2-map",
+      "type": "map"
+    },
+    {
+      "id": "second-brain-meta-map",
+      "type": "map"
+    },
+    {
+      "id": "substack-essays-map",
+      "type": "map"
+    },
+    {
+      "id": "life shit",
+      "type": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "acemoglu-task-exposure",
+      "target": "data-debt-as-wrong-question",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "acemoglu-task-exposure",
+      "target": "sustainability-ai-thesis",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "acemoglu-task-exposure",
+      "target": "governance-capital-day1",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "acemoglu-task-exposure",
+      "target": "brynjolfsson-j-curve",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "acemoglu-task-exposure",
+      "target": "agi-labour-restructure-thesis",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "acemoglu-task-exposure",
+      "target": "actuarial-vs-clinical-judgment",
+      "type": "challenges",
+      "target_exists": true
+    },
+    {
+      "source": "acemoglu-task-exposure",
+      "target": "legibility-bias",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "acemoglu-task-exposure",
+      "target": "goodharts-law",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "acemoglu-task-exposure",
+      "target": "sensitivity-specificity",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "acemoglu-task-exposure",
+      "target": "schumacher-principle",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "acemoglu-task-exposure",
+      "target": "ai-governance-canon-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "actuarial-vs-clinical-judgment",
+      "target": "sensitivity-specificity",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "actuarial-vs-clinical-judgment",
+      "target": "pearls-ladder",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "actuarial-vs-clinical-judgment",
+      "target": "calibration-over-threshold",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "actuarial-vs-clinical-judgment",
+      "target": "acemoglu-task-exposure",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "actuarial-vs-clinical-judgment",
+      "target": "goodharts-law",
+      "type": "challenges",
+      "target_exists": true
+    },
+    {
+      "source": "actuarial-vs-clinical-judgment",
+      "target": "sensitivity-specificity",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "agi-labour-restructure-thesis",
+      "target": "acemoglu-task-exposure",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "agi-labour-restructure-thesis",
+      "target": "brynjolfsson-j-curve",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "agi-labour-restructure-thesis",
+      "target": "scaling-laws-capability-thesis",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "agi-labour-restructure-thesis",
+      "target": "second-brain-meta-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "agi-labour-restructure-thesis",
+      "target": "ai-governance-canon-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "anti-fragility-via-expertise",
+      "target": "mastery-trap",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "anti-fragility-via-expertise",
+      "target": "tacit-knowledge-escapes-legibility",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "anti-fragility-via-expertise",
+      "target": "below-sea-level-underfunding-trap",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "anti-fragility-via-expertise",
+      "target": "second-brain-meta-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "anti-fragility-via-expertise",
+      "target": "ai-governance-canon-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "antifragile-expertise-as-optionality",
+      "target": "mastery-trap",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "antifragile-expertise-as-optionality",
+      "target": "tacit-knowledge-escapes-legibility",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "antifragile-expertise-as-optionality",
+      "target": "schumacher-principle",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "antifragile-expertise-as-optionality",
+      "target": "second-brain-meta-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "antifragile-expertise-as-optionality",
+      "target": "ai-governance-canon-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "architectural-restraint",
+      "target": "schumacher-principle",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "architectural-restraint",
+      "target": "legibility-bias",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "architectural-restraint",
+      "target": "computer-vision-hierarchy",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "architectural-restraint",
+      "target": "symbiosis-paradox-entry-condition",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "architectural-restraint",
+      "target": "governance-capital",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "architectural-restraint",
+      "target": "sustainability-ai-thesis",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "architectural-restraint",
+      "target": "scaling-laws-capability-thesis",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "architectural-restraint",
+      "target": "jevons-paradox-ai-compute",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "architectural-restraint",
+      "target": "computer-vision-hierarchy",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "architectural-restraint",
+      "target": "below-sea-level-underfunding-trap",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "architectural-restraint",
+      "target": "ai-governance-canon-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "atomicity-as-compression-discipline",
+      "target": "zettelkasten-and-second-brain",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "atomicity-as-compression-discipline",
+      "target": "knowledge-compression-translation-problem",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "atomicity-as-compression-discipline",
+      "target": "typed-edges-as-semantic-grammar",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "atomicity-as-compression-discipline",
+      "target": "architectural-restraint",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "atomicity-as-compression-discipline",
+      "target": "summary-as-minimum-description-length",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "atomicity-as-compression-discipline",
+      "target": "second-brain-meta-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "automation-bias",
+      "target": "sensitivity-specificity",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "automation-bias",
+      "target": "sensitivity-specificity",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "automation-bias",
+      "target": "actuarial-vs-clinical-judgment",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "automation-bias",
+      "target": "ai-business-concepts",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "automation-bias",
+      "target": "actuarial-vs-clinical-judgment",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "below-sea-level-underfunding-trap",
+      "target": "legibility-bias",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "below-sea-level-underfunding-trap",
+      "target": "niresh-rajah-ai-data-foundation",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "below-sea-level-underfunding-trap",
+      "target": "data-debt-as-political-failure",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "below-sea-level-underfunding-trap",
+      "target": "governance-capital-day1",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "below-sea-level-underfunding-trap",
+      "target": "brynjolfsson-j-curve",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "below-sea-level-underfunding-trap",
+      "target": "architectural-restraint",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "below-sea-level-underfunding-trap",
+      "target": "mastery-trap",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "below-sea-level-underfunding-trap",
+      "target": "ai-governance-canon-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "below-sea-level-underfunding-trap",
+      "target": "hpe-sustainability-work-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "bisociation-mode-mixing-as-creativity-engine",
+      "target": "mixed-session-residue",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "bisociation-mode-mixing-as-creativity-engine",
+      "target": "five-quotes-framework",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "bisociation-mode-mixing-as-creativity-engine",
+      "target": "second-brain-meta-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "bitter-lesson-inversion-at-user-scale",
+      "target": "context-engineering-as-structural-discipline",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "bitter-lesson-inversion-at-user-scale",
+      "target": "context-window-quality-vs-size-divergence",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "bitter-lesson-inversion-at-user-scale",
+      "target": "metcalfes-law-for-ideas",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "bitter-lesson-inversion-at-user-scale",
+      "target": "governance-capital",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "bitter-lesson-inversion-at-user-scale",
+      "target": "architectural-restraint",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "bitter-lesson-inversion-at-user-scale",
+      "target": "sustainability-ai-thesis",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "bitter-lesson-inversion-at-user-scale",
+      "target": "second-brain-meta-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "bitter-lesson-inversion-at-user-scale",
+      "target": "ai-governance-canon-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "brynjolfsson-j-curve",
+      "target": "below-sea-level-underfunding-trap",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "brynjolfsson-j-curve",
+      "target": "symbiosis-paradox-entry-condition",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "brynjolfsson-j-curve",
+      "target": "governance-capital-day1",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "brynjolfsson-j-curve",
+      "target": "acemoglu-task-exposure",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "brynjolfsson-j-curve",
+      "target": "schumacher-principle",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "brynjolfsson-j-curve",
+      "target": "agi-labour-restructure-thesis",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "brynjolfsson-j-curve",
+      "target": "governance-capital-day1",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "brynjolfsson-j-curve",
+      "target": "zettelkasten-and-second-brain",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "brynjolfsson-j-curve",
+      "target": "meaningful-learning",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "brynjolfsson-j-curve",
+      "target": "mastery-trap",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "brynjolfsson-j-curve",
+      "target": "einstellung-effect",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "brynjolfsson-j-curve",
+      "target": "below-sea-level-underfunding-trap",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "brynjolfsson-j-curve",
+      "target": "ai-governance-canon-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "calibration-over-threshold",
+      "target": "validation-protocol-imbalanced-classifier",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "calibration-over-threshold",
+      "target": "causal-design-automation-vs-human",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "calibration-over-threshold",
+      "target": "sensitivity-specificity",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "calibration-over-threshold",
+      "target": "actuarial-vs-clinical-judgment",
+      "type": "challenges",
+      "target_exists": true
+    },
+    {
+      "source": "calibration-over-threshold",
+      "target": "data-debt-as-wrong-question",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "calibration-over-threshold",
+      "target": "second-brain-meta-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "calibration-over-threshold",
+      "target": "oxford-dipai-module2-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "classification-trees",
+      "target": "ensemble-methods",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "classification-trees",
+      "target": "sensitivity-specificity",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "classification-trees",
+      "target": "logistic-regression-ann",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "classification-trees",
+      "target": "ensemble-methods",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "classification-trees",
+      "target": "goodharts-law",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "classification-trees",
+      "target": "oxford-dipai-module2-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "cognitive-fit-theory",
+      "target": "meaningful-learning",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "cognitive-fit-theory",
+      "target": "zettelkasten-and-second-brain",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "cognitive-fit-theory",
+      "target": "mixed-session-residue",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "cognitive-fit-theory",
+      "target": "legibility-bias",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "cognitive-fit-theory",
+      "target": "acemoglu-task-exposure",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "cognitive-fit-theory",
+      "target": "oxford-dipai-module2-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "compliance-theatre-critique",
+      "target": "governance-capital",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "compliance-theatre-critique",
+      "target": "governance-capital-day1",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "compliance-theatre-critique",
+      "target": "goodharts-law",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "compliance-theatre-critique",
+      "target": "first-mover-governance-disadvantage",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "compliance-theatre-critique",
+      "target": "second-brain-meta-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "compliance-theatre-critique",
+      "target": "ai-governance-canon-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "computer-vision-hierarchy",
+      "target": "schumacher-principle",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "computer-vision-hierarchy",
+      "target": "architectural-restraint",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "computer-vision-hierarchy",
+      "target": "cognitive-fit-theory",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "computer-vision-hierarchy",
+      "target": "acemoglu-task-exposure",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "computer-vision-hierarchy",
+      "target": "oxford-dipai-module2-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "context-engineering-as-structural-discipline",
+      "target": "three-tier-retrieval-architecture",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "context-engineering-as-structural-discipline",
+      "target": "bitter-lesson-inversion-at-user-scale",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "context-engineering-as-structural-discipline",
+      "target": "context-window-quality-vs-size-divergence",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "context-engineering-as-structural-discipline",
+      "target": "architectural-restraint",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "context-engineering-as-structural-discipline",
+      "target": "schumacher-principle",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "context-engineering-as-structural-discipline",
+      "target": "second-brain-meta-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "context-engineering-as-structural-discipline",
+      "target": "ai-governance-canon-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "context-window-quality-vs-size-divergence",
+      "target": "three-tier-retrieval-architecture",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "context-window-quality-vs-size-divergence",
+      "target": "context-engineering-as-structural-discipline",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "context-window-quality-vs-size-divergence",
+      "target": "bitter-lesson-inversion-at-user-scale",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "context-window-quality-vs-size-divergence",
+      "target": "sensitivity-specificity",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "context-window-quality-vs-size-divergence",
+      "target": "goodharts-law",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "context-window-quality-vs-size-divergence",
+      "target": "second-brain-meta-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "darwin-godel-machine",
+      "target": "hyperagents",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "darwin-godel-machine",
+      "target": "metacognition-loop3",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "darwin-godel-machine",
+      "target": "meaningful-learning",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "darwin-godel-machine",
+      "target": "brynjolfsson-j-curve",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "darwin-godel-machine",
+      "target": "ai-governance-canon-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "data-debt-as-political-failure",
+      "target": "goodharts-law",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "data-debt-as-political-failure",
+      "target": "niresh-rajah-ai-data-foundation",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "data-debt-as-political-failure",
+      "target": "governance-capital-day1",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "data-debt-as-political-failure",
+      "target": "below-sea-level-underfunding-trap",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "data-debt-as-political-failure",
+      "target": "data-debt-as-skill-gap",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "data-debt-as-political-failure",
+      "target": "mastery-trap",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "data-debt-as-political-failure",
+      "target": "sensitivity-specificity",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "data-debt-as-political-failure",
+      "target": "ai-governance-canon-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "data-debt-as-political-failure",
+      "target": "hpe-sustainability-work-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "data-debt-as-skill-gap",
+      "target": "data-debt-as-political-failure",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "data-debt-as-skill-gap",
+      "target": "data-debt-as-wrong-question",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "data-debt-as-skill-gap",
+      "target": "second-brain-meta-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "data-debt-as-skill-gap",
+      "target": "ai-governance-canon-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "data-debt-as-wrong-question",
+      "target": "niresh-rajah-ai-data-foundation",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "data-debt-as-wrong-question",
+      "target": "goodharts-law",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "data-debt-as-wrong-question",
+      "target": "acemoglu-task-exposure",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "data-debt-as-wrong-question",
+      "target": "symbiosis-paradox-entry-condition",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "data-debt-as-wrong-question",
+      "target": "niresh-rajah-ai-data-foundation",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "data-debt-as-wrong-question",
+      "target": "garbage-in-garbage-out-empirical-floor",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "data-debt-as-wrong-question",
+      "target": "architectural-restraint",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "data-debt-as-wrong-question",
+      "target": "schumacher-principle",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "data-debt-as-wrong-question",
+      "target": "ai-governance-canon-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "data-network-effects-weaker",
+      "target": "first-mover-governance-disadvantage",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "data-network-effects-weaker",
+      "target": "governance-capital",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "data-network-effects-weaker",
+      "target": "brynjolfsson-j-curve",
+      "type": "challenges",
+      "target_exists": true
+    },
+    {
+      "source": "data-network-effects-weaker",
+      "target": "compliance-theatre-critique",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "data-network-effects-weaker",
+      "target": "first-mover-governance-disadvantage",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "data-network-effects-weaker",
+      "target": "compliance-theatre-critique",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "divergence-theorem",
+      "target": "governance-capital-day1",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "divergence-theorem",
+      "target": "mastery-trap",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "divergence-theorem",
+      "target": "legibility-bias",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "divergence-theorem",
+      "target": "schumacher-principle",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "divergence-theorem",
+      "target": "sustainability-ai-thesis",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "divergence-theorem",
+      "target": "brynjolfsson-j-curve",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "divergence-theorem",
+      "target": "brynjolfsson-j-curve",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "divergence-theorem",
+      "target": "below-sea-level-underfunding-trap",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "divergence-theorem",
+      "target": "geopolitical-risk-fourth-pressure",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "divergence-theorem",
+      "target": "ai-governance-canon-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "divergence-theorem",
+      "target": "substack-essays-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "edge-taxonomy-encodes-priors",
+      "target": "typed-edges-as-semantic-grammar",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "edge-taxonomy-encodes-priors",
+      "target": "goodharts-law",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "edge-taxonomy-encodes-priors",
+      "target": "legibility-bias",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "edge-taxonomy-encodes-priors",
+      "target": "second-brain-meta-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "einstellung-effect",
+      "target": "mastery-trap",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "einstellung-effect",
+      "target": "legibility-bias",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "einstellung-effect",
+      "target": "tacit-knowledge-escapes-legibility",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "einstellung-effect",
+      "target": "schumacher-principle",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "einstellung-effect",
+      "target": "brynjolfsson-j-curve",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "einstellung-effect",
+      "target": "ai-governance-canon-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "ensemble-methods",
+      "target": "classification-trees",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "ensemble-methods",
+      "target": "logistic-regression-ann",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "ensemble-methods",
+      "target": "explainability-tools",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "ensemble-methods",
+      "target": "classification-trees",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "ensemble-methods",
+      "target": "governance-capital",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "ensemble-methods",
+      "target": "oxford-dipai-module2-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "epistemically-honest-cycles",
+      "target": "vault-as-cyclic-directed-graph",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "epistemically-honest-cycles",
+      "target": "pearl-vs-rubin",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "epistemically-honest-cycles",
+      "target": "goodharts-law",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "explainability-guided-feature-reduction-is-circular",
+      "target": "shap",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "explainability-guided-feature-reduction-is-circular",
+      "target": "interpretability-vs-explainability",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "explainability-guided-feature-reduction-is-circular",
+      "target": "proxy-laundering-trap",
+      "type": "challenges",
+      "target_exists": true
+    },
+    {
+      "source": "explainability-guided-feature-reduction-is-circular",
+      "target": "imposed-vs-discovered-structure",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "explainability-guided-feature-reduction-is-circular",
+      "target": "interpretability-vs-explainability",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "explainability-guided-feature-reduction-is-circular",
+      "target": "shap",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "explainability-guided-feature-reduction-is-circular",
+      "target": "proxy-laundering-trap",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "explainability-tools",
+      "target": "ensemble-methods",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "explainability-tools",
+      "target": "classification-trees",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "explainability-tools",
+      "target": "logistic-regression-ann",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "explainability-tools",
+      "target": "governance-capital",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "explainability-tools",
+      "target": "sensitivity-specificity",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "explainability-tools",
+      "target": "acemoglu-task-exposure",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "explainability-tools",
+      "target": "ai-governance-canon-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "explainability-tools",
+      "target": "oxford-dipai-module2-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "externalities-as-economics",
+      "target": "data-network-effects-weaker",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "externalities-as-economics",
+      "target": "governance-capital",
+      "type": "challenges",
+      "target_exists": true
+    },
+    {
+      "source": "first-mover-governance-disadvantage",
+      "target": "governance-capital-day1",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "first-mover-governance-disadvantage",
+      "target": "governance-capital",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "first-mover-governance-disadvantage",
+      "target": "compliance-theatre-critique",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "first-mover-governance-disadvantage",
+      "target": "second-brain-meta-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "first-mover-governance-disadvantage",
+      "target": "ai-governance-canon-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "five-quotes-framework",
+      "target": "schumacher-principle",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "five-quotes-framework",
+      "target": "legibility-bias",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "five-quotes-framework",
+      "target": "mastery-trap",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "five-quotes-framework",
+      "target": "einstellung-effect",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "five-quotes-framework",
+      "target": "brynjolfsson-j-curve",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "five-quotes-framework",
+      "target": "ai-governance-canon-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "forcing-function-as-design-primitive",
+      "target": "schumacher-principle",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "forcing-function-as-design-primitive",
+      "target": "metcalfes-law-for-ideas",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "forcing-function-as-design-primitive",
+      "target": "writing-as-graph-resolution",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "forcing-function-as-design-primitive",
+      "target": "mastery-trap",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "garbage-in-garbage-out-empirical-floor",
+      "target": "data-debt-as-wrong-question",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "garbage-in-garbage-out-empirical-floor",
+      "target": "data-debt-as-political-failure",
+      "type": "challenges",
+      "target_exists": true
+    },
+    {
+      "source": "garbage-in-garbage-out-empirical-floor",
+      "target": "acemoglu-task-exposure",
+      "type": "challenges",
+      "target_exists": true
+    },
+    {
+      "source": "garbage-in-garbage-out-empirical-floor",
+      "target": "second-brain-meta-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "garbage-in-garbage-out-empirical-floor",
+      "target": "ai-governance-canon-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "garbage-in-garbage-out-thesis",
+      "target": "data-debt-as-wrong-question",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "garbage-in-garbage-out-thesis",
+      "target": "data-debt-as-skill-gap",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "garbage-in-garbage-out-thesis",
+      "target": "second-brain-meta-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "garbage-in-garbage-out-thesis",
+      "target": "ai-governance-canon-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "generative-encoding-over-external-retrieval",
+      "target": "zettelkasten-and-second-brain",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "generative-encoding-over-external-retrieval",
+      "target": "voice-lock-in-ship-of-theseus",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "generative-encoding-over-external-retrieval",
+      "target": "second-brain-meta-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "geopolitical-risk-fourth-pressure",
+      "target": "governance-capital-day1",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "geopolitical-risk-fourth-pressure",
+      "target": "architectural-restraint",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "geopolitical-risk-fourth-pressure",
+      "target": "sustainability-ai-thesis",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "geopolitical-risk-fourth-pressure",
+      "target": "below-sea-level-underfunding-trap",
+      "type": "exemplifies",
+      "target_exists": true
+    },
+    {
+      "source": "geopolitical-risk-fourth-pressure",
+      "target": "mastery-trap",
+      "type": "exemplifies",
+      "target_exists": true
+    },
+    {
+      "source": "geopolitical-risk-fourth-pressure",
+      "target": "legibility-bias",
+      "type": "exemplifies",
+      "target_exists": true
+    },
+    {
+      "source": "geopolitical-risk-fourth-pressure",
+      "target": "ai-governance-canon-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "geopolitical-risk-fourth-pressure",
+      "target": "hpe-sustainability-work-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "geopolitical-risk-fourth-pressure",
+      "target": "substack-essays-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "goodharts-law",
+      "target": "sensitivity-specificity",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "goodharts-law",
+      "target": "governance-capital",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "goodharts-law",
+      "target": "sensitivity-specificity",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "goodharts-law",
+      "target": "metrics-as-managed-social-technology",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "goodharts-law",
+      "target": "legibility-bias",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "goodharts-law",
+      "target": "acemoglu-task-exposure",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "goodharts-law",
+      "target": "ai-governance-canon-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "governance-capital-day1",
+      "target": "mastery-trap",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "governance-capital-day1",
+      "target": "legibility-bias",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "governance-capital-day1",
+      "target": "acemoglu-task-exposure",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "governance-capital-day1",
+      "target": "below-sea-level-underfunding-trap",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "governance-capital-day1",
+      "target": "brynjolfsson-j-curve",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "governance-capital-day1",
+      "target": "data-debt-as-political-failure",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "governance-capital-day1",
+      "target": "schumacher-principle",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "governance-capital-day1",
+      "target": "governance-capital",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "governance-capital-day1",
+      "target": "first-mover-governance-disadvantage",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "governance-capital-day1",
+      "target": "compliance-theatre-critique",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "governance-capital-day1",
+      "target": "schumacher-principle",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "governance-capital-day1",
+      "target": "brynjolfsson-j-curve",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "governance-capital-day1",
+      "target": "ai-governance-canon-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "governance-capital",
+      "target": "governance-capital-day1",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "governance-capital",
+      "target": "architectural-restraint",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "governance-capital",
+      "target": "bitter-lesson-inversion-at-user-scale",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "governance-capital",
+      "target": "explainability-tools",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "governance-capital",
+      "target": "goodharts-law",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "governance-capital",
+      "target": "hyperagents",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "governance-capital",
+      "target": "metacognition-loop3",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "governance-capital",
+      "target": "sensitivity-specificity",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "governance-capital",
+      "target": "vault-as-essay-staging-ground",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "governance-capital",
+      "target": "sustainability-ai-thesis",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "governance-capital",
+      "target": "first-mover-governance-disadvantage",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "governance-capital",
+      "target": "compliance-theatre-critique",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "governance-capital",
+      "target": "data-network-effects-weaker",
+      "type": "challenges",
+      "target_exists": true
+    },
+    {
+      "source": "governance-capital",
+      "target": "switching-costs-lock-in",
+      "type": "challenges",
+      "target_exists": true
+    },
+    {
+      "source": "governance-capital",
+      "target": "model-commoditisation-foundation-dependence",
+      "type": "challenges",
+      "target_exists": true
+    },
+    {
+      "source": "governance-capital",
+      "target": "sensitivity-specificity",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "governance-capital",
+      "target": "brynjolfsson-j-curve",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "governance-capital",
+      "target": "ai-governance-canon-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "governance-capital",
+      "target": "governance-capital-day1",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "graph-rag-fidelity-vs-scale-tradeoff",
+      "target": "typed-edges-as-semantic-grammar",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "graph-rag-fidelity-vs-scale-tradeoff",
+      "target": "manual-curation-scaling-ceiling",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "graph-rag-fidelity-vs-scale-tradeoff",
+      "target": "schumacher-principle",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "graph-rag-fidelity-vs-scale-tradeoff",
+      "target": "architectural-restraint",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "graph-rag-fidelity-vs-scale-tradeoff",
+      "target": "second-brain-meta-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "hyperagents",
+      "target": "darwin-godel-machine",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "hyperagents",
+      "target": "governance-capital",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "hyperagents",
+      "target": "metacognition-loop3",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "hyperagents",
+      "target": "governance-capital",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "hyperagents",
+      "target": "symbolic-ai-reasoning-critique",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "hyperagents",
+      "target": "acemoglu-task-exposure",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "hyperagents",
+      "target": "goodharts-law",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "hyperagents",
+      "target": "ai-governance-canon-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "imposed-vs-discovered-structure",
+      "target": "interpretability-vs-explainability",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "imposed-vs-discovered-structure",
+      "target": "ml-model-fundamentals",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "imposed-vs-discovered-structure",
+      "target": "pearls-ladder",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "imposed-vs-discovered-structure",
+      "target": "interpretability-vs-explainability",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "jevons-paradox-ai-compute",
+      "target": "sustainability-ai-thesis",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "jevons-paradox-ai-compute",
+      "target": "architectural-restraint",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "jevons-paradox-ai-compute",
+      "target": "schumacher-principle",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "jevons-paradox-ai-compute",
+      "target": "scaling-laws-capability-thesis",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "jevons-paradox-ai-compute",
+      "target": "second-brain-meta-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "jevons-paradox-ai-compute",
+      "target": "ai-governance-canon-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "jevons-paradox-ai-compute",
+      "target": "hpe-sustainability-work-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "knowledge-compression-translation-problem",
+      "target": "zettelkasten-and-second-brain",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "knowledge-compression-translation-problem",
+      "target": "summary-as-minimum-description-length",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "knowledge-compression-translation-problem",
+      "target": "vault-as-labelled-directed-multigraph",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "knowledge-compression-translation-problem",
+      "target": "vault-as-cyclic-directed-graph",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "knowledge-compression-translation-problem",
+      "target": "architectural-restraint",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "knowledge-compression-translation-problem",
+      "target": "second-brain-meta-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "legibility-bias",
+      "target": "einstellung-effect",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "legibility-bias",
+      "target": "mastery-trap",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "legibility-bias",
+      "target": "schumacher-principle",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "legibility-bias",
+      "target": "tacit-knowledge-escapes-legibility",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "legibility-bias",
+      "target": "goodharts-law",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "legibility-bias",
+      "target": "acemoglu-task-exposure",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "legibility-bias",
+      "target": "ai-governance-canon-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "linkedin-recommends-past-not-target",
+      "target": "voice-lock-in-ship-of-theseus",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "logistic-regression-ann",
+      "target": "classification-trees",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "logistic-regression-ann",
+      "target": "ensemble-methods",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "logistic-regression-ann",
+      "target": "explainability-tools",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "logistic-regression-ann",
+      "target": "darwin-godel-machine",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "logistic-regression-ann",
+      "target": "oxford-dipai-module2-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "manual-curation-scaling-ceiling",
+      "target": "graph-rag-fidelity-vs-scale-tradeoff",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "manual-curation-scaling-ceiling",
+      "target": "metcalfes-law-for-ideas",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "manual-curation-scaling-ceiling",
+      "target": "below-sea-level-underfunding-trap",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "manual-curation-scaling-ceiling",
+      "target": "scale-before-purpose-trap",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "manual-curation-scaling-ceiling",
+      "target": "second-brain-meta-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "mastery-trap",
+      "target": "einstellung-effect",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "mastery-trap",
+      "target": "legibility-bias",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "mastery-trap",
+      "target": "five-quotes-framework",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "mastery-trap",
+      "target": "mixed-session-residue",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "mastery-trap",
+      "target": "governance-capital-day1",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "mastery-trap",
+      "target": "antifragile-expertise-as-optionality",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "mastery-trap",
+      "target": "tacit-knowledge-escapes-legibility",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "mastery-trap",
+      "target": "mixed-session-residue",
+      "type": "exemplifies",
+      "target_exists": true
+    },
+    {
+      "source": "mastery-trap",
+      "target": "goodharts-law",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "mastery-trap",
+      "target": "brynjolfsson-j-curve",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "mastery-trap",
+      "target": "ai-governance-canon-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "meaningful-learning",
+      "target": "cognitive-fit-theory",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "meaningful-learning",
+      "target": "zettelkasten-and-second-brain",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "meaningful-learning",
+      "target": "metacognition-loop3",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "meaningful-learning",
+      "target": "brynjolfsson-j-curve",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "meaningful-learning",
+      "target": "oxford-dipai-module2-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "metacognition-loop3",
+      "target": "hyperagents",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "metacognition-loop3",
+      "target": "darwin-godel-machine",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "metacognition-loop3",
+      "target": "meaningful-learning",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "metacognition-loop3",
+      "target": "governance-capital",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "metacognition-loop3",
+      "target": "meaningful-learning",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "metacognition-loop3",
+      "target": "brynjolfsson-j-curve",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "metacognition-loop3",
+      "target": "ai-governance-canon-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "metcalfes-law-for-ideas",
+      "target": "bitter-lesson-inversion-at-user-scale",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "metcalfes-law-for-ideas",
+      "target": "typed-edges-as-semantic-grammar",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "metcalfes-law-for-ideas",
+      "target": "forcing-function-as-design-primitive",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "metcalfes-law-for-ideas",
+      "target": "governance-capital",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "metcalfes-law-for-ideas",
+      "target": "brynjolfsson-j-curve",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "metcalfes-law-for-ideas",
+      "target": "second-brain-meta-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "metrics-as-managed-social-technology",
+      "target": "goodharts-law",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "metrics-as-managed-social-technology",
+      "target": "compliance-theatre-critique",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "metrics-as-managed-social-technology",
+      "target": "second-brain-meta-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "metrics-as-managed-social-technology",
+      "target": "ai-governance-canon-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "metrics-as-managed-social-technology",
+      "target": "governance-capital",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "mixed-session-residue",
+      "target": "cognitive-fit-theory",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "mixed-session-residue",
+      "target": "vault-design-lesson-hpe-projects",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "mixed-session-residue",
+      "target": "symbiosis-paradox-entry-condition",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "mixed-session-residue",
+      "target": "mastery-trap",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "mixed-session-residue",
+      "target": "zettelkasten-and-second-brain",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "mixed-session-residue",
+      "target": "bisociation-mode-mixing-as-creativity-engine",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "mixed-session-residue",
+      "target": "darwin-godel-machine",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "mixed-session-residue",
+      "target": "sensitivity-specificity",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "mixed-session-residue",
+      "target": "einstellung-effect",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "mixed-session-residue",
+      "target": "data-debt-as-political-failure",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "mixed-session-residue",
+      "target": "second-brain-meta-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "mixed-session-residue",
+      "target": "ai-governance-canon-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "mode-mixing-as-creative-fuel",
+      "target": "mixed-session-residue",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "mode-mixing-as-creative-fuel",
+      "target": "einstellung-effect",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "mode-mixing-as-creative-fuel",
+      "target": "five-quotes-framework",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "mode-mixing-as-creative-fuel",
+      "target": "second-brain-meta-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "model-commoditisation-foundation-dependence",
+      "target": "blanchard-tfp-deepseek-session",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "model-commoditisation-foundation-dependence",
+      "target": "governance-capital",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "model-commoditisation-foundation-dependence",
+      "target": "data-network-effects-weaker",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "model-commoditisation-foundation-dependence",
+      "target": "blanchard-tfp-deepseek-session",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "preference-revealed-not-described",
+      "target": "lacan-real-symbolic",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "preference-revealed-not-described",
+      "target": "love-as-encounter",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "preference-revealed-not-described",
+      "target": "careervinny-fail-forward",
+      "type": "mentioned",
+      "target_exists": false
+    },
+    {
+      "source": "proxy-laundering-trap",
+      "target": "interpretability-vs-explainability",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "proxy-laundering-trap",
+      "target": "explainability-tools",
+      "type": "challenges",
+      "target_exists": true
+    },
+    {
+      "source": "proxy-laundering-trap",
+      "target": "ml-model-fundamentals",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "proxy-laundering-trap",
+      "target": "interpretability-vs-explainability",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "scale-before-purpose-trap",
+      "target": "schumacher-principle",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "scale-before-purpose-trap",
+      "target": "vault-design-lesson-hpe-projects",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "scale-before-purpose-trap",
+      "target": "brynjolfsson-j-curve",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "scale-before-purpose-trap",
+      "target": "second-brain-meta-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "scaling-laws-capability-thesis",
+      "target": "schumacher-principle",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "scaling-laws-capability-thesis",
+      "target": "architectural-restraint",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "scaling-laws-capability-thesis",
+      "target": "sustainability-ai-thesis",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "scaling-laws-capability-thesis",
+      "target": "jevons-paradox-ai-compute",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "scaling-laws-capability-thesis",
+      "target": "second-brain-meta-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "scaling-laws-capability-thesis",
+      "target": "ai-governance-canon-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "schumacher-principle",
+      "target": "legibility-bias",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "schumacher-principle",
+      "target": "vault-as-essay-staging-ground",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "schumacher-principle",
+      "target": "acemoglu-task-exposure",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "schumacher-principle",
+      "target": "architectural-restraint",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "schumacher-principle",
+      "target": "governance-capital-day1",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "schumacher-principle",
+      "target": "brynjolfsson-j-curve",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "schumacher-principle",
+      "target": "scaling-laws-capability-thesis",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "schumacher-principle",
+      "target": "jevons-paradox-ai-compute",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "schumacher-principle",
+      "target": "einstellung-effect",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "schumacher-principle",
+      "target": "ai-governance-canon-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "sensitivity-specificity",
+      "target": "classification-trees",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "sensitivity-specificity",
+      "target": "goodharts-law",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "sensitivity-specificity",
+      "target": "governance-capital",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "sensitivity-specificity",
+      "target": "goodharts-law",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "sensitivity-specificity",
+      "target": "calibration-over-threshold",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "sensitivity-specificity",
+      "target": "acemoglu-task-exposure",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "sensitivity-specificity",
+      "target": "explainability-tools",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "sensitivity-specificity",
+      "target": "oxford-dipai-module2-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "sensitivity-specificity",
+      "target": "ai-governance-canon-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "separate-executor-from-adversary",
+      "target": "darwin-godel-machine",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "separate-executor-from-adversary",
+      "target": "vault-as-cognitive-instrument",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "separate-executor-from-adversary",
+      "target": "mixed-session-residue",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "soft-constraints-vs-capability-removal",
+      "target": "spec-as-source-of-truth",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "soft-constraints-vs-capability-removal",
+      "target": "sensitivity-specificity",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "spec-as-source-of-truth",
+      "target": "context-engineering-as-structural-discipline",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "spec-as-source-of-truth",
+      "target": "generative-encoding-over-external-retrieval",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "spec-as-source-of-truth",
+      "target": "vault-as-cognitive-instrument",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "summary-as-minimum-description-length",
+      "target": "knowledge-compression-translation-problem",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "summary-as-minimum-description-length",
+      "target": "five-quotes-framework",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "summary-as-minimum-description-length",
+      "target": "three-tier-retrieval-architecture",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "summary-as-minimum-description-length",
+      "target": "atomicity-as-compression-discipline",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "summary-as-minimum-description-length",
+      "target": "architectural-restraint",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "summary-as-minimum-description-length",
+      "target": "second-brain-meta-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "sustainability-ai-thesis",
+      "target": "schumacher-principle",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "sustainability-ai-thesis",
+      "target": "architectural-restraint",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "sustainability-ai-thesis",
+      "target": "governance-capital-day1",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "sustainability-ai-thesis",
+      "target": "mastery-trap",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "sustainability-ai-thesis",
+      "target": "acemoglu-task-exposure",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "sustainability-ai-thesis",
+      "target": "divergence-theorem",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "sustainability-ai-thesis",
+      "target": "geopolitical-risk-fourth-pressure",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "sustainability-ai-thesis",
+      "target": "governance-capital",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "sustainability-ai-thesis",
+      "target": "brynjolfsson-j-curve",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "sustainability-ai-thesis",
+      "target": "jevons-paradox-ai-compute",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "sustainability-ai-thesis",
+      "target": "scaling-laws-capability-thesis",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "sustainability-ai-thesis",
+      "target": "zettelkasten-and-second-brain",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "sustainability-ai-thesis",
+      "target": "darwin-godel-machine",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "sustainability-ai-thesis",
+      "target": "ai-governance-canon-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "sustainability-ai-thesis",
+      "target": "substack-essays-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "switching-costs-lock-in",
+      "target": "data-network-effects-weaker",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "switching-costs-lock-in",
+      "target": "governance-capital",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "switching-costs-lock-in",
+      "target": "ai-business-concepts",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "symbiosis-paradox-entry-condition",
+      "target": "niresh-rajah-ai-data-foundation",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "symbiosis-paradox-entry-condition",
+      "target": "data-debt-as-wrong-question",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "symbiosis-paradox-entry-condition",
+      "target": "architectural-restraint",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "symbiosis-paradox-entry-condition",
+      "target": "brynjolfsson-j-curve",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "symbiosis-paradox-entry-condition",
+      "target": "niresh-rajah-ai-data-foundation",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "symbiosis-paradox-entry-condition",
+      "target": "darwin-godel-machine",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "symbiosis-paradox-entry-condition",
+      "target": "data-debt-as-political-failure",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "symbiosis-paradox-entry-condition",
+      "target": "ai-governance-canon-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "symbolic-ai-reasoning-critique",
+      "target": "hyperagents",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "symbolic-ai-reasoning-critique",
+      "target": "knowledge-based-AI-and-semantic-reasoning",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "symbolic-ai-reasoning-critique",
+      "target": "second-brain-meta-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "symbolic-ai-reasoning-critique",
+      "target": "ai-governance-canon-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "tacit-knowledge-escapes-legibility",
+      "target": "mastery-trap",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "tacit-knowledge-escapes-legibility",
+      "target": "legibility-bias",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "tacit-knowledge-escapes-legibility",
+      "target": "einstellung-effect",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "tacit-knowledge-escapes-legibility",
+      "target": "second-brain-meta-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "tacit-knowledge-escapes-legibility",
+      "target": "ai-governance-canon-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "three-tier-retrieval-architecture",
+      "target": "summary-as-minimum-description-length",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "three-tier-retrieval-architecture",
+      "target": "typed-edges-as-semantic-grammar",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "three-tier-retrieval-architecture",
+      "target": "vault-as-labelled-directed-multigraph",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "three-tier-retrieval-architecture",
+      "target": "context-engineering-as-structural-discipline",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "three-tier-retrieval-architecture",
+      "target": "writing-as-graph-resolution",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "three-tier-retrieval-architecture",
+      "target": "sensitivity-specificity",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "three-tier-retrieval-architecture",
+      "target": "second-brain-meta-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "typed-edges-as-semantic-grammar",
+      "target": "vault-as-labelled-directed-multigraph",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "typed-edges-as-semantic-grammar",
+      "target": "atomicity-as-compression-discipline",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "typed-edges-as-semantic-grammar",
+      "target": "three-tier-retrieval-architecture",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "typed-edges-as-semantic-grammar",
+      "target": "edge-taxonomy-encodes-priors",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "typed-edges-as-semantic-grammar",
+      "target": "second-brain-working-contract",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "typed-edges-as-semantic-grammar",
+      "target": "second-brain-meta-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "vault-as-cognitive-instrument",
+      "target": "second-brain-working-contract",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "vault-as-cognitive-instrument",
+      "target": "generative-encoding-over-external-retrieval",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "vault-as-cognitive-instrument",
+      "target": "preference-revealed-not-described",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "vault-as-cognitive-instrument",
+      "target": "second-brain-meta-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "vault-as-cognitive-instrument",
+      "target": "lacan-real-symbolic",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "vault-as-cognitive-instrument",
+      "target": "love-as-encounter",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "vault-as-cognitive-instrument",
+      "target": "generative-encoding-over-external-retrieval",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "vault-as-cyclic-directed-graph",
+      "target": "zettelkasten-and-second-brain",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "vault-as-cyclic-directed-graph",
+      "target": "writing-as-graph-resolution",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "vault-as-cyclic-directed-graph",
+      "target": "pearl-vs-rubin",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "vault-as-cyclic-directed-graph",
+      "target": "second-brain-meta-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "vault-as-cyclic-directed-graph",
+      "target": "causal-inference-ml-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "vault-as-essay-staging-ground",
+      "target": "zettelkasten-and-second-brain",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "vault-as-essay-staging-ground",
+      "target": "writing-as-graph-resolution",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "vault-as-essay-staging-ground",
+      "target": "governance-capital",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "vault-as-essay-staging-ground",
+      "target": "schumacher-principle",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "vault-as-essay-staging-ground",
+      "target": "vault-design-lesson-hpe-projects",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "vault-as-essay-staging-ground",
+      "target": "second-brain-meta-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "vault-as-labelled-directed-multigraph",
+      "target": "knowledge-compression-translation-problem",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "vault-as-labelled-directed-multigraph",
+      "target": "typed-edges-as-semantic-grammar",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "vault-as-labelled-directed-multigraph",
+      "target": "three-tier-retrieval-architecture",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "vault-as-labelled-directed-multigraph",
+      "target": "vault-as-cyclic-directed-graph",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "vault-as-labelled-directed-multigraph",
+      "target": "dag-directed-acyclic-graph",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "vault-as-labelled-directed-multigraph",
+      "target": "second-brain-meta-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "vault-design-lesson-hpe-projects",
+      "target": "cognitive-fit-theory",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "vault-design-lesson-hpe-projects",
+      "target": "zettelkasten-and-second-brain",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "vault-design-lesson-hpe-projects",
+      "target": "second-brain-working-contract",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "vault-design-lesson-hpe-projects",
+      "target": "mixed-session-residue",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "vault-design-lesson-hpe-projects",
+      "target": "schumacher-principle",
+      "type": "exemplifies",
+      "target_exists": true
+    },
+    {
+      "source": "vault-design-lesson-hpe-projects",
+      "target": "data-debt-as-wrong-question",
+      "type": "exemplifies",
+      "target_exists": true
+    },
+    {
+      "source": "vault-design-lesson-hpe-projects",
+      "target": "second-brain-meta-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "voice-lock-in-ship-of-theseus",
+      "target": "bitter-lesson-inversion-at-user-scale",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "voice-lock-in-ship-of-theseus",
+      "target": "einstellung-effect",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "voice-lock-in-ship-of-theseus",
+      "target": "mastery-trap",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "voice-lock-in-ship-of-theseus",
+      "target": "second-brain-meta-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "writing-as-graph-resolution",
+      "target": "vault-as-cyclic-directed-graph",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "writing-as-graph-resolution",
+      "target": "forcing-function-as-design-primitive",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "writing-as-graph-resolution",
+      "target": "vault-as-essay-staging-ground",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "writing-as-graph-resolution",
+      "target": "meaningful-learning",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "writing-as-graph-resolution",
+      "target": "second-brain-meta-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "zettelkasten-and-second-brain",
+      "target": "meaningful-learning",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "zettelkasten-and-second-brain",
+      "target": "cognitive-fit-theory",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "zettelkasten-and-second-brain",
+      "target": "mixed-session-residue",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "zettelkasten-and-second-brain",
+      "target": "generative-encoding-over-external-retrieval",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "zettelkasten-and-second-brain",
+      "target": "darwin-godel-machine",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "zettelkasten-and-second-brain",
+      "target": "metacognition-loop3",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "zettelkasten-and-second-brain",
+      "target": "brynjolfsson-j-curve",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "zettelkasten-and-second-brain",
+      "target": "second-brain-meta-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "acemoglu-brynjolfsson-productivity-session",
+      "target": "governance-capital-day1",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "acemoglu-brynjolfsson-productivity-session",
+      "target": "legibility-bias",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "acemoglu-brynjolfsson-productivity-session",
+      "target": "mastery-trap",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "acemoglu-brynjolfsson-productivity-session",
+      "target": "schumacher-principle",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "acemoglu-brynjolfsson-productivity-session",
+      "target": "below-sea-level-underfunding-trap",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "acemoglu-brynjolfsson-productivity-session",
+      "target": "niresh-rajah-ai-data-foundation",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "acemoglu-brynjolfsson-productivity-session",
+      "target": "acemoglu-task-exposure",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "acemoglu-brynjolfsson-productivity-session",
+      "target": "brynjolfsson-j-curve",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "ai-business-concepts",
+      "target": "pearls-ladder",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "ai-business-concepts",
+      "target": "ml-model-fundamentals",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "ai-business-concepts",
+      "target": "causal-ML-landscape",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "ai-business-concepts",
+      "target": "knowledge-based-AI-and-semantic-reasoning",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "ai-business-concepts",
+      "target": "governance-capital",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "ai-business-concepts",
+      "target": "explainability-tools",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "ai-business-concepts",
+      "target": "acemoglu-task-exposure",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "blanchard-tfp-deepseek-session",
+      "target": "brynjolfsson-j-curve",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "blanchard-tfp-deepseek-session",
+      "target": "acemoglu-task-exposure",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "blanchard-tfp-deepseek-session",
+      "target": "schumacher-principle",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "blanchard-tfp-deepseek-session",
+      "target": "architectural-restraint",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "causal-ML-landscape",
+      "target": "double-ml",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "causal-ML-landscape",
+      "target": "pearls-ladder",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "causal-ML-landscape",
+      "target": "four-causal-identification-strategies",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "causal-ML-landscape",
+      "target": "pearl-vs-rubin",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "causal-design-automation-vs-human",
+      "target": "double-ml",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "causal-design-automation-vs-human",
+      "target": "brynjolfsson-j-curve",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "causal-design-automation-vs-human",
+      "target": "correlation-vs-causation",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "causal-design-automation-vs-human",
+      "target": "pearls-ladder",
+      "type": "operationalises",
+      "target_exists": true
+    },
+    {
+      "source": "causal-design-automation-vs-human",
+      "target": "four-causal-identification-strategies",
+      "type": "operationalises",
+      "target_exists": true
+    },
+    {
+      "source": "causal-design-automation-vs-human",
+      "target": "pearls-ladder",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "causal-design-automation-vs-human",
+      "target": "sensitivity-specificity",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "causal-design-automation-vs-human",
+      "target": "four-causal-identification-strategies",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "causal-design-automation-vs-human",
+      "target": "double-ml",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "causal-design-automation-vs-human",
+      "target": "brynjolfsson-j-curve",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "correlation-vs-causation",
+      "target": "pearls-ladder",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "correlation-vs-causation",
+      "target": "dag-directed-acyclic-graph",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "correlation-vs-causation",
+      "target": "four-causal-identification-strategies",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "dag-directed-acyclic-graph",
+      "target": "pearls-ladder",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "dag-directed-acyclic-graph",
+      "target": "correlation-vs-causation",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "dag-directed-acyclic-graph",
+      "target": "double-ml",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "dag-directed-acyclic-graph",
+      "target": "four-causal-identification-strategies",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "dag-directed-acyclic-graph",
+      "target": "knowledge-based-AI-and-semantic-reasoning",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "dama-data-quality-dimensions",
+      "target": "garbage-in-garbage-out-empirical-floor",
+      "type": "operationalises",
+      "target_exists": true
+    },
+    {
+      "source": "dama-data-quality-dimensions",
+      "target": "validation-protocol-imbalanced-classifier",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "dama-data-quality-dimensions",
+      "target": "validation-protocol-imbalanced-classifier",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "double-ml",
+      "target": "pearls-ladder",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "double-ml",
+      "target": "causal-ML-landscape",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "double-ml",
+      "target": "dag-directed-acyclic-graph",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "double-ml",
+      "target": "four-causal-identification-strategies",
+      "type": "exemplifies",
+      "target_exists": true
+    },
+    {
+      "source": "four-causal-identification-strategies",
+      "target": "pearls-ladder",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "four-causal-identification-strategies",
+      "target": "correlation-vs-causation",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "four-causal-identification-strategies",
+      "target": "causal-ML-landscape",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "four-causal-identification-strategies",
+      "target": "double-ml",
+      "type": "exemplifies",
+      "target_exists": true
+    },
+    {
+      "source": "interpretability-vs-explainability",
+      "target": "ml-model-fundamentals",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "interpretability-vs-explainability",
+      "target": "explainability-tools",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "interpretability-vs-explainability",
+      "target": "explainability-tools",
+      "type": "challenges",
+      "target_exists": true
+    },
+    {
+      "source": "interpretability-vs-explainability",
+      "target": "explainability-tools",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "knowledge-based-AI-and-semantic-reasoning",
+      "target": "dag-directed-acyclic-graph",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "knowledge-based-AI-and-semantic-reasoning",
+      "target": "causal-ML-landscape",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "knowledge-based-AI-and-semantic-reasoning",
+      "target": "explainability-tools",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "knowledge-based-AI-and-semantic-reasoning",
+      "target": "zettelkasten-and-second-brain",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "lime",
+      "target": "explainability-tools",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "lime",
+      "target": "interpretability-vs-explainability",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "lime",
+      "target": "shap",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "lime",
+      "target": "proxy-laundering-trap",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "lime",
+      "target": "shap",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "lime",
+      "target": "proxy-laundering-trap",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "ml-model-fundamentals",
+      "target": "pearls-ladder",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "ml-model-fundamentals",
+      "target": "causal-ML-landscape",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "ml-model-fundamentals",
+      "target": "pca-principal-component-analysis",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "ml-model-fundamentals",
+      "target": "double-ml",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "ml-model-fundamentals",
+      "target": "goodharts-law",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "ml-model-fundamentals",
+      "target": "acemoglu-task-exposure",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "module-2-working-method",
+      "target": "module-2-assessment-state",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "niresh-rajah-ai-data-foundation",
+      "target": "governance-capital",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "niresh-rajah-ai-data-foundation",
+      "target": "legibility-bias",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "niresh-rajah-ai-data-foundation",
+      "target": "ai-business-concepts",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "niresh-rajah-ai-data-foundation",
+      "target": "symbiosis-paradox-entry-condition",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "niresh-rajah-ai-data-foundation",
+      "target": "data-debt-as-political-failure",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "niresh-rajah-ai-data-foundation",
+      "target": "data-debt-as-wrong-question",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "niresh-rajah-ai-data-foundation",
+      "target": "below-sea-level-underfunding-trap",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "pca-principal-component-analysis",
+      "target": "ml-model-fundamentals",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "pca-principal-component-analysis",
+      "target": "pearls-ladder",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "pca-principal-component-analysis",
+      "target": "causal-ML-landscape",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "pdf-and-cdf",
+      "target": "ml-model-fundamentals",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "pdf-and-cdf",
+      "target": "sensitivity-specificity",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "pdf-and-cdf",
+      "target": "ai-business-concepts",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "pearl-vs-rubin",
+      "target": "dag-directed-acyclic-graph",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "pearl-vs-rubin",
+      "target": "four-causal-identification-strategies",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "pearl-vs-rubin",
+      "target": "causal-ML-landscape",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "pearl-vs-rubin",
+      "target": "pearls-ladder",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "pearls-ladder",
+      "target": "correlation-vs-causation",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "pearls-ladder",
+      "target": "dag-directed-acyclic-graph",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "pearls-ladder",
+      "target": "four-causal-identification-strategies",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "pearls-ladder",
+      "target": "acemoglu-task-exposure",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "pearls-ladder",
+      "target": "ai-business-concepts",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "second-brain-system-build-session",
+      "target": "zettelkasten-and-second-brain",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "second-brain-system-build-session",
+      "target": "meaningful-learning",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "second-brain-system-build-session",
+      "target": "cognitive-fit-theory",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "second-brain-system-build-session",
+      "target": "zettelkasten-and-second-brain",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "second-brain-system-build-session",
+      "target": "second-brain-working-contract",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "selective-labels-feedback-loop",
+      "target": "pearls-ladder",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "selective-labels-feedback-loop",
+      "target": "validation-protocol-imbalanced-classifier",
+      "type": "challenges",
+      "target_exists": true
+    },
+    {
+      "source": "selective-labels-feedback-loop",
+      "target": "causal-design-automation-vs-human",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "selective-labels-feedback-loop",
+      "target": "validation-protocol-imbalanced-classifier",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "selective-labels-feedback-loop",
+      "target": "causal-design-automation-vs-human",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "session-close-2026-04-23-phase1-substrate-build",
+      "target": "second-brain-system-build-session",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "session-close-2026-04-23-phase1-substrate-build",
+      "target": "zettelkasten-and-second-brain",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "session-close-2026-04-23-phase1-substrate-build",
+      "target": "knowledge-compression-translation-problem",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "session-close-2026-04-23-phase1-substrate-build",
+      "target": "three-tier-retrieval-architecture",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "session-close-2026-04-23-phase1-substrate-build",
+      "target": "context-engineering-as-structural-discipline",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "session-close-2026-04-23-phase1-substrate-build",
+      "target": "mixed-session-residue",
+      "type": "exemplifies",
+      "target_exists": true
+    },
+    {
+      "source": "session-close-2026-04-23-phase1-substrate-build",
+      "target": "forcing-function-as-design-primitive",
+      "type": "exemplifies",
+      "target_exists": true
+    },
+    {
+      "source": "session-close-2026-04-23-phase1-substrate-build",
+      "target": "second-brain-meta-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "session-close-2026-05-01-phase2-shipped",
+      "target": "vault-design-lesson-hpe-projects",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "session-close-2026-05-08-taxonomy-v2-phase4-forks-m1",
+      "target": "session-close-2026-05-01-phase2-shipped",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "session-close-2026-05-08-taxonomy-v2-phase4-forks-m1",
+      "target": "three-tier-retrieval-architecture",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "session-close-2026-05-08-taxonomy-v2-phase4-forks-m1",
+      "target": "context-engineering-as-structural-discipline",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "session-close-2026-05-08-taxonomy-v2-phase4-forks-m1",
+      "target": "forcing-function-as-design-primitive",
+      "type": "exemplifies",
+      "target_exists": true
+    },
+    {
+      "source": "session-close-2026-05-08-taxonomy-v2-phase4-forks-m1",
+      "target": "vault-design-lesson-hpe-projects",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "session-close-2026-05-10-ppr-perplexity-voice",
+      "target": "second-brain-meta-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "session-close-2026-05-10-ppr-perplexity-voice",
+      "target": "note-id",
+      "type": "mentioned",
+      "target_exists": false
+    },
+    {
+      "source": "session-close-2026-05-12-multi-agent-refactor-stage9",
+      "target": "second-brain-meta-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "session-close-2026-05-27-phase-6-templates",
+      "target": "session-close-2026-05-27-phases-1-5-drift-refactor",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "session-close-2026-05-27-phases-1-5-drift-refactor",
+      "target": "session-close-2026-05-12-multi-agent-refactor-stage9",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "shap",
+      "target": "explainability-tools",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "shap",
+      "target": "interpretability-vs-explainability",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "shap",
+      "target": "lime",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "shap",
+      "target": "proxy-laundering-trap",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "shap",
+      "target": "lime",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "shap",
+      "target": "proxy-laundering-trap",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "shap",
+      "target": "imposed-vs-discovered-structure",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "validation-protocol-imbalanced-classifier",
+      "target": "ml-model-fundamentals",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "validation-protocol-imbalanced-classifier",
+      "target": "sensitivity-specificity",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "validation-protocol-imbalanced-classifier",
+      "target": "sensitivity-specificity",
+      "type": "builds-toward",
+      "target_exists": true
+    },
+    {
+      "source": "validation-protocol-imbalanced-classifier",
+      "target": "goodharts-law",
+      "type": "contradicts",
+      "target_exists": true
+    },
+    {
+      "source": "validation-protocol-imbalanced-classifier",
+      "target": "logistic-regression-ann",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "validation-protocol-imbalanced-classifier",
+      "target": "calibration-over-threshold",
+      "type": "operationalises",
+      "target_exists": true
+    },
+    {
+      "source": "validation-protocol-imbalanced-classifier",
+      "target": "calibration-over-threshold",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "validation-protocol-imbalanced-classifier",
+      "target": "sensitivity-specificity",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "validation-protocol-imbalanced-classifier",
+      "target": "goodharts-law",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "hyperagent-conversation-protocol",
+      "target": "hyperagents",
+      "type": "operationalises",
+      "target_exists": true
+    },
+    {
+      "source": "hyperagent-conversation-protocol",
+      "target": "metacognition-loop3",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "hyperagent-conversation-protocol",
+      "target": "darwin-godel-machine",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "hyperagent-conversation-protocol",
+      "target": "mastery-trap",
+      "type": "analogous-to",
+      "target_exists": true
+    },
+    {
+      "source": "module-2-assessment-state",
+      "target": "calibration-over-threshold",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "module-2-assessment-state",
+      "target": "validation-protocol-imbalanced-classifier",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "module-2-assessment-state",
+      "target": "classification-trees",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "module-2-assessment-state",
+      "target": "automation-bias",
+      "type": "builds-on",
+      "target_exists": true
+    },
+    {
+      "source": "module-2-assessment-state",
+      "target": "oxford-dipai-module2-map",
+      "type": "referenced-in",
+      "target_exists": true
+    },
+    {
+      "source": "module-2-assessment-state",
+      "target": "module-2-locked-answers-final",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "module-2-assessment-state",
+      "target": "module-2-locked-answers",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "module-2-assessment-state",
+      "target": "module-2-audit-log",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "module-2-assessment-state",
+      "target": "module-2-working-method",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "module-2-assessment-state",
+      "target": "durable-operational-necessity-trichotomy",
+      "type": "mentioned",
+      "target_exists": false
+    },
+    {
+      "source": "module-2-assessment-state",
+      "target": "ai-complementarities",
+      "type": "mentioned",
+      "target_exists": false
+    },
+    {
+      "source": "module-2-audit-log",
+      "target": "module-2-assessment-state",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "module-2-locked-answers-FINAL-v2",
+      "target": "module-2-locked-answers-final",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "module-2-locked-answers-FINAL-v2",
+      "target": "module-2-locked-answers",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "module-2-locked-answers-final",
+      "target": "module-2-locked-answers",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "module-2-locked-answers",
+      "target": "module-2-assessment-state",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "essay-1-mastery-trap-outline",
+      "target": "mastery-trap",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "essay-1-mastery-trap-outline",
+      "target": "einstellung-effect",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "essay-1-mastery-trap-outline",
+      "target": "legibility-bias",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "essay-1-mastery-trap-outline",
+      "target": "governance-capital-day1",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "essay-1-mastery-trap-outline",
+      "target": "sensitivity-specificity",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "essay-1-mastery-trap-outline",
+      "target": "schumacher-principle",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "essay-1-mastery-trap-outline",
+      "target": "divergence-theorem",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "ai-governance-canon-map",
+      "target": "schumacher-principle",
+      "type": "untyped",
+      "target_exists": true
+    },
+    {
+      "source": "ai-governance-canon-map",
+      "target": "governance-capital-day1",
+      "type": "untyped",
+      "target_exists": true
+    },
+    {
+      "source": "ai-governance-canon-map",
+      "target": "oxford-dipai-module2-map",
+      "type": "untyped",
+      "target_exists": true
+    },
+    {
+      "source": "ai-governance-canon-map",
+      "target": "substack-essays-map",
+      "type": "untyped",
+      "target_exists": true
+    },
+    {
+      "source": "ai-governance-canon-map",
+      "target": "hpe-sustainability-work-map",
+      "type": "untyped",
+      "target_exists": true
+    },
+    {
+      "source": "causal-inference-ml-map",
+      "target": "pearls-ladder",
+      "type": "untyped",
+      "target_exists": true
+    },
+    {
+      "source": "causal-inference-ml-map",
+      "target": "correlation-vs-causation",
+      "type": "untyped",
+      "target_exists": true
+    },
+    {
+      "source": "causal-inference-ml-map",
+      "target": "oxford-dipai-module2-map",
+      "type": "untyped",
+      "target_exists": true
+    },
+    {
+      "source": "causal-inference-ml-map",
+      "target": "ai-governance-canon-map",
+      "type": "untyped",
+      "target_exists": true
+    },
+    {
+      "source": "hpe-sustainability-work-map",
+      "target": "ai-governance-canon-map",
+      "type": "untyped",
+      "target_exists": true
+    },
+    {
+      "source": "hpe-sustainability-work-map",
+      "target": "oxford-dipai-module2-map",
+      "type": "untyped",
+      "target_exists": true
+    },
+    {
+      "source": "hpe-sustainability-work-map",
+      "target": "vault-design-lesson-hpe-projects",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "hpe-sustainability-work-map",
+      "target": "sustainability-ai-thesis",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "love-as-encounter",
+      "target": "buber-i-thou",
+      "type": "mentioned",
+      "target_exists": false
+    },
+    {
+      "source": "love-as-encounter",
+      "target": "fana-baqa",
+      "type": "mentioned",
+      "target_exists": false
+    },
+    {
+      "source": "love-as-encounter",
+      "target": "ibn-arabi-tajalli",
+      "type": "mentioned",
+      "target_exists": false
+    },
+    {
+      "source": "love-as-encounter",
+      "target": "barthes-lover-position",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "love-as-encounter",
+      "target": "auden-more-loving-one",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "love-as-encounter",
+      "target": "carson-eros-gap",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "love-as-encounter",
+      "target": "proust-loving-inaccessible",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "love-as-encounter",
+      "target": "tsvetaeva-loving-too-much",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "love-as-encounter",
+      "target": "winnicott-false-self",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "love-as-encounter",
+      "target": "laing-divided-self",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "love-as-encounter",
+      "target": "weil-attention-love",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "love-as-encounter",
+      "target": "murdoch-love-as-perception",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "love-as-encounter",
+      "target": "lispector-being-misread",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "love-as-encounter",
+      "target": "rilke-two-solitudes",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "love-as-encounter",
+      "target": "bell-hooks-love-as-practice",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "love-as-encounter",
+      "target": "nostalgia-etymology-pathology",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "love-as-encounter",
+      "target": "boym-restorative-reflective-nostalgia",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "love-as-encounter",
+      "target": "jameson-nostalgia-mode",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "love-as-encounter",
+      "target": "fisher-hauntology-lost-futures",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "love-as-encounter",
+      "target": "bachelard-memory-as-architecture",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "love-as-encounter",
+      "target": "sehnsucht-saudade-hiraeth",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "love-as-encounter",
+      "target": "proust-involuntary-memory",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "love-as-encounter",
+      "target": "wittgenstein-limits-of-language",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "love-as-encounter",
+      "target": "lacan-real-symbolic",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "love-as-encounter",
+      "target": "langer-discursive-presentational",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "love-as-encounter",
+      "target": "merleau-ponty-bodily-knowing",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "love-as-encounter",
+      "target": "articulation-as-constitutive",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "oxford-dipai-module2-map",
+      "target": "causal-inference-ml-map",
+      "type": "untyped",
+      "target_exists": true
+    },
+    {
+      "source": "oxford-dipai-module2-map",
+      "target": "ai-governance-canon-map",
+      "type": "untyped",
+      "target_exists": true
+    },
+    {
+      "source": "oxford-dipai-module2-map",
+      "target": "pearls-ladder",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "oxford-dipai-module2-map",
+      "target": "correlation-vs-causation",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "second-brain-meta-map",
+      "target": "second-brain-working-contract",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "second-brain-meta-map",
+      "target": "zettelkasten-and-second-brain",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "second-brain-meta-map",
+      "target": "second-brain-system-build-session",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "second-brain-meta-map",
+      "target": "vault-design-lesson-hpe-projects",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "substack-essays-map",
+      "target": "ai-governance-canon-map",
+      "type": "untyped",
+      "target_exists": true
+    },
+    {
+      "source": "substack-essays-map",
+      "target": "hpe-sustainability-work-map",
+      "type": "untyped",
+      "target_exists": true
+    },
+    {
+      "source": "substack-essays-map",
+      "target": "divergence-theorem",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "substack-essays-map",
+      "target": "architectural-restraint",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "substack-essays-map",
+      "target": "sustainability-ai-thesis",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "substack-essays-map",
+      "target": "legibility-bias",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "substack-essays-map",
+      "target": "acemoglu-task-exposure",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "substack-essays-map",
+      "target": "mastery-trap",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "substack-essays-map",
+      "target": "sensitivity-specificity",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "substack-essays-map",
+      "target": "explainability-tools",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "substack-essays-map",
+      "target": "data-debt-as-wrong-question",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "substack-essays-map",
+      "target": "symbiosis-paradox-entry-condition",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "substack-essays-map",
+      "target": "goodharts-law",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "substack-essays-map",
+      "target": "hyperagents",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "substack-essays-map",
+      "target": "governance-capital",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "substack-essays-map",
+      "target": "geopolitical-risk-fourth-pressure",
+      "type": "mentioned",
+      "target_exists": true
+    },
+    {
+      "source": "substack-essays-map",
+      "target": "governance-capital-day1",
+      "type": "mentioned",
+      "target_exists": true
+    }
+  ]
+}
