@@ -1,6 +1,6 @@
 # Mini Vinny / KBAI
 
-A personal AI knowledge agent over an Obsidian vault. Four agent roles, one
+A personal AI knowledge agent over an Obsidian vault. Three agent roles, one
 typed graph, two fidelity axes (voice and **thinking**). Designed to make
 me think with my own writing as the prior — not to be a chatbot, not a RAG
 demo.
@@ -18,12 +18,12 @@ typed wikilinks (`builds-on`, `contradicts`, `analogous-to`, `exemplifies`,
 `mentioned`). The graph IS the vocabulary; structured links are how meaning
 travels.
 
-On top of the vault sit four agents with clean scopes:
+On top of the vault sit three agents with clean scopes:
 
 | Role | Owns |
 |---|---|
-| **Mini Vinny** | Vault retrieval, graph reasoning, cognitive routing |
-| **Write Agent** | The only mutator — every vault write is journaled |
+| **Mini Vinny** | Vault retrieval, graph reasoning, cognitive routing — **read-only** |
+| **Write Agent** | The only mutator — every vault write is journaled. **Live.** |
 | **Claude** | Orchestration, voice rendering, human-in-the-loop gates |
 
 Two independent fidelity axes layer on top:
@@ -41,13 +41,17 @@ synthesizing with consensus / disagreement structure made explicit.
 
 ## Status
 
-- **22 slash commands** live.
-- MCP tools across two servers (mini-vinny, write-agent stub).
-- **164 tests** passing.
-- Stages 0, 1, 2, 4, 5, 5.5, 5.6, 9 shipped. Stage 3 (Write Agent live
-  mutations) deferred until usage demand surfaces. Stage 6/7/8
-  (eval harness + calibration) blocked on accumulated `council_events`
-  data — accumulating organically as the system is used.
+- **21 slash commands** live.
+- MCP tools across two servers: **mini-vinny** (16 read-only tools) and
+  **write-agent** (3 live, journaled mutators).
+- **316 tests** passing.
+- The Write Agent is **live**: real journaled mutations (`write_create_note`,
+  `write_append_research_section`, `write_apply_link_suggestions`), each body
+  ≤5 lines delegating into `kbai/storage/`.
+- Frontmatter is structurally enforced on write. Deferred-tool discovery and
+  embed-on-write freshness are in place.
+- Eval harness + profile calibration remain blocked on accumulated
+  `council_events` data — accumulating organically as the system is used.
 
 See [`docs/refactor-plan.md`](docs/refactor-plan.md) for the full stage
 plan and verification stamps.
@@ -103,20 +107,23 @@ Two MCP servers, configured in
 Snippets in each server's `claude_desktop_config_snippet.json`. Restart
 Claude Desktop after edits — MCP tool list is cached at process start.
 
-### Slash commands
+### Slash commands and voices
 
-Symlink the versioned commands and voices into your home `~/.claude/`:
+`~/.claude/commands/` and `~/.claude/voices/` are canonical — that is where
+Claude Desktop reads them at runtime. The copies under `claude/` in this repo
+are a versioned **snapshot** for portfolio and review purposes, not a live
+symlink. To use them, copy (or sync) the contents into your home `~/.claude/`:
 
 ```bash
-ln -s "$PWD/claude/commands" ~/.claude/commands
-ln -s "$PWD/claude/voices"   ~/.claude/voices
+cp claude/commands/*.md ~/.claude/commands/
+cp claude/voices/*.md   ~/.claude/voices/
 ```
 
 ---
 
 ## Slash commands
 
-22 total, organised by intent.
+21 total, organised by intent.
 
 ### Discovery
 
@@ -146,13 +153,20 @@ ln -s "$PWD/claude/voices"   ~/.claude/voices
 | `/compare-thinkers <p1>+<p2> <query>` | Side-by-side multi-profile compare |
 | `/pressure-test <fuzzy>` | Auto-escalates challenge → council |
 
+### Generative
+
+| Command | What it does |
+|---|---|
+| `/imagine <fuzzy>` | Propose new research domains from cluster shape (extend / fracture / bridge / deepen / historicise) |
+
 ### Maintenance
 
 | Command | What it does |
 |---|---|
+| `/audit` | Read-only vault health audit (link health, missing connections) |
 | `/audit-edges <type1> <type2>` | Triage edges that may be the wrong type |
-| `/connect <fuzzy>` | Suggest new typed links |
-| `/capture <text>` | Quick idea capture (preview-only until Stage 3) |
+| `/connect <fuzzy>` | Suggest new typed links (preview only) |
+| `/capture <text>` | Idea capture — preview, then write on confirmation |
 
 ### Voice / routing
 
@@ -181,7 +195,7 @@ Same graph, different traversal. Edge weights and policies in
 | `exhaustive` | (admits `mentioned`) | Deep audits |
 
 **No person-named profiles in v1.** A profile named after a person is a
-claim to model a mind. Until calibration (Stage 8) earns one from real
+claim to model a mind. Until calibration earns one from real
 `council_events` data, only functional lenses ship.
 
 ---
@@ -196,7 +210,6 @@ Modular and combinable via `+`.
 | `tharoor` | Long erudite argument |
 | `bourdain` | Vernacular observation |
 | `clarkson` | Hyperbolic provocation |
-| `vinay` | Reserved — pulls live from notes tagged `voice-exemplar: true` |
 
 `/voice naval+bourdain explain X` picks dimensions from each rather than
 mechanically merging.
@@ -212,21 +225,26 @@ mechanically merging.
 │   ├── cognitive_routing/        # Profiles, registry, applier
 │   │   └── profiles/             # YAML profile definitions
 │   ├── council/                  # Council Mode retrieval + overlap
-│   ├── embed/                    # Reindex hooks
+│   ├── embed/                    # Reindex hooks + embed-on-write indexer
+│   │   └── indexer.py            # Embeds new notes on write (immediate freshness)
 │   ├── eval/                     # Eval scaffolding + sampler
 │   ├── graph/                    # Reindex hooks
+│   ├── imagination/              # Imagine-mode cluster reading
 │   ├── instrumentation/          # note_hits, council_events logs
 │   ├── retrieve/                 # dense, ppr, path, assembler
-│   ├── storage/                  # note_io, note_resolver
+│   ├── storage/                  # note_io, note_resolver, writers, journal
+│   │   └── frontmatter_migrate.py  # Migrate notes to the canonical schema
 │   ├── voice_profile/            # Voice exemplar hashing + cache
+│   ├── schema.py                 # Canonical frontmatter schema — single source of truth
+│   ├── tool_battery.py           # Deferred-tool discovery battery (session-start surfacing)
 │   └── contracts.py              # Pydantic models for all boundaries
 │
-├── minivinnymcp/                 # Mini Vinny MCP server (read-only)
-├── writeagentmcp/                # Write Agent (stub-only until Stage 3)
+├── minivinnymcp/                 # Mini Vinny MCP server (read-only, 16 tools)
+├── writeagentmcp/                # Write Agent MCP server (live, 3 journaled mutators)
 │
 ├── claude/
-│   ├── commands/                 # 22 slash commands (mirrored to ~/.claude/)
-│   └── voices/                   # 4 voice archetypes
+│   ├── commands/                 # Slash-command snapshot (canonical copy lives in ~/.claude/)
+│   └── voices/                   # Voice archetype snapshot
 │
 ├── docs/
 │   ├── refactor-plan.md          # Master plan with stage checkboxes
@@ -236,6 +254,7 @@ mechanically merging.
 ├── eval/                         # Golden-set queries (drafts)
 ├── scripts/                      # Pre-push hooks
 │
+├── CLAUDE.md                     # Single governance doc (static doctrine + operating rules)
 ├── vault_graph.py                # Vault → typed JSON graph builder
 ├── vault_graph_loader.py         # NetworkX wrapper, PPR, paths
 ├── vault_embed.py                # BGE → sqlite-vec indexer
@@ -251,7 +270,7 @@ mechanically merging.
 
 ### Personalized PageRank with edge-type-aware weights
 
-`assemble_context` (now decomposed into `kbai/retrieve/{dense,ppr,path,
+`assemble_context` (decomposed into `kbai/retrieve/{dense,ppr,path,
 assembler}.py`) runs:
 
 1. Dense vector seed via BGE-small over note summaries.
@@ -276,13 +295,37 @@ Claude synthesizes per the `/council` slash-command rules:
 - A recommendation that names how the debate sharpened it.
 
 Every invocation logs to `council_events` — the dataset that makes future
-profile calibration (Stage 8) possible.
+profile calibration possible.
 
 ### Single-writer invariant
 
-Mini Vinny contains no file-write code. The Write Agent is
-the only mutator and journals every change. Currently in stub mode;
-Stage 3 turns on real mutations when usage demands it.
+Mini Vinny contains no file-write code. The Write Agent is the only mutator
+and journals every change. It is **live**: `write_create_note`,
+`write_append_research_section`, and `write_apply_link_suggestions` perform
+real, journaled mutations, each delegating into
+`kbai/storage/{note_creator,research_appender,link_applier,write_journal}`.
+
+### Structurally enforced frontmatter
+
+`kbai/schema.py` is the single source of truth for frontmatter — required
+fields, allowed enums (status, type, lens), per-type allowed keys, and the
+deprecated-field set. Both the parser (`vault_graph.py`) and the writer
+import from it. `write_create_note` **hard-rejects** non-conformant
+frontmatter: missing required fields, out-of-enum values, keys not allowed
+for the note's type, and unknown keys all fail the write rather than landing
+malformed notes in the vault.
+
+### Embed-on-write freshness
+
+`kbai/embed/indexer.py` embeds a note into the vector index at write time,
+so a newly created note is searchable immediately — no separate reindex pass
+required before it can surface in retrieval.
+
+### Deferred-tool discovery battery
+
+`kbai/tool_battery.py` ensures the MCP tool surface is discovered and
+exercised at session start, so deferred/lazy tools are reliably available
+rather than missing until first use.
 
 ### Two fidelity axes
 
@@ -296,7 +339,7 @@ retrieved. They never overlap.
 ```bash
 PYTEST=/path/to/.venv/bin/pytest
 
-# Full suite
+# Full suite (316 passing)
 $PYTEST minivinnymcp/tests/ writeagentmcp/tests/ -q
 ```
 
@@ -306,7 +349,7 @@ Test taxonomy spans:
 - L2 integration (module ↔ storage adapter)
 - L3 contract (MCP adapter → tool result schema validates against
   `kbai/contracts.py` Pydantic models)
-- L4 retrieval eval (planned for Stage 6)
+- L4 retrieval eval (blocked on accumulated `council_events` data)
 
 Pre-push eval hook stub at `scripts/pre-push-eval.sh`. GitHub Actions
 workflow stub at `.github/workflows/retrieval-eval.yml`.
