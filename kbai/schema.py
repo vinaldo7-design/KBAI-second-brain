@@ -14,7 +14,7 @@ from __future__ import annotations
 
 # Fields that must be present on every note.
 REQUIRED_FRONTMATTER: frozenset[str] = frozenset({
-    "id", "title", "type", "status", "summary", "tags",
+    "id", "title", "created", "updated", "type", "status", "summary", "tags",
 })
 
 # Fields no longer recognised — surfaced as schema drift by the parser.
@@ -37,7 +37,7 @@ ALLOWED_LIFECYCLE_STAGES: frozenset[str] = frozenset({
 # `quick-capture` is a template name, not a type value (its template sets
 # `type: capture`), so it is not listed here.
 ALLOWED_TYPES: frozenset[str] = frozenset({
-    "capture", "idea", "learning", "essay", "personal", "map", "concept",
+    "capture", "idea", "learning", "essay", "personal", "map", "concept", "project",
 })
 
 # Lens vocabulary — LOCKED, CLAUDE-static.md §5.
@@ -57,7 +57,42 @@ TAG_PREFIX_LENS = "lens/"
 CANONICAL_FIELD_ORDER: tuple[str, ...] = (
     "id", "title", "created", "updated",
     "type", "status", "lifecycle_stage", "summary", "tags",
+    "origin", "author", "context", "published_url", "supersedes",
 )
+
+# Provenance vocabulary (CLAUDE doctrine §4 + corpus). The value of `origin`.
+ALLOWED_ORIGINS: frozenset[str] = frozenset({
+    "conversation", "lecture", "paper", "session", "capture",
+})
+
+# Types on which `origin` (provenance) is allowed. concept/map are structural or
+# derived and carry no provenance. `capture` is included so the /capture
+# command's `origin: conversation` validates (decision 11 + capture-origin sign-off).
+ORIGIN_TYPES: frozenset[str] = frozenset({
+    "idea", "learning", "project", "personal", "capture",
+})
+
+# Optional fields permitted on every type.
+SHARED_OPTIONAL: frozenset[str] = frozenset({"lifecycle_stage"})
+
+# Per-type extension fields (beyond shared core + shared-optional + origin).
+TYPE_EXTENSIONS: dict[str, frozenset[str]] = {
+    "learning": frozenset({"author", "context"}),
+    "essay": frozenset({"published_url"}),
+    "project": frozenset({"supersedes"}),
+}
+
+
+def allowed_keys(note_type: str) -> frozenset[str]:
+    """Complete set of frontmatter keys permitted on a note of this type:
+    shared required core + shared-optional + origin (origin-types only) + that
+    type's extensions. Any key outside this set is rejected on write — this is
+    what stops free-form drift (e.g. `medium`/`author` on the wrong type)."""
+    keys = set(REQUIRED_FRONTMATTER) | set(SHARED_OPTIONAL)
+    if note_type in ORIGIN_TYPES:
+        keys.add("origin")
+    keys |= set(TYPE_EXTENSIONS.get(note_type, frozenset()))
+    return frozenset(keys)
 
 
 def validate_frontmatter(fm: dict) -> str | None:
@@ -87,8 +122,8 @@ def validate_frontmatter(fm: dict) -> str | None:
         return f"required frontmatter fields missing: {sorted(missing)}"
 
     summary = fm.get("summary")
-    if not summary or not str(summary).strip():
-        return "summary missing or empty"
+    if not isinstance(summary, str) or not summary.strip():
+        return "summary missing, empty, or not a string"
 
     status = fm.get("status")
     if status not in ALLOWED_STATUSES:
@@ -102,12 +137,22 @@ def validate_frontmatter(fm: dict) -> str | None:
             f"type {note_type!r} not in allowed set: {sorted(ALLOWED_TYPES)}"
         )
 
-    if "lifecycle_stage" in fm and fm["lifecycle_stage"] is not None:
+    if fm.get("lifecycle_stage") is not None:
         ls = fm["lifecycle_stage"]
         if ls not in ALLOWED_LIFECYCLE_STAGES:
             return (
                 f"lifecycle_stage {ls!r} not in allowed set: "
                 f"{sorted(ALLOWED_LIFECYCLE_STAGES)}"
+            )
+
+    origin = fm.get("origin")
+    if origin is not None and str(origin).strip():
+        if origin not in ALLOWED_ORIGINS:
+            return f"origin {origin!r} not in allowed set: {sorted(ALLOWED_ORIGINS)}"
+        if note_type not in ORIGIN_TYPES:
+            return (
+                f"origin not allowed on type {note_type!r} "
+                f"(only {sorted(ORIGIN_TYPES)})"
             )
 
     tags = fm.get("tags")
@@ -127,6 +172,16 @@ def validate_frontmatter(fm: dict) -> str | None:
             return (
                 f"tag {tag!r} must start with "
                 f"{TAG_PREFIX_TOPIC!r} or {TAG_PREFIX_LENS!r}"
+            )
+
+    # Unknown-key rejection (the gate against free-form drift). type is already
+    # validated above, so allowed_keys() is well-defined here.
+    allowed = allowed_keys(note_type)
+    for key in fm:
+        if key not in allowed:
+            return (
+                f"unknown frontmatter key {key!r} not allowed for type "
+                f"{note_type!r}; allowed: {sorted(allowed)}"
             )
 
     return None

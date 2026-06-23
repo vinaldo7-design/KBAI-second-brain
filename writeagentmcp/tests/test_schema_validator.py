@@ -19,11 +19,14 @@ from kbai import schema
 from kbai.schema import (
     ALLOWED_LENSES,
     ALLOWED_LIFECYCLE_STAGES,
+    ALLOWED_ORIGINS,
     ALLOWED_STATUSES,
     ALLOWED_TYPES,
+    ORIGIN_TYPES,
     REQUIRED_FRONTMATTER,
     TAG_PREFIX_LENS,
     TAG_PREFIX_TOPIC,
+    allowed_keys,
     validate_frontmatter,
 )
 from kbai.storage.note_creator import create_note
@@ -34,6 +37,8 @@ def _valid_fm() -> dict:
     return {
         "id": "202605271215",
         "title": "Some Note Title",
+        "created": "2026-05-27",
+        "updated": "2026-05-27",
         "type": "idea",
         "status": "seedling",
         "summary": "A one-sentence summary.",
@@ -154,7 +159,7 @@ def test_drift_allowed_types_accept_set_equals_schema():
         assert validate_frontmatter(_valid_fm() | {"type": nt}) is None, (
             f"validator rejected schema-allowed type {nt!r}"
         )
-    for nt in ("thinker", "draft", "project", "todo", "quick-capture", ""):
+    for nt in ("thinker", "draft", "todo", "quick-capture", ""):
         if nt in ALLOWED_TYPES:
             continue
         err = validate_frontmatter(_valid_fm() | {"type": nt})
@@ -297,3 +302,105 @@ def test_create_note_valid_passes_through(tmp_path):
     assert receipt.status == "applied"
     assert receipt.applied is True
     assert (vault / "01-Ideas" / "valid-note.md").exists()
+
+
+# --- Task 4: strengthened validator (created/updated, project, origin, unknown-key) ---
+
+
+def test_created_and_updated_now_required():
+    for field in ("created", "updated"):
+        fm = {k: v for k, v in _valid_fm().items() if k != field}
+        err = validate_frontmatter(fm)
+        assert err is not None and ("required" in err.lower() or field in err.lower()), (
+            f"validator accepted frontmatter missing {field!r}"
+        )
+
+
+def test_project_type_passes():
+    assert validate_frontmatter(_valid_fm() | {"type": "project"}) is None
+
+
+def test_wrong_case_type_fails():
+    err = validate_frontmatter(_valid_fm() | {"type": "Learning"})
+    assert err is not None and "type" in err.lower()
+
+
+def test_summary_non_string_fails():
+    err = validate_frontmatter(_valid_fm() | {"summary": {"summary": None}})
+    assert err is not None and "summary" in err.lower()
+
+
+def test_unknown_key_rejected():
+    err = validate_frontmatter(_valid_fm() | {"medium": "lecture"})
+    assert err is not None
+    assert "medium" in err.lower()
+
+
+def test_origin_valid_on_idea_passes():
+    assert validate_frontmatter(_valid_fm() | {"origin": "lecture"}) is None
+
+
+def test_origin_off_enum_fails():
+    err = validate_frontmatter(_valid_fm() | {"origin": "podcast"})
+    assert err is not None and "origin" in err.lower()
+
+
+def test_origin_on_concept_fails():
+    err = validate_frontmatter(_valid_fm() | {"type": "concept", "origin": "conversation"})
+    assert err is not None and "origin" in err.lower()
+
+
+def test_capture_with_origin_passes():
+    # capture IS an origin-type — the /capture command writes origin: conversation.
+    assert validate_frontmatter(
+        _valid_fm() | {"type": "capture", "origin": "conversation"}
+    ) is None
+
+
+def test_learning_extensions_pass():
+    fm = _valid_fm() | {
+        "type": "learning", "origin": "lecture",
+        "author": "Some Author", "context": "Oxford DipAI",
+    }
+    assert validate_frontmatter(fm) is None
+
+
+def test_learning_extensions_rejected_on_idea():
+    err = validate_frontmatter(_valid_fm() | {"author": "Some Author"})
+    assert err is not None and "author" in err.lower()
+
+
+# --- drift detectors for the new sets ---
+
+
+def test_drift_allowed_origins_accept_set_equals_schema():
+    for org in ALLOWED_ORIGINS:
+        assert validate_frontmatter(_valid_fm() | {"origin": org}) is None, (
+            f"validator rejected schema-allowed origin {org!r}"
+        )
+    for org in ("podcast", "video", "tweet", "blog"):
+        if org in ALLOWED_ORIGINS:
+            continue
+        err = validate_frontmatter(_valid_fm() | {"origin": org})
+        assert err is not None and "origin" in err.lower()
+
+
+def test_drift_origin_only_on_origin_types():
+    for nt in ALLOWED_TYPES:
+        err = validate_frontmatter(_valid_fm() | {"type": nt, "origin": "conversation"})
+        if nt in ORIGIN_TYPES:
+            assert err is None, f"origin rejected on origin-type {nt!r}: {err}"
+        else:
+            assert err is not None and "origin" in err.lower(), (
+                f"origin accepted on non-origin-type {nt!r}"
+            )
+
+
+def test_allowed_keys_composition_matches_schema():
+    from kbai.schema import SHARED_OPTIONAL, TYPE_EXTENSIONS
+    for nt in ALLOWED_TYPES:
+        ak = allowed_keys(nt)
+        assert REQUIRED_FRONTMATTER <= ak
+        assert SHARED_OPTIONAL <= ak
+        assert ("origin" in ak) == (nt in ORIGIN_TYPES)
+        assert TYPE_EXTENSIONS.get(nt, frozenset()) <= ak

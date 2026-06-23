@@ -10,8 +10,9 @@ summary: {summary}
 tags:
   - topic/
   - lens/
-medium: lecture | book | paper | article
+origin: lecture
 author: 
+context: 
 ---
 
 # {title}
