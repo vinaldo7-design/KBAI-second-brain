@@ -37,6 +37,16 @@ def serialize_embedding(vec) -> bytes:
     return struct.pack(f"{len(vec)}f", *vec)
 
 
+def node_filepath(node: dict) -> str:
+    """Return a graph node's vault-relative path.
+
+    vault_graph.py serialises Node dataclasses (via asdict), which store the
+    path under the key ``path``. Older/alternate dumps may use ``filepath``;
+    fall back to that for safety. Returns "" if neither is present.
+    """
+    return node.get("path") or node.get("filepath", "") or ""
+
+
 def init_db(db: sqlite3.Connection):
     db.execute("""
         CREATE TABLE IF NOT EXISTS notes (
@@ -95,7 +105,7 @@ def main():
         if not args.rebuild and existing.get(nid) == h:
             skipped_unchanged += 1
             continue
-        to_embed.append((nid, n.get("title", ""), summary, h, n.get("filepath", "")))
+        to_embed.append((nid, n.get("title", ""), summary, h, node_filepath(n)))
 
     embedded = 0
     if to_embed:
