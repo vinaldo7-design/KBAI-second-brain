@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
 import re
 from datetime import datetime, timezone
 from pathlib import Path
@@ -29,6 +30,8 @@ from kbai.schema import CANONICAL_FIELD_ORDER, validate_frontmatter
 from kbai.storage.write_journal import record_mutation
 from kbai.templates import render_body
 
+
+logger = logging.getLogger(__name__)
 
 _TOOL = "write_create_note"
 
@@ -181,8 +184,18 @@ def create_note(
 
     hash_after = hashlib.sha256(target.read_bytes()).hexdigest()
 
-    # Reindex hooks (still stubs — Stage 1 will replace).
-    update_note_embeddings(note_id)
+    # Reindex hooks. update_note_embeddings is now REAL (loads BGE on first
+    # call in this process, opens + writes the sqlite-vec DB), so its failure
+    # must never break the create: wrap it and swallow. The write already
+    # succeeded above; the receipt stays status="applied" regardless.
+    # update_note_edges is still a no-op stub, so it's left unwrapped.
+    # NOTE / latent issue: link_applier and research_appender call their reindex
+    # hooks unwrapped too — once those hooks do real I/O they need the same
+    # try/except guard. Flagged for a later pass; not touched here.
+    try:
+        update_note_embeddings(note_id, vault_root)
+    except Exception:  # noqa: BLE001 — hook failure must not fail the write
+        logger.exception("update_note_embeddings hook failed note=%s", note_id)
     update_note_edges(note_id)
 
     journal_id = record_mutation(

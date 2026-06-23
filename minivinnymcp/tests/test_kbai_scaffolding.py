@@ -83,12 +83,15 @@ def test_eval_runner_loads_queries(tmp_path):
 
 # --- item 8: reindex hooks ---
 
-def test_update_note_embeddings_returns_stub():
+def test_update_note_embeddings_skips_unknown_note():
+    # Task 3: the embed hook is now REAL (no longer a stub). An unknown note_id
+    # has no file to read, so it returns a soft "skipped" status rather than the
+    # old "stub" sentinel — and still never raises.
     from kbai.embed.reindex_hooks import update_note_embeddings
     out = update_note_embeddings("foo")
-    assert out["status"] == "stub"
+    assert out["status"] == "skipped"
     assert out["note_id"] == "foo"
-    assert out["would_re_embed"] is True
+    assert out["reason"] == "note_file_not_found"
 
 
 def test_update_note_edges_returns_stub():
