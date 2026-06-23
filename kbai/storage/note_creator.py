@@ -184,19 +184,21 @@ def create_note(
 
     hash_after = hashlib.sha256(target.read_bytes()).hexdigest()
 
-    # Reindex hooks. update_note_embeddings is now REAL (loads BGE on first
-    # call in this process, opens + writes the sqlite-vec DB), so its failure
-    # must never break the create: wrap it and swallow. The write already
-    # succeeded above; the receipt stays status="applied" regardless.
-    # update_note_edges is still a no-op stub, so it's left unwrapped.
-    # NOTE / latent issue: link_applier calls its reindex hook unwrapped too —
-    # once that hook does real I/O it needs the same try/except guard. Flagged
-    # for a later pass; not touched here.
+    # Reindex hooks (both REAL now): update_note_embeddings re-embeds the summary;
+    # update_note_edges merges this note's node + edges into the graph JSON. Both
+    # do real I/O (BGE load, sqlite/JSON writes), so a failure must never break the
+    # create — the file write already succeeded above; wrap each and swallow, the
+    # receipt stays status="applied". (link_applier calls these hooks too and
+    # should wrap them the same way once it drives graph freshness for the edges
+    # it adds — separate slice.)
     try:
         update_note_embeddings(note_id, vault_root)
     except Exception:  # noqa: BLE001 — hook failure must not fail the write
         logger.exception("update_note_embeddings hook failed note=%s", note_id)
-    update_note_edges(note_id)
+    try:
+        update_note_edges(note_id, vault_root)
+    except Exception:  # noqa: BLE001 — hook failure must not fail the write
+        logger.exception("update_note_edges hook failed note=%s", note_id)
 
     journal_id = record_mutation(
         vault_root=vault_root,

@@ -94,10 +94,12 @@ def test_update_note_embeddings_skips_unknown_note():
     assert out["reason"] == "note_file_not_found"
 
 
-def test_update_note_edges_returns_stub():
+def test_update_note_edges_skips_unknown_note():
+    # The graph reindex hook is now REAL (incremental merge). An unknown note_id
+    # has no file to reparse, so it returns a soft "skipped", and never raises.
     from kbai.graph.reindex_hooks import update_note_edges
     out = update_note_edges("foo")
-    assert out["status"] == "stub"
+    assert out["status"] == "skipped"
     assert out["note_id"] == "foo"
 
 
