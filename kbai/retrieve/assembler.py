@@ -52,6 +52,7 @@ def assemble_context(
     attr_top_n: int | None = 15,
     reranker=None,
     drop_types=frozenset({"map"}),
+    skip_graph: bool = False,
 ) -> dict:
     """Full hybrid retrieval: dense seed → PPR → char-budget content → path attribution.
 
@@ -83,11 +84,14 @@ def assemble_context(
     # ── Hybrid seed (dense + BM25, RRF-fused; dense-only if no FTS index) ─────
     seed_scores, seed_meta = hybrid_seed(query, db_path, model, seed_k)
 
-    # ── PPR ──────────────────────────────────────────────────────────────────
-    ranked = ppr_rank(
-        graph, seed_scores, exclude_types, weight_overrides,
-        cap=top_k, include_mentioned=include_mentioned,
-    )
+    # ── Rank: fact lookups (router) skip the graph walk; else full PPR ───────
+    if skip_graph:
+        ranked = sorted(seed_scores.items(), key=lambda kv: -kv[1])[:top_k]
+    else:
+        ranked = ppr_rank(
+            graph, seed_scores, exclude_types, weight_overrides,
+            cap=top_k, include_mentioned=include_mentioned,
+        )
 
     # ── Drop navigation/MOC notes from the result set (they aid the walk as ──
     # hubs but aren't synthesis content). Maps still boosted PPR centrality above.

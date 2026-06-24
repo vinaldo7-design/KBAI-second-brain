@@ -287,6 +287,7 @@ def _assemble_context_impl(
     """Legacy mode= entry point → kbai.retrieve.assembler (Stage 1.4).
     Signature unchanged; MCP tools and eval runner call this without modification."""
     from kbai.retrieve.assembler import assemble_context as _assemble
+    from kbai.retrieve.router import classify_query
     if mode not in RETRIEVAL_MODES:
         mode = "standard"
     return _assemble(
@@ -301,6 +302,7 @@ def _assemble_context_impl(
         top_k=50,
         attr_top_n=15,
         reranker=_get_reranker(),
+        skip_graph=(classify_query(query) == "fact"),
     )
 
 
