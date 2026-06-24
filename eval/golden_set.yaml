@@ -1,0 +1,52 @@
+# Silver-standard retrieval golden set.
+#
+# Claude-generated, CONTENT-grounded: each query's `expected` notes were chosen
+# by reading note titles/summaries that genuinely address the query — NOT by
+# running the retriever (which would be circular). `primary` is the single most
+# canonical note. Used to MEASURE retrieval changes (slices 4/5) against a
+# recorded baseline (eval/baseline.json), and to catch regressions.
+#
+# This is SILVER, not gold: upgrade by correcting `expected`/`primary` to your
+# own relevance judgments. Each `primary` must appear in its own `expected`.
+version: 1
+queries:
+  - id: q01
+    query: "the difference between interpretability and explainability in machine learning"
+    primary: interpretability-vs-explainability
+    expected: [interpretability-vs-explainability, explainability-tools, ml-model-fundamentals, imposed-vs-discovered-structure]
+  - id: q02
+    query: "post-hoc explanation methods SHAP and LIME for black-box models"
+    primary: shap
+    expected: [shap, lime, explainability-tools, interpretability-vs-explainability]
+  - id: q03
+    query: "Pearl's ladder of causation and the rungs of causal reasoning"
+    primary: pearls-ladder
+    expected: [pearls-ladder, correlation-vs-causation, dag-directed-acyclic-graph, pearl-vs-rubin, causal-inference-ml-map]
+  - id: q04
+    query: "directed acyclic graphs and strategies for causal identification"
+    primary: dag-directed-acyclic-graph
+    expected: [dag-directed-acyclic-graph, four-causal-identification-strategies, double-ml, pearls-ladder]
+  - id: q05
+    query: "fairness, bias, and proxy discrimination when a protected attribute is removed"
+    primary: proxy-laundering-trap
+    expected: [proxy-laundering-trap, explainability-tools, explainability-guided-feature-reduction-is-circular]
+  - id: q06
+    query: "parametric versus nonparametric model structure imposed or discovered"
+    primary: imposed-vs-discovered-structure
+    expected: [imposed-vs-discovered-structure, ml-model-fundamentals, classification-trees]
+  - id: q07
+    query: "governance capital as a competitive moat in AI strategy"
+    primary: governance-capital-day1
+    expected: [governance-capital-day1, governance-capital]
+  - id: q08
+    query: "AI's effect on productivity, task automation, and the automation ceiling"
+    primary: acemoglu-task-exposure
+    expected: [acemoglu-task-exposure, acemoglu-brynjolfsson-productivity-session, blanchard-tfp-deepseek-session, jevons-paradox-ai-compute]
+  - id: q09
+    query: "the mastery trap and expertise as optionality"
+    primary: mastery-trap
+    expected: [mastery-trap, antifragile-expertise-as-optionality]
+  - id: q10
+    query: "love as encounter with the otherness and separateness of another person"
+    primary: love-as-encounter
+    expected: [love-as-encounter, barthes-lover-position, weil-attention-love, rilke-two-solitudes]
