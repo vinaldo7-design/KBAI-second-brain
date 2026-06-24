@@ -72,6 +72,14 @@ def main():
     db = open_db(DB_PATH)
     init_db(db)
 
+    if args.rebuild:
+        # Purge stale rows so a full rebuild reflects ONLY the current graph —
+        # otherwise renamed/deleted notes leave orphaned ids (e.g. a pre-rename
+        # timestamp id) that surface as phantom duplicates in retrieval.
+        for _tbl in ("notes", "note_vectors", "notes_fts"):
+            db.execute(f"DELETE FROM {_tbl}")
+        db.commit()
+
     existing = {row[0]: row[1] for row in db.execute(
         "SELECT id, summary_hash FROM notes")}
 
