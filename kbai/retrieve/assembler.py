@@ -27,6 +27,7 @@ from kbai.contracts import CognitiveProfile
 from kbai.retrieve.path import path_attribute, path_exclude_from_profile
 from kbai.retrieve.ppr import ppr_rank
 from kbai.retrieve.prune import prune_redundant_paths
+from kbai.retrieve.rerank import rerank_ranked
 from kbai.retrieve.sparse import hybrid_seed
 
 _MODE_TO_PROFILE: dict[str, str] = {
@@ -49,6 +50,7 @@ def assemble_context(
     char_budget: int = 12000,
     top_k: int = 50,
     attr_top_n: int | None = 15,
+    reranker=None,
 ) -> dict:
     """Full hybrid retrieval: dense seed → PPR → char-budget content → path attribution.
 
@@ -91,6 +93,14 @@ def assemble_context(
     # seeds, never below keep_min. With top_k<=10 (council/profile path) this is
     # a no-op; it only trims the long legacy-mode tail (top_k=50).
     ranked = prune_redundant_paths(ranked, list(seed_meta.keys()))
+
+    # ── Rerank by query<->summary relevance (cross-encoder; demotes generic ──
+    # map/MOC hubs PPR over-ranks). Optional: dense-only first stage when off.
+    if reranker is not None:
+        def _summary_of(nid):
+            meta = seed_meta.get(nid) or {}
+            return meta.get("summary") or (graph.node(nid) or {}).get("summary")
+        ranked = rerank_ranked(query, ranked, _summary_of, reranker)
 
     # ── Build result list ────────────────────────────────────────────────────
     results: list[dict] = []

@@ -1,6 +1,6 @@
 {
-  "mrr": 0.6893,
-  "recall@10": 0.7167,
-  "primary_hit@3": 0.6,
+  "mrr": 0.85,
+  "recall@10": 0.7583,
+  "primary_hit@3": 0.5,
   "n": 10
 }

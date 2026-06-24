@@ -134,12 +134,16 @@ def test_assemble_context_note_shape():
         assert note["source"] in ("seed", "ppr")
 
 
-def test_assemble_context_sorted_by_score():
+def test_assemble_context_returns_scored_notes():
     if not _graph_available():
         return
     result = assemble_context("governance capital", seed_k=3)
-    scores = [n["composite_score"] for n in result["notes"]]
-    assert scores == sorted(scores, reverse=True)
+    notes = result["notes"]
+    assert notes, "expected at least one note"
+    # Every note carries its first-stage PPR composite_score. The FINAL order is
+    # now set by the cross-encoder reranker (mode path), so the list is no longer
+    # monotonic in composite_score — assert presence/type, not sort order.
+    assert all(isinstance(n["composite_score"], (int, float)) for n in notes)
 
 
 def test_assemble_context_budget_respected():

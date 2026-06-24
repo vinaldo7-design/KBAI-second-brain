@@ -40,6 +40,19 @@ def _get_model() -> SentenceTransformer:
     return _model
 
 
+_reranker = None  # None=uninitialised; False=load failed (don't retry); else=scorer fn
+
+
+def _get_reranker():
+    """Lazy cross-encoder reranker scorer. Returns None if the model can't load,
+    so retrieval cleanly degrades to the first-stage (dense+BM25 → PPR) order."""
+    global _reranker
+    if _reranker is None:
+        from kbai.retrieve.rerank import cross_encoder_scorer
+        _reranker = cross_encoder_scorer() or False
+    return _reranker or None
+
+
 def _get_graph() -> VaultGraph:
     """Single VaultGraph cache. Post-2b the constructor preserves every edge;
     query-time options (collapse, include_mentioned) select the view."""
@@ -287,6 +300,7 @@ def _assemble_context_impl(
         char_budget=char_budget,
         top_k=50,
         attr_top_n=15,
+        reranker=_get_reranker(),
     )
 
 
