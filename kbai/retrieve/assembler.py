@@ -26,7 +26,7 @@ from kbai.cognitive_routing import apply_profile, load_profile
 from kbai.contracts import CognitiveProfile
 from kbai.retrieve.path import path_attribute, path_exclude_from_profile
 from kbai.retrieve.ppr import ppr_rank
-from kbai.retrieve.prune import prune_redundant_paths
+from kbai.retrieve.prune import drop_node_types, prune_redundant_paths
 from kbai.retrieve.rerank import rerank_ranked
 from kbai.retrieve.sparse import hybrid_seed
 
@@ -51,6 +51,7 @@ def assemble_context(
     top_k: int = 50,
     attr_top_n: int | None = 15,
     reranker=None,
+    drop_types=frozenset({"map"}),
 ) -> dict:
     """Full hybrid retrieval: dense seed → PPR → char-budget content → path attribution.
 
@@ -86,6 +87,12 @@ def assemble_context(
     ranked = ppr_rank(
         graph, seed_scores, exclude_types, weight_overrides,
         cap=top_k, include_mentioned=include_mentioned,
+    )
+
+    # ── Drop navigation/MOC notes from the result set (they aid the walk as ──
+    # hubs but aren't synthesis content). Maps still boosted PPR centrality above.
+    ranked = drop_node_types(
+        ranked, lambda nid: (graph.node(nid) or {}).get("type"), drop_types
     )
 
     # ── Prune the redundant tail (PathRAG: redundancy, not insufficiency) ─────

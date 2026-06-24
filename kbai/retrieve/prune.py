@@ -49,3 +49,16 @@ def prune_redundant_paths(
     merged = floor + extra_seeds
     merged.sort(key=lambda x: -x[1])
     return merged
+
+
+def drop_node_types(ranked, type_of, drop_types=frozenset({"map"})):
+    """Remove (note_id, score) entries whose node type is in drop_types.
+
+    Map / MOC notes connect the graph (and still help PPR traversal as hubs, so
+    we drop them from the *result list*, not the walk) but are navigation, not
+    synthesis content — they shouldn't be returned as synthesis answers. Order
+    preserved. (Eval-measured: a blanket drop beat a keep-the-seed-maps variant.)
+    """
+    if not drop_types:
+        return list(ranked)
+    return [(nid, s) for nid, s in ranked if type_of(nid) not in drop_types]

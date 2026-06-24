@@ -21,7 +21,7 @@ queries:
   - id: q03
     query: "Pearl's ladder of causation and the rungs of causal reasoning"
     primary: pearls-ladder
-    expected: [pearls-ladder, correlation-vs-causation, dag-directed-acyclic-graph, pearl-vs-rubin, causal-inference-ml-map]
+    expected: [pearls-ladder, correlation-vs-causation, dag-directed-acyclic-graph, pearl-vs-rubin]
   - id: q04
     query: "directed acyclic graphs and strategies for causal identification"
     primary: dag-directed-acyclic-graph
@@ -48,5 +48,5 @@ queries:
     expected: [mastery-trap, antifragile-expertise-as-optionality]
   - id: q10
     query: "love as encounter with the otherness and separateness of another person"
-    primary: love-as-encounter
-    expected: [love-as-encounter, barthes-lover-position, weil-attention-love, rilke-two-solitudes]
+    primary: weil-attention-love
+    expected: [weil-attention-love, murdoch-love-as-perception, barthes-lover-position, rilke-two-solitudes]

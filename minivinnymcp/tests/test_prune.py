@@ -15,7 +15,7 @@ _vault_root = Path(__file__).parent.parent.parent
 os.environ.setdefault("VAULT_ROOT", str(_vault_root))
 sys.path.insert(0, str(_vault_root))
 
-from kbai.retrieve.prune import prune_redundant_paths
+from kbai.retrieve.prune import drop_node_types, prune_redundant_paths
 
 
 def test_prunes_low_reliability_tail():
@@ -54,3 +54,24 @@ def test_preserves_descending_order():
 
 def test_empty_input():
     assert prune_redundant_paths([], seed_ids=[]) == []
+
+
+# --- map-fix: drop navigation/MOC notes from synthesis results ---------------
+
+def test_drop_node_types_removes_maps():
+    ranked = [("idea-a", 0.9), ("the-map", 0.7), ("idea-b", 0.5)]
+    types = {"idea-a": "idea", "the-map": "map", "idea-b": "learning"}
+    out = drop_node_types(ranked, lambda nid: types[nid])
+    ids = [nid for nid, _ in out]
+    assert "the-map" not in ids
+    assert ids == ["idea-a", "idea-b"]   # order preserved, map removed
+
+
+def test_drop_node_types_empty_set_is_noop():
+    ranked = [("a", 1.0), ("m", 0.5)]
+    assert drop_node_types(ranked, lambda nid: "map", drop_types=frozenset()) == ranked
+
+
+def test_drop_node_types_keeps_unknown_type():
+    ranked = [("a", 1.0)]
+    assert drop_node_types(ranked, lambda nid: None) == ranked   # None type → kept
