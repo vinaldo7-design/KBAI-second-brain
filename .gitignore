@@ -46,6 +46,10 @@ life shit.md
 .obsidian/workspace-mobile.json
 .claude/settings.local.json
 
+# Plugin-local config — the Local REST API plugin stores its API key + TLS
+# private key here. NEVER commit: these are secrets.
+.obsidian/plugins/*/data.json
+
 # Test cache
 .pytest_cache/
 

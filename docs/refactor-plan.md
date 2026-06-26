@@ -178,7 +178,7 @@ cd "<vault root>"
 
 # IMPORTANT: tests need the minivinnymcp conda env (mcp + sentence-transformers).
 # The base anaconda env will fail with ModuleNotFoundError: mcp.
-PYTEST=/Users/vinaynair/opt/anaconda3/envs/minivinnymcp/bin/pytest
+PYTEST=pytest
 
 $PYTEST minivinnymcp/tests/ perplexitymcp/tests/  # all 48 baseline + aliases
 $PYTEST writeagentmcp/tests/                       # new package

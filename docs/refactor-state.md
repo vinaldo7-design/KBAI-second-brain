@@ -106,7 +106,7 @@ Asserts the post-Phase-2 default view reproduces pre-refactor PPR / PageRank sco
 ### Full test sweep
 
 ```bash
-/Users/vinaynair/opt/anaconda3/envs/minivinnymcp/bin/python -m pytest \
+python -m pytest \
     minivinnymcp/tests/ writeagentmcp/tests/ -q
 ```
 Run before committing any structural change. (Perplexity MCP server removed 2026-06-23; its test suite is gone.)
@@ -114,12 +114,12 @@ Run before committing any structural change. (Perplexity MCP server removed 2026
 ### Template skeleton audit (Phase 6)
 
 ```bash
-/Users/vinaynair/opt/anaconda3/envs/minivinnymcp/bin/python -m pytest writeagentmcp/tests/test_templates.py -v
+python -m pytest writeagentmcp/tests/test_templates.py -v
 ```
 Drift detectors for the kbai/templates/ ↔ schema/yaml relationship. If any skeleton goes out of sync with `ALLOWED_TYPES`, `EDGE_HEADING`, `ALLOWED_STATUSES`, or `ALLOWED_LIFECYCLE_STAGES`, these fail.
 
 ```bash
-/Users/vinaynair/opt/anaconda3/envs/minivinnymcp/bin/python scripts/regenerate_obsidian_templates.py
+python scripts/regenerate_obsidian_templates.py
 ```
 Idempotent. Run after editing any `kbai/templates/*.md`. Output should be "unchanged: ..." if the working tree is in sync.
 

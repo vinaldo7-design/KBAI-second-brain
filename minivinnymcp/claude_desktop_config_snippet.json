@@ -1,12 +1,12 @@
 {
   "mcpServers": {
     "mini-vinny": {
-      "command": "/Users/vinaynair/opt/anaconda3/envs/minivinnymcp/bin/python",
+      "command": "/path/to/venv/bin/python",
       "args": [
-        "/Users/vinaynair/Library/Mobile Documents/iCloud~md~obsidian/Documents/Second Brain/Second Brain/minivinnymcp/server.py"
+        "/path/to/KBAI-second-brain/minivinnymcp/server.py"
       ],
       "env": {
-        "VAULT_ROOT": "/Users/vinaynair/Library/Mobile Documents/iCloud~md~obsidian/Documents/Second Brain/Second Brain"
+        "VAULT_ROOT": "/path/to/your/vault"
       }
     }
   }
