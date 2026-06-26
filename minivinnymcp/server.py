@@ -5,7 +5,16 @@ import sqlite3
 import time
 from pathlib import Path
 
-_vault_root = Path(os.environ["VAULT_ROOT"])
+_vault_root_env = os.environ.get("VAULT_ROOT")
+if not _vault_root_env:
+    # Bracket access used to raise a bare KeyError here, which the MCP host
+    # surfaces as an opaque "tool-call error" on EVERY tool. Name the cause.
+    raise RuntimeError(
+        "VAULT_ROOT is not set. minivinnymcp/server.py needs it to locate the "
+        "vault and the embedding index (06-Maps/vault-embeddings.db). Set it in "
+        "the mini-vinny env block of claude_desktop_config.json."
+    )
+_vault_root = Path(_vault_root_env)
 sys.path.insert(0, str(_vault_root))
 
 import networkx as nx
@@ -94,25 +103,44 @@ app = FastMCP("mini-vinny")
 
 
 def _vault_search_impl(query: str, top_k: int = 5) -> list[dict]:
-    """Semantic search over vault note summaries."""
-    qvec = _get_model().encode(QUERY_PREFIX + query, normalize_embeddings=True)
+    """Semantic search over vault note summaries.
 
-    db = sqlite3.connect(_DB_PATH)
-    db.enable_load_extension(True)
-    sqlite_vec.load(db)
-    db.enable_load_extension(False)
+    On failure this returns ``[{"error": ...}]`` instead of raising, so a
+    transient problem (cold model load, sqlite-vec failing to load, a missing or
+    empty index) surfaces as a legible message in the tool result rather than an
+    opaque tool-call error. Run ``python healthcheck.py --semantic`` to localise.
+    """
+    # sqlite3.connect() would silently CREATE an empty db at a wrong/missing
+    # path, which then returns 0 hits forever — the exact silent-empty trap.
+    if not _DB_PATH.exists():
+        return [{"error": f"Embedding index missing at {_DB_PATH}. "
+                          "Run vault_embed.py (and check VAULT_ROOT)."}]
 
-    rows = db.execute(
-        """
-        SELECT v.note_id, v.distance, n.title, n.summary, n.filepath
-        FROM note_vectors v
-        JOIN notes n ON n.id = v.note_id
-        WHERE v.embedding MATCH ? AND k = ?
-        ORDER BY v.distance
-        """,
-        (serialize_embedding(qvec), top_k),
-    ).fetchall()
-    db.close()
+    db = None
+    try:
+        qvec = _get_model().encode(QUERY_PREFIX + query, normalize_embeddings=True)
+
+        db = sqlite3.connect(_DB_PATH)
+        db.enable_load_extension(True)
+        sqlite_vec.load(db)
+        db.enable_load_extension(False)
+
+        rows = db.execute(
+            """
+            SELECT v.note_id, v.distance, n.title, n.summary, n.filepath
+            FROM note_vectors v
+            JOIN notes n ON n.id = v.note_id
+            WHERE v.embedding MATCH ? AND k = ?
+            ORDER BY v.distance
+            """,
+            (serialize_embedding(qvec), top_k),
+        ).fetchall()
+    except Exception as e:  # noqa: BLE001 — make the failure legible, not opaque
+        return [{"error": f"{type(e).__name__}: {e}",
+                 "hint": "run `python healthcheck.py --semantic` to localise"}]
+    finally:
+        if db is not None:
+            db.close()
 
     return [
         {
