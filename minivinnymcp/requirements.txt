@@ -4,3 +4,4 @@ numpy==1.26.4
 networkx>=3.0
 pyyaml>=6.0
 sqlite-vec
+pydantic>=2.0
