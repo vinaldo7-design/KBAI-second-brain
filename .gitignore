@@ -61,3 +61,11 @@ life shit.md
 # Build / packaging
 build/
 dist/
+
+# Oxford ingestion drop zone: course material, transcripts, payloads (never commit)
+07-attachments/oxford-inbox/
+07-attachments/_backups/
+
+# One-off native run scripts from the Oxford ingestion (absolute local paths)
+scripts/push_M*.command
+scripts/fix_index_titles.command

@@ -144,7 +144,7 @@ def test_embed_note_skips_blank_summary(tmp_path, model):
 # fair test of the gate.
 #
 # Banding (honest about the real geometry): the live capture gate surfaces the
-# top-5 (_GATE_TOP_K) as "potential collisions". Two of these near-misses land
+# top-10 (_GATE_TOP_K) as "potential collisions". Two of these near-misses land
 # the target inside that band; one (`explainability-tools` from a
 # feature-importance candidate) ranks ~#13 in the REAL index because that note's
 # summary is framed around the global/local explainability + governance-gap
@@ -184,11 +184,30 @@ _NEAR_MISSES = [
     ),
 ]
 
-_GATE_TOP_K = 5
+# Gate band widened 5 -> 10 on 2026-10-02: the index grew from ~135 to 515 notes
+# when the four Oxford modules were ingested, and real near-duplicates began to
+# land at ranks 6-10 (ml-model-fundamentals went from #3 to outside the top 5).
+# The same number is the pre-write duplicate check in CLAUDE.md, /capture and
+# docs/ingest-pipeline.md; change them together.
+_GATE_TOP_K = 10
 # Diagnostic ceiling: how deep we look to REPORT the target's true rank when it
 # falls outside the gate band. Never used to pass the gate — only to fail/skip
-# with a useful number.
-_DIAG_K = 50
+# with a useful number. Scales with the index (it was 50 on a 135-note index,
+# about 37 per cent) so corpus growth alone cannot turn "nearby" into "broken".
+_DIAG_FRACTION = 0.37
+
+
+def _index_size() -> int:
+    if not _REAL_DB.exists():
+        return 0
+    db = sqlite3.connect(str(_REAL_DB))
+    try:
+        return int(db.execute("SELECT count(*) FROM notes").fetchone()[0])
+    finally:
+        db.close()
+
+
+_DIAG_K = max(50, int(_index_size() * _DIAG_FRACTION))
 
 
 def _target_in_index(target_id: str) -> bool:

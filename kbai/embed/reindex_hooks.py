@@ -61,6 +61,21 @@ def _read_summary(note_path: Path) -> str | None:
     return summary if (summary and str(summary).strip()) else None
 
 
+def _read_title(note_path) -> str:
+    """Frontmatter title for the notes row; empty string when absent."""
+    try:
+        text = note_path.read_text(encoding="utf-8")
+        if not text.startswith("---"):
+            return ""
+        parts = text.split("---", 2)
+        if len(parts) < 3:
+            return ""
+        fm = yaml.safe_load(parts[1]) or {}
+        return str(fm.get("title") or "") if isinstance(fm, dict) else ""
+    except Exception:
+        return ""
+
+
 def update_note_embeddings(note_id: str, vault_root=None) -> dict:
     """Embed one freshly-written note into the live sqlite-vec index.
 
@@ -101,6 +116,7 @@ def update_note_embeddings(note_id: str, vault_root=None) -> dict:
             note_id,
             summary,
             db_path,
+            title=_read_title(note_path),
             filepath=rel,
         )
         logger.info("reindex_embed: note=%s embedded=%s", note_id, embedded)

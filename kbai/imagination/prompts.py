@@ -164,7 +164,7 @@ def build_synthesis_prompt(
         edge_distribution=signature.get("edge_distribution", {}),
         load_bearing_block=_format_block(
             signature.get("load_bearing", []),
-            ["note_id", "in_degree", "contradicts_in", "unchallenged_load_score"],
+            ["note_id", "in_degree", "contradicts_in", "challenges_in", "unchallenged_load_score"],
         ),
         frontier_block=_format_block(
             signature.get("frontier", []),

@@ -132,6 +132,27 @@ def test_signature_load_bearing_identifies_a_and_b():
         assert idx_a < idx_b  # a (unchallenged) ranks above b (challenged)
 
 
+def test_load_bearing_counts_challenges_as_pressure():
+    """A note with incoming challenges is not unchallenged: challenges count
+    toward the opposition ratio alongside contradicts (2026-10-02)."""
+    from kbai.imagination.signature import _load_bearing_nodes
+
+    class _G:
+        def node(self, nid):
+            return {"title": nid, "summary": ""}
+
+    edges = [
+        ("p", "x", {"type": "builds-on"}),
+        ("q", "x", {"type": "builds-on"}),
+        ("p", "y", {"type": "builds-on"}),
+        ("q", "y", {"type": "challenges"}),
+    ]
+    out = {r["note_id"]: r for r in _load_bearing_nodes(_G(), {"x", "y", "p", "q"}, edges)}
+    assert out["x"]["unchallenged_load_score"] == 2.0
+    assert out["y"]["challenges_in"] == 1 and out["y"]["contradicts_in"] == 0
+    assert out["y"]["unchallenged_load_score"] == 1.0
+
+
 def test_signature_frontier_excludes_nodes_with_outgoing_builds():
     g = _synthetic_graph()
     sig = extract_cluster_signature(g, "a", depth=1)

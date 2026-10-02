@@ -18,7 +18,7 @@ edge_types:
     section_heading: "contradicts"
     collapse_to: null
     default_weight: 1.2
-    description: "A and B make incompatible claims or rest on incompatible premises — accepting one weakens or refutes the other"
+    description: "A and B cannot both be true — incompatible claims or premises about the same question. Symmetric. Test: can both notes be true at once? No -> contradicts"
 
   analogous-to:
     section_heading: "analogous to"
@@ -36,13 +36,13 @@ edge_types:
     section_heading: "challenges"
     collapse_to: null
     default_weight: 0.80
-    description: "A complicates or qualifies B without full contradiction — A introduces friction, edge cases, or conditions that limit B's scope"
+    description: "Both can be true, but A limits where B applies — a condition, edge case, cost or counter-example. One-way: the line lives in A (the challenger) and points at B. Test: can both notes be true at once? Yes -> challenges"
 
   operationalises:
     section_heading: "operationalises"
     collapse_to: null
     default_weight: 0.85
-    description: "A is how B becomes practice — A converts the abstract principle of B into concrete method, process, or action"
+    description: "A is how B becomes practice — A converts the abstract principle of B into concrete method, process, or action. Kept distinct from exemplifies because the operator profile weights it higher (x1.6 vs x1.3)"
 
   referenced-in:
     section_heading: "referenced in maps"

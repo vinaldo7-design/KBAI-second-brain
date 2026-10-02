@@ -107,10 +107,16 @@ def _load_bearing_nodes(
     edges: list[tuple[str, str, dict[str, Any]]],
     top_n: int = 5,
 ) -> list[dict[str, Any]]:
-    """High in-degree, low contradicts ratio — concepts the cluster depends on
-    but rarely pressure-tests. These are the prime fracture candidates."""
+    """High in-degree, low opposition ratio — concepts the cluster depends on
+    but rarely pressure-tests. These are the prime fracture candidates.
+
+    Opposition = contradicts (cannot both be true) + challenges (scope limit).
+    Both count as pressure: a note with ten incoming challenges is not
+    unchallenged. `contradicts_in` and `challenges_in` are reported separately.
+    """
     in_deg: Counter[str] = Counter()
     contradicts_in: Counter[str] = Counter()
+    challenges_in: Counter[str] = Counter()
     for src, tgt, data in edges:
         etype = data.get("type") or "untyped"
         if etype in ("untyped", "mentioned", "referenced-in"):
@@ -118,12 +124,14 @@ def _load_bearing_nodes(
         in_deg[tgt] += 1
         if etype == "contradicts":
             contradicts_in[tgt] += 1
+        elif etype == "challenges":
+            challenges_in[tgt] += 1
 
     scored: list[tuple[float, str]] = []
     for nid, deg in in_deg.items():
         if deg < 2:
             continue
-        contradiction_ratio = contradicts_in[nid] / deg
+        contradiction_ratio = (contradicts_in[nid] + challenges_in[nid]) / deg
         # Score = load it carries × (1 - how pressure-tested it is)
         score = deg * (1.0 - contradiction_ratio)
         scored.append((score, nid))
@@ -138,6 +146,7 @@ def _load_bearing_nodes(
             "summary": node.get("summary"),
             "in_degree": in_deg[nid],
             "contradicts_in": contradicts_in[nid],
+            "challenges_in": challenges_in[nid],
             "unchallenged_load_score": round(score, 3),
         })
     return out
