@@ -241,7 +241,7 @@ def audit_taxonomy(check_type: str, against_type: str) -> list[dict]:
     against_desc = edge_types[against_type].get("description", against_type)
     against_vec = model.encode(against_desc, normalize_embeddings=True)
 
-    results: list[dict] = []
+    rows: list[tuple] = []
     for source, target, data in g.view(collapse=True, include_mentioned=False).edges(data=True):
         if data.get("type") != check_type:
             continue
@@ -252,17 +252,24 @@ def audit_taxonomy(check_type: str, against_type: str) -> list[dict]:
         tgt_summary = tgt_node.get("summary") or target
 
         parts = [src_summary, annotation, tgt_summary] if annotation else [src_summary, tgt_summary]
-        rel_vec = model.encode(" | ".join(parts), normalize_embeddings=True)
-        score = float(np.dot(rel_vec, against_vec))
+        rows.append((source, target, annotation, src_summary, tgt_summary, " | ".join(parts)))
 
-        results.append({
+    if not rows:
+        return []
+
+    # One batch: encoding per edge took 112s on the live graph, past the 60s tool cap.
+    rel_vecs = model.encode([row[-1] for row in rows], normalize_embeddings=True)
+    results = [
+        {
             "source": source,
             "target": target,
-            "score": round(score, 4),
+            "score": round(float(np.dot(rel_vec, against_vec)), 4),
             "annotation": annotation or None,
             "source_summary": src_summary,
             "target_summary": tgt_summary,
-        })
+        }
+        for (source, target, annotation, src_summary, tgt_summary, _), rel_vec in zip(rows, rel_vecs)
+    ]
 
     results.sort(key=lambda x: -x["score"])
     return results
