@@ -316,7 +316,7 @@ def walk_vault(vault_root: Path) -> list[Path]:
     notes: list[Path] = []
     for path in vault_root.rglob("*.md"):
         rel_parts = path.relative_to(vault_root).parts
-        if any(part in SKIP_DIRS for part in rel_parts):
+        if any(part in SKIP_DIRS or part.startswith(".") for part in rel_parts):
             continue
         if path.name in SKIP_FILES:
             continue

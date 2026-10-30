@@ -3,6 +3,7 @@
 import json
 
 import minivinnymcp.server as mv
+import vault_graph
 from kbai.storage.link_applier import apply_link_suggestions
 from kbai.storage.note_creator import create_note
 
@@ -76,3 +77,11 @@ def test_an_added_link_reaches_the_graph(toy_vault):
     ])
     assert receipt.applied_count == 1
     assert "rotate-metrics-quarterly" in json.dumps(mv.notes_get_with_context("managed-metrics-hold"))
+
+
+def test_graph_ignores_hidden_folders(toy_vault):
+    hidden = toy_vault / ".venv" / "lib"
+    hidden.mkdir(parents=True)
+    (hidden / "LICENSE.md").write_text("# License\n")
+    ids = {node["id"] for node in vault_graph.build_graph(toy_vault)["nodes"]}
+    assert "LICENSE" not in ids and "metric-targets-decay" in ids
