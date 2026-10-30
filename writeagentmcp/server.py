@@ -17,7 +17,14 @@ from pathlib import Path
 
 from mcp.server.fastmcp import FastMCP
 
-_VAULT_ROOT = Path(os.environ.get("VAULT_ROOT", "."))
+_vault_root_env = os.environ.get("VAULT_ROOT")
+if not _vault_root_env:
+    # Defaulting to "." would write notes into whatever folder the host started in.
+    raise RuntimeError(
+        "VAULT_ROOT is not set. writeagentmcp/server.py needs it to locate the vault. "
+        "Set it in the write-agent env block of claude_desktop_config.json."
+    )
+_VAULT_ROOT = Path(_vault_root_env)
 sys.path.insert(0, str(_VAULT_ROOT))
 
 # Same reason as minivinnymcp/server.py: a failed huggingface.co check on model

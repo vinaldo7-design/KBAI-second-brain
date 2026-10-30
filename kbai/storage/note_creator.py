@@ -16,7 +16,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-import logging
 import re
 from datetime import datetime, timezone
 from pathlib import Path
@@ -24,14 +23,10 @@ from pathlib import Path
 import yaml
 
 from kbai.contracts import WriteReceipt
-from kbai.embed.reindex_hooks import update_note_embeddings
-from kbai.graph.reindex_hooks import update_note_edges
 from kbai.schema import CANONICAL_FIELD_ORDER, validate_frontmatter
-from kbai.storage.write_journal import record_mutation
+from kbai.storage.post_write import finish_write
 from kbai.templates import render_body
 
-
-logger = logging.getLogger(__name__)
 
 _TOOL = "write_create_note"
 
@@ -184,31 +179,15 @@ def create_note(
 
     hash_after = hashlib.sha256(target.read_bytes()).hexdigest()
 
-    # Reindex hooks (both REAL now): update_note_embeddings re-embeds the summary;
-    # update_note_edges merges this note's node + edges into the graph JSON. Both
-    # do real I/O (BGE load, sqlite/JSON writes), so a failure must never break the
-    # create — the file write already succeeded above; wrap each and swallow, the
-    # receipt stays status="applied". (link_applier calls these hooks too and
-    # should wrap them the same way once it drives graph freshness for the edges
-    # it adds — separate slice.)
-    try:
-        update_note_embeddings(note_id, vault_root)
-    except Exception:  # noqa: BLE001 — hook failure must not fail the write
-        logger.exception("update_note_embeddings hook failed note=%s", note_id)
-    try:
-        update_note_edges(note_id, vault_root)
-    except Exception:  # noqa: BLE001 — hook failure must not fail the write
-        logger.exception("update_note_edges hook failed note=%s", note_id)
-
-    journal_id = record_mutation(
-        vault_root=vault_root,
+    # The file is saved, so what follows can only warn: see kbai/storage/post_write.py.
+    post = finish_write(
+        vault_root,
+        note_id,
         tool=_TOOL,
-        note_id=note_id,
         file=rel_file,
         hash_before=None,
         hash_after=hash_after,
         status="applied",
-        dryrun=False,
         payload_json=json.dumps(
             {"folder": folder, "body_chars": len(body), "fm_keys": list(fm.keys())}
         ),
@@ -225,5 +204,7 @@ def create_note(
         hash_after=hash_after,
         ts=now_iso,
         applied_at=now_iso,
-        journal_id=journal_id,
+        journal_id=post.journal_id,
+        index_status=post.index_status,
+        message="; ".join(post.problems) or None,
     )

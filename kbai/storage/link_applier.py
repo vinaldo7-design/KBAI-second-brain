@@ -10,6 +10,9 @@ Status taxonomy for each row:
   no_section       — heading not found in source file
   missing_file     — source note resolves to no file
 
+A patched row also carries index_status and journal_error, and the receipt's
+message summarises any write that landed but was not indexed or journalled.
+
 The aggregate receipt is always status="applied" — even if every row
 landed in one of the non-success buckets — because the *bulk operation*
 itself completed. Callers inspect `results` and `counts` for detail.
@@ -23,11 +26,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from kbai.contracts import WriteReceipt
-from kbai.embed.reindex_hooks import update_note_embeddings
-from kbai.graph.reindex_hooks import update_note_edges
 from kbai.storage.note_io import find_note_file
+from kbai.storage.post_write import finish_write
 from kbai.storage.section_patcher import patch_section
-from kbai.storage.write_journal import record_mutation
 
 
 _TOOL = "write_apply_link_suggestions"
@@ -42,6 +43,14 @@ def _rel_or_abs(p: Path, vault_root: Path) -> str:
         return str(p.relative_to(vault_root))
     except ValueError:
         return str(p)
+
+
+def _summarise(problems: list[str], limit: int = 5) -> str | None:
+    """One line for the receipt; a bad index or journal repeats on every row."""
+    if not problems:
+        return None
+    extra = len(problems) - limit
+    return "; ".join(problems[:limit]) + (f"; and {extra} more" if extra > 0 else "")
 
 
 def _normalise(s: dict) -> tuple[str, str, str, str] | None:
@@ -83,6 +92,7 @@ def apply_link_suggestions(
 
     counts = {"patched": 0, "already_present": 0, "no_section": 0, "missing_file": 0, "invalid": 0}
     results: list[dict] = []
+    problems: list[str] = []
 
     for idx, raw in enumerate(suggestions):
         norm = _normalise(raw)
@@ -185,18 +195,14 @@ def apply_link_suggestions(
             continue
 
         hash_after = hashlib.sha256(source_file.read_bytes()).hexdigest()
-        update_note_embeddings(source_id)
-        update_note_edges(source_id)
-
-        journal_id = record_mutation(
-            vault_root=vault_root,
+        post = finish_write(
+            vault_root,
+            source_id,
             tool=_TOOL,
-            note_id=source_id,
             file=rel_file,
             hash_before=hash_before,
             hash_after=hash_after,
             status="patched",
-            dryrun=False,
             payload_json=json.dumps(
                 {
                     "target_id": target_id,
@@ -205,6 +211,7 @@ def apply_link_suggestions(
                 }
             ),
         )
+        problems.extend(f"{source_id}: {problem}" for problem in post.problems)
 
         counts["patched"] += 1
         results.append(
@@ -217,7 +224,9 @@ def apply_link_suggestions(
                 "file": rel_file,
                 "hash_before": hash_before,
                 "hash_after": hash_after,
-                "journal_id": journal_id,
+                "journal_id": post.journal_id,
+                "journal_error": post.journal_error,
+                "index_status": post.index_status,
             }
         )
 
@@ -238,4 +247,5 @@ def apply_link_suggestions(
         missing_file=counts["missing_file"],
         rejected_count=counts["invalid"],
         results=results,
+        message=_summarise(problems),
     )

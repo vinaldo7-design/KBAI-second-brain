@@ -249,6 +249,7 @@ class WriteReceipt(BaseModel):
     section_chars: int | None = None
     ts: str | None = None
     applied_at: str | None = None
+    index_status: dict[str, str] | None = None
 
     # Stage 0 stub diagnostic fields
     stage: int | None = None
