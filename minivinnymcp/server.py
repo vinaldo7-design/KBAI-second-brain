@@ -17,6 +17,11 @@ if not _vault_root_env:
 _vault_root = Path(_vault_root_env)
 sys.path.insert(0, str(_vault_root))
 
+# Models are cached locally. Online, a failed huggingface.co check retries for
+# over a minute on model load, past the 60s tool-call cap. Must precede the
+# huggingface_hub import, which reads this once. HF_HUB_OFFLINE=0 overrides.
+os.environ.setdefault("HF_HUB_OFFLINE", "1")
+
 import networkx as nx
 import numpy as np
 import sqlite_vec

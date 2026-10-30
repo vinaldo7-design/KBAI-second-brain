@@ -20,6 +20,10 @@ from mcp.server.fastmcp import FastMCP
 _VAULT_ROOT = Path(os.environ.get("VAULT_ROOT", "."))
 sys.path.insert(0, str(_VAULT_ROOT))
 
+# Same reason as minivinnymcp/server.py: a failed huggingface.co check on model
+# load retries past the 60s tool-call cap. Must precede the huggingface_hub import.
+os.environ.setdefault("HF_HUB_OFFLINE", "1")
+
 from kbai.storage.link_applier import apply_link_suggestions  # noqa: E402
 from kbai.storage.note_creator import create_note  # noqa: E402
 
