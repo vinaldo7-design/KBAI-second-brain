@@ -165,16 +165,6 @@ def assemble_context(
             attributions.get(r["note_id"]) if r["source"] == "ppr" else None
         )
 
-    # ── Instrumentation ──────────────────────────────────────────────────────
-    mode_label = (
-        f"profile:{profile.profile_id}" if _profile_explicit else (mode or "standard")
-    )
-    try:
-        from kbai.instrumentation import record_note_hits
-        record_note_hits(db_path, query=query, results=results, mode=mode_label)
-    except Exception:
-        pass  # never block retrieval on instrumentation
-
     # ── Return ───────────────────────────────────────────────────────────────
     out: dict = {
         "query": query,

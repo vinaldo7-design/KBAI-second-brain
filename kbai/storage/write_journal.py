@@ -9,7 +9,7 @@ DB path: <vault_root>/06-Maps/write-journal.db
 Schema (table `mutations`):
   id            INTEGER PRIMARY KEY AUTOINCREMENT
   ts            TEXT  -- ISO 8601 UTC
-  tool          TEXT  -- write_create_note | write_apply_link_suggestions | frontmatter_migrate
+  tool          TEXT  -- write_create_note | write_apply_link_suggestions
   note_id       TEXT  -- single note_id when applicable; else "" or bulk descriptor
   file          TEXT  -- vault-relative path (or absolute fallback)
   hash_before   TEXT  -- SHA-256 of pre-write file bytes (NULL for new-file create)

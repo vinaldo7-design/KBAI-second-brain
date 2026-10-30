@@ -1,4 +1,3 @@
-import hashlib
 import os
 import sys
 import sqlite3
@@ -23,7 +22,6 @@ sys.path.insert(0, str(_vault_root))
 # huggingface_hub import, which reads this once. HF_HUB_OFFLINE=0 overrides.
 os.environ.setdefault("HF_HUB_OFFLINE", "1")
 
-import networkx as nx
 import numpy as np
 import sqlite_vec
 import yaml
@@ -40,7 +38,6 @@ _model = None
 _model_lock = threading.Lock()  # the warm-up thread and a first search can race
 _graph: VaultGraph | None = None
 _graph_mtime: int | None = None
-_pagerank: dict[str, float] | None = None
 
 # Retrieval modes (Stage 0 item 3 — formalised cognitive routing precursor).
 # - standard:   contradicts + mentioned excluded from PPR walk + path attribution
@@ -92,7 +89,7 @@ def _get_graph() -> VaultGraph:
     """Single VaultGraph cache. Post-2b the constructor preserves every edge;
     query-time options (collapse, include_mentioned) select the view. Reloads
     when the file changes, because the write-agent process updates it."""
-    global _graph, _graph_mtime, _pagerank
+    global _graph, _graph_mtime
     mtime = _GRAPH_PATH.stat().st_mtime_ns if _GRAPH_PATH.exists() else None
     if _graph is None or mtime != _graph_mtime:
         try:
@@ -103,36 +100,13 @@ def _get_graph() -> VaultGraph:
             print(f"graph reload failed, keeping the last good graph: {exc}", file=sys.stderr)
             return _graph
         _graph_mtime = mtime
-        _pagerank = None
     return _graph
-
-
-def _get_pagerank() -> dict[str, float]:
-    """PageRank over the default view, normalised 0–1. Cached after first call."""
-    global _pagerank
-    if _pagerank is None:
-        g = _get_graph()
-        scores = nx.pagerank(
-            g._simple_digraph(collapse=True, include_mentioned=False),
-            weight="weight",
-        )
-        max_pr = max(scores.values()) if scores else 1.0
-        _pagerank = {k: v / max_pr for k, v in scores.items()}
-    return _pagerank
 
 
 def _find_note_file(note_id: str, node: dict) -> Path | None:
     """Thin shim over kbai.storage.note_io.find_note_file (Stage 1 dedup)."""
     from kbai.storage.note_io import find_note_file
     return find_note_file(note_id, _vault_root, node)
-
-
-def _record_hits(query: str, results: list[dict], mode: str) -> None:
-    """Fire-and-forget: thin shim over kbai.instrumentation.record_note_hits.
-    Preserves the legacy note_hits schema; also captures query text into
-    query_log so the golden-set sampler can recover queries by hash."""
-    from kbai.instrumentation import record_note_hits
-    record_note_hits(_DB_PATH, query=query, results=results, mode=mode)
 
 
 app = FastMCP("mini-vinny")
@@ -482,22 +456,6 @@ def council_retrieve(
         top_k=top_k,
         retrieve_fn=_retrieve_fn,
     )
-
-    # Stage 5.6 feedback hook: record the council event so Stage 8 calibration
-    # can correlate which profiles surface notes the user later acts on.
-    try:
-        from kbai.instrumentation import record_council_event
-        record_council_event(
-            _DB_PATH,
-            query=query,
-            profiles=evidence.profiles,
-            per_profile_top_ids={
-                p.profile_id: [n.note_id for n in p.notes]
-                for p in evidence.per_profile
-            },
-        )
-    except Exception:
-        pass  # never block retrieval on instrumentation
 
     return evidence.model_dump(by_alias=True)
 

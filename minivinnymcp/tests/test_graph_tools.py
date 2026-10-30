@@ -283,13 +283,3 @@ def test_assemble_context_has_reasoning_path():
                 assert {"from", "edge", "to"} <= step.keys()
 
 
-def test_note_hits_table_created():
-    import sqlite3, os
-    if not _graph_available():
-        return
-    assemble_context("mastery trap", seed_k=3)
-    db_path = _vault_root / "06-Maps" / "vault-embeddings.db"
-    db = sqlite3.connect(db_path)
-    tables = [r[0] for r in db.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()]
-    db.close()
-    assert "note_hits" in tables

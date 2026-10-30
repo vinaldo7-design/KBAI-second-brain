@@ -52,4 +52,4 @@ Read the evidence and write the answer in this order:
   so and continue.
 - Cap at ~400 words for the full synthesis. Tightness > completeness.
 - If the user re-runs `/council` on the same query, retrieval is
-  re-logged to `council_events`; this feedback signal is intentional.
+  re-run; each call retrieves from scratch.

@@ -1,13 +1,11 @@
-"""Task 4: frontmatter-SSOT conformance / idempotency / write-path guard.
+"""Task 4: frontmatter-SSOT conformance / write-path guard.
 
-Three guarantees, proven against the live corpus and the write path:
+Two guarantees, proven against the live corpus and the write path:
 
   TEST 1 — corpus conformance (drift detector): every content note's
            frontmatter validates against kbai.schema. Fails loudly with the
            offending path+error if any future note drifts.
-  TEST 2 — migration idempotency: re-running the Task 3 migration
-           (normalize_frontmatter) on the already-migrated corpus is a no-op.
-  TEST 3 — write-path guard: kbai.storage.note_creator.create_note refuses to
+  TEST 2 — write-path guard: kbai.storage.note_creator.create_note refuses to
            persist schema-invalid frontmatter — status=="error", applied is
            False, and NO file is written.
 
@@ -28,7 +26,6 @@ os.environ.setdefault("VAULT_ROOT", str(_vault_root))
 sys.path.insert(0, str(_vault_root))
 
 from kbai.schema import validate_frontmatter
-from kbai.storage.frontmatter_migrate import normalize_frontmatter
 from kbai.storage.note_creator import create_note
 
 
@@ -134,39 +131,6 @@ def test_corpus_frontmatter_is_conformant():
     assert not failures, (
         f"{len(failures)} content note(s) have non-conformant frontmatter "
         f"(not in DEFERRED):\n" + "\n".join(failures)
-    )
-
-
-# --- TEST 2: migration idempotency ------------------------------------------
-
-def test_migration_is_idempotent_on_migrated_corpus():
-    """Re-running the Task 3 migration over the already-migrated corpus must be
-    a no-op: normalize_frontmatter returns changes == [] for every conformant
-    note (skipping non-notes + DEFERRED)."""
-    notes = _require_corpus()
-
-    failures: list[str] = []
-    checked = 0
-    for rel, fm in notes:
-        if rel in DEFERRED:
-            continue
-        # Only assert idempotency on notes that are actually conformant; a
-        # non-conformant note legitimately produces changes and is TEST 1's job.
-        if validate_frontmatter(fm) is not None:
-            continue
-        checked += 1
-        _new_fm, changes = normalize_frontmatter(fm)
-        if changes:
-            failures.append(f"  {rel}\n      -> {changes}")
-
-    assert checked > 0, (
-        "no conformant content notes were checked — idempotency guard is vacuous"
-    )
-
-    assert not failures, (
-        f"{len(failures)} conformant note(s) were still mutated by "
-        f"normalize_frontmatter (migration not idempotent):\n"
-        + "\n".join(failures)
     )
 
 

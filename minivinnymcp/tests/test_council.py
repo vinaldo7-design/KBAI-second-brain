@@ -10,7 +10,6 @@ Layered:
 """
 
 import os
-import sqlite3
 import sys
 from pathlib import Path
 
@@ -220,21 +219,3 @@ def test_council_retrieve_live_smoke():
         assert len(p.notes) <= 5
 
 
-def test_council_retrieve_writes_council_event(tmp_path, monkeypatch):
-    """Exercise feedback capture without needing the real DB to exist.
-    Patch _DB_PATH so the council writes into a clean tmp DB and verify
-    the council_events row appears."""
-    if not GRAPH_PATH.exists() or not EMBED_DB.exists():
-        return
-    import minivinnymcp.server as mv
-    new_db = tmp_path / "test_events.db"
-    # Seed the tmp db by copying the live embedding tables (only `notes`
-    # table needed for vault_search; embeddings table is required too)
-    import shutil
-    shutil.copy(EMBED_DB, new_db)
-    monkeypatch.setattr(mv, "_DB_PATH", new_db)
-    mv.council_retrieve(query="governance capital", top_k=3)
-    db = sqlite3.connect(new_db)
-    rows = db.execute("SELECT query_text, profiles FROM council_events").fetchall()
-    db.close()
-    assert any(r[0] == "governance capital" for r in rows)
