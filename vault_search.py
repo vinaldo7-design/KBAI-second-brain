@@ -18,7 +18,6 @@ import struct
 from pathlib import Path
 
 import sqlite_vec
-from sentence_transformers import SentenceTransformer
 
 VAULT_ROOT = Path(__file__).parent
 DB_PATH = VAULT_ROOT / "06-Maps" / "vault-embeddings.db"
@@ -41,6 +40,10 @@ def main():
 
     if not DB_PATH.exists():
         raise SystemExit(f"Missing {DB_PATH}. Run vault_embed.py first.")
+
+    # Local import: the MCP servers import this module for its constants and must
+    # start without loading the ML stack.
+    from sentence_transformers import SentenceTransformer
 
     model = SentenceTransformer(MODEL_NAME)
     qvec = model.encode(QUERY_PREFIX + args.query, normalize_embeddings=True)

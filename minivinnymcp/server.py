@@ -2,6 +2,7 @@ import hashlib
 import os
 import sys
 import sqlite3
+import threading
 import time
 from pathlib import Path
 
@@ -26,7 +27,6 @@ import networkx as nx
 import numpy as np
 import sqlite_vec
 import yaml
-from sentence_transformers import SentenceTransformer
 from mcp.server.fastmcp import FastMCP
 
 from vault_search import serialize_embedding, QUERY_PREFIX, MODEL_NAME
@@ -36,7 +36,8 @@ _DB_PATH = _vault_root / "06-Maps" / "vault-embeddings.db"
 _GRAPH_PATH = _vault_root / "06-Maps" / "vault-graph.json"
 _TAXONOMY_PATH = _vault_root / "vault_taxonomy.yaml"
 
-_model: SentenceTransformer | None = None
+_model = None
+_model_lock = threading.Lock()  # the warm-up thread and a first search can race
 _graph: VaultGraph | None = None
 _graph_mtime: int | None = None
 _pagerank: dict[str, float] | None = None
@@ -48,10 +49,17 @@ _pagerank: dict[str, float] | None = None
 RETRIEVAL_MODES = ("standard", "sparring", "exhaustive")
 
 
-def _get_model() -> SentenceTransformer:
+def _load_model():
+    from sentence_transformers import SentenceTransformer
+
+    return SentenceTransformer(MODEL_NAME)
+
+
+def _get_model():
     global _model
-    if _model is None:
-        _model = SentenceTransformer(MODEL_NAME)
+    with _model_lock:
+        if _model is None:
+            _model = _load_model()
     return _model
 
 
@@ -62,10 +70,22 @@ def _get_reranker():
     """Lazy cross-encoder reranker scorer. Returns None if the model can't load,
     so retrieval cleanly degrades to the first-stage (dense+BM25 → PPR) order."""
     global _reranker
-    if _reranker is None:
-        from kbai.retrieve.rerank import cross_encoder_scorer
-        _reranker = cross_encoder_scorer() or False
+    with _model_lock:
+        if _reranker is None:
+            from kbai.retrieve.rerank import cross_encoder_scorer
+            _reranker = cross_encoder_scorer() or False
     return _reranker or None
+
+
+def _warm_models() -> None:
+    """Load the models in the background after start, so the handshake is not held
+    up and the first search does not pay for them. A failure here only logs: the
+    first search reports the real error."""
+    try:
+        _get_model()
+        _get_reranker()
+    except Exception as exc:
+        print(f"model warm-up failed: {exc}", file=sys.stderr)
 
 
 def _get_graph() -> VaultGraph:
@@ -631,4 +651,5 @@ def analytics_connect_suggest(categories: list[str] | None = None) -> dict:
 
 
 if __name__ == "__main__":
+    threading.Thread(target=_warm_models, daemon=True).start()
     app.run()
