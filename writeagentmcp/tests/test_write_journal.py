@@ -1,9 +1,7 @@
 """Tests for kbai/storage/write_journal.py."""
 
-import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from kbai.storage.write_journal import ensure_schema, last_n, record_mutation
 

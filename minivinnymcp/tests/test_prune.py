@@ -7,13 +7,9 @@ prune_redundant_paths trims that tail conservatively: drop notes scoring below
 `keep_min`. Pure function — these are small, deterministic unit tests.
 """
 
-import os
-import sys
 from pathlib import Path
 
 _vault_root = Path(__file__).parent.parent.parent
-os.environ.setdefault("VAULT_ROOT", str(_vault_root))
-sys.path.insert(0, str(_vault_root))
 
 from kbai.retrieve.prune import drop_node_types, prune_redundant_paths
 

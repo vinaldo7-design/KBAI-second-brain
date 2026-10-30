@@ -6,14 +6,10 @@ miss, and reciprocal-rank fusion (RRF) merges the two seed lists. Pure/sqlite
 unit tests here; the end-to-end hybrid is eyeballed on real queries.
 """
 
-import os
 import sqlite3
-import sys
 from pathlib import Path
 
 _vault_root = Path(__file__).parent.parent.parent
-os.environ.setdefault("VAULT_ROOT", str(_vault_root))
-sys.path.insert(0, str(_vault_root))
 
 from kbai.retrieve.sparse import _rrf, bm25_seed
 

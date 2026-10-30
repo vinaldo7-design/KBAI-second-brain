@@ -8,8 +8,6 @@ import sys
 from pathlib import Path
 
 _vault_root = Path(__file__).parent.parent.parent
-os.environ.setdefault("VAULT_ROOT", str(_vault_root))
-sys.path.insert(0, str(_vault_root))
 
 from kbai.storage import link_applier, note_creator, post_write  # noqa: E402
 

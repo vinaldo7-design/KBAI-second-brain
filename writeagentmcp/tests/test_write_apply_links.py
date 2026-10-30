@@ -1,9 +1,7 @@
 """Tests for write_apply_link_suggestions (kbai/storage/link_applier.py)."""
 
-import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from kbai.storage.link_applier import apply_link_suggestions
 from kbai.storage.section_patcher import patch_section  # noqa: F401 — import test

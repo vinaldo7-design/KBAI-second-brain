@@ -6,13 +6,11 @@ vault_taxonomy.yaml — never hardcoded here.
 """
 
 import re
-import sys
 from pathlib import Path
 
 import pytest
 import yaml
 
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from kbai.schema import (
     ALLOWED_LIFECYCLE_STAGES,

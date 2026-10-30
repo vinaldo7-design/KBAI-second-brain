@@ -11,14 +11,10 @@ serialise identically.
 """
 
 import json
-import os
 import shutil
-import sys
 from pathlib import Path
 
 _vault_root = Path(__file__).parent.parent.parent
-os.environ.setdefault("VAULT_ROOT", str(_vault_root))
-sys.path.insert(0, str(_vault_root))
 
 import vault_graph  # noqa: E402
 from kbai.graph.reindex_hooks import update_note_edges  # noqa: E402

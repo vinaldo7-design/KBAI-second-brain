@@ -21,14 +21,12 @@ from pathlib import Path
 # so the batch builder and the write path can never drift. MODEL_NAME /
 # serialize_embedding ultimately come from vault_search via kbai.embed.indexer.
 from kbai.embed.indexer import (
-    EMBED_DIM,
     MODEL_NAME,
     embed_note,
     get_model,
     hash_summary,
     init_db,
     open_db,
-    serialize_embedding,
 )
 
 VAULT_ROOT = Path(__file__).parent

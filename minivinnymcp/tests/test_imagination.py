@@ -8,14 +8,10 @@ Layered:
        (skipped if graph absent).
 """
 
-import json
-import os
-import sys
+import pytest
 from pathlib import Path
 
 _vault_root = Path(__file__).parent.parent.parent
-os.environ.setdefault("VAULT_ROOT", str(_vault_root))
-sys.path.insert(0, str(_vault_root))
 
 from kbai.imagination import MODES, build_synthesis_prompt, extract_cluster_signature, imagine
 from vault_graph_loader import VaultGraph
@@ -227,10 +223,9 @@ def test_mcp_tool_registered():
     assert callable(tool_imagine)
 
 
+@pytest.mark.live
 def test_live_imagine_against_real_graph():
     """Smoke test against the actual vault. Skipped if graph absent."""
-    if not GRAPH_PATH.exists():
-        return
     from minivinnymcp.server import imagine as tool_imagine
     out = tool_imagine(seed="governance-capital", mode="fracture", depth=2, k=5)
     assert "error" not in out, f"Unexpected error: {out.get('error')}"

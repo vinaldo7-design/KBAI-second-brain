@@ -2,16 +2,12 @@
 live graph, past the 60s tool-call cap. Uses a toy graph and a fake model."""
 
 import hashlib
-import os
-import sys
 from pathlib import Path
 
 import networkx as nx
 import numpy as np
 
 _vault_root = Path(__file__).parent.parent.parent
-os.environ.setdefault("VAULT_ROOT", str(_vault_root))
-sys.path.insert(0, str(_vault_root))
 
 import minivinnymcp.server as mv  # noqa: E402
 

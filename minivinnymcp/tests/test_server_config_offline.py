@@ -42,7 +42,7 @@ LOAD_MINI_VINNY = (
 def test_server_defaults_to_offline_without_config(load):
     env = {k: v for k, v in os.environ.items() if k != "HF_HUB_OFFLINE"}
     env.update(VAULT_ROOT=str(VAULT_ROOT), PYTHONPATH=str(VAULT_ROOT))
-    probe = f"{load}; from huggingface_hub import constants; assert constants.HF_HUB_OFFLINE"
+    probe = f"{load}; import os; assert os.environ['HF_HUB_OFFLINE'] == '1'"
     result = subprocess.run(
         [sys.executable, "-c", probe],
         capture_output=True, text=True, env=env, cwd=VAULT_ROOT, timeout=180,

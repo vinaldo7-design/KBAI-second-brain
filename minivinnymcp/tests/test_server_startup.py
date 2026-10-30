@@ -10,8 +10,6 @@ from pathlib import Path
 import pytest
 
 _vault_root = Path(__file__).resolve().parents[2]
-os.environ.setdefault("VAULT_ROOT", str(_vault_root))
-sys.path.insert(0, str(_vault_root))
 
 import minivinnymcp.server as mv  # noqa: E402
 

@@ -9,13 +9,10 @@ Layered:
        against the real graph. Skipped if graph/db absent.
 """
 
-import os
-import sys
+import pytest
 from pathlib import Path
 
 _vault_root = Path(__file__).parent.parent.parent
-os.environ.setdefault("VAULT_ROOT", str(_vault_root))
-sys.path.insert(0, str(_vault_root))
 
 from kbai.contracts import ContextNote, CouncilEvidence
 from kbai.council import (
@@ -205,10 +202,9 @@ def test_council_tools_registered():
     assert {"council_retrieve", "cognition_retrieve_as"} <= names
 
 
+@pytest.mark.live
 def test_council_retrieve_live_smoke():
     """Exercise the real pipeline against the vault if it's available."""
-    if not GRAPH_PATH.exists() or not EMBED_DB.exists():
-        return
     from minivinnymcp.server import council_retrieve
     out = council_retrieve(query="mastery and deliberate practice", top_k=5)
     ev = CouncilEvidence(**out)

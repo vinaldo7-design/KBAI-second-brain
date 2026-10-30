@@ -7,13 +7,9 @@ reasoning queries. Reasoning is the SAFE DEFAULT (the system's strength) — onl
 short, signal-free, single-entity queries take the dense-only fast path.
 """
 
-import os
-import sys
 from pathlib import Path
 
 _vault_root = Path(__file__).parent.parent.parent
-os.environ.setdefault("VAULT_ROOT", str(_vault_root))
-sys.path.insert(0, str(_vault_root))
 
 from kbai.retrieve.router import classify_query
 

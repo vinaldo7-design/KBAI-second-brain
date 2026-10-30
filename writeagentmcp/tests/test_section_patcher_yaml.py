@@ -5,15 +5,11 @@ patch_section — no "no_section" for canonical types. Kills the silent
 `referenced-in` bug specifically.
 """
 
-import os
-import sys
 from pathlib import Path
 
 import yaml
 
 _vault_root = Path(__file__).parent.parent.parent
-os.environ.setdefault("VAULT_ROOT", str(_vault_root))
-sys.path.insert(0, str(_vault_root))
 
 from kbai.storage.section_patcher import EDGE_HEADING, patch_section
 

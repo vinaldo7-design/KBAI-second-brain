@@ -22,16 +22,12 @@ Run ONLY this file:
     <py> -m pytest minivinnymcp/tests/test_collision_gate.py -q
 """
 
-import os
 import sqlite3
-import sys
 from pathlib import Path
 
 import pytest
 
 _vault_root = Path(__file__).parent.parent.parent
-os.environ.setdefault("VAULT_ROOT", str(_vault_root))
-sys.path.insert(0, str(_vault_root))
 
 import sqlite_vec  # noqa: E402
 
@@ -81,6 +77,7 @@ def model():
 # ---------------------------------------------------------------------------
 # 1. FRESHNESS — deterministic, tmp DB. embed_note → immediately searchable.
 # ---------------------------------------------------------------------------
+@pytest.mark.live
 def test_embed_on_write_is_immediately_searchable(tmp_path, model):
     """A note embedded via embed_note is found by a semantic query in the same
     session — proving embed-on-write closes the staleness window."""
@@ -114,6 +111,7 @@ def test_embed_on_write_is_immediately_searchable(tmp_path, model):
     )
 
 
+@pytest.mark.live
 def test_embed_note_skips_blank_summary(tmp_path, model):
     """A blank/whitespace summary is not indexed (nothing to embed)."""
     db_path = tmp_path / "vault-embeddings.db"

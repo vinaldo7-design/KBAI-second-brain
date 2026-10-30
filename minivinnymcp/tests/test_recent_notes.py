@@ -8,15 +8,11 @@ L5 — skip-dirs exclusion
 """
 
 import os
-import sys
-import time
 from pathlib import Path
 
 import pytest
 
 _vault_root = Path(__file__).parent.parent.parent
-os.environ.setdefault("VAULT_ROOT", str(_vault_root))
-sys.path.insert(0, str(_vault_root))
 
 
 # ── fixture: synthetic vault in tmp_path ──────────────────────────────────────

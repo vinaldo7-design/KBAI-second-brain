@@ -6,16 +6,11 @@ Layered:
   L3 — Single-profile edge case (divergence=0.0).
 """
 
-import os
-import sys
 from pathlib import Path
 from unittest.mock import patch
 
 _vault_root = Path(__file__).parent.parent.parent
-os.environ.setdefault("VAULT_ROOT", str(_vault_root))
-sys.path.insert(0, str(_vault_root))
 
-from kbai.contracts import ContextNote, ProfileComparison
 from minivinnymcp.server import cognition_compare_profiles
 
 

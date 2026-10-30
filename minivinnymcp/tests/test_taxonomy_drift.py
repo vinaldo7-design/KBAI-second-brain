@@ -2,14 +2,11 @@
 do not drift. The yaml is canonical; the dict is the fallback. Both must agree
 on the section_heading → edge_type mapping for every type that has a heading."""
 
-import os
-import sys
 from pathlib import Path
 
 import yaml
 
 _vault_root = Path(__file__).parent.parent.parent
-sys.path.insert(0, str(_vault_root))
 
 from vault_graph import TYPED_LINK_SECTIONS, UNTYPED_LINK_SECTION_NAMES
 

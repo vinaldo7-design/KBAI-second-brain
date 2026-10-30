@@ -6,11 +6,9 @@ must read that key so the ``filepath`` column in vault-embeddings.db is
 populated; otherwise kbai/retrieve/dense.py emits empty seed filepaths.
 """
 
-import sys
 from pathlib import Path
 
 _vault_root = Path(__file__).parent.parent.parent
-sys.path.insert(0, str(_vault_root))
 
 from vault_embed import node_filepath  # noqa: E402
 

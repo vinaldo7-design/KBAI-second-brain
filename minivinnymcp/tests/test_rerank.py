@@ -7,13 +7,9 @@ tested here with an injected fake scorer (deterministic, no model); the real
 quality is measured by the golden-set eval before/after.
 """
 
-import os
-import sys
 from pathlib import Path
 
 _vault_root = Path(__file__).parent.parent.parent
-os.environ.setdefault("VAULT_ROOT", str(_vault_root))
-sys.path.insert(0, str(_vault_root))
 
 from kbai.retrieve.rerank import rerank_ranked
 

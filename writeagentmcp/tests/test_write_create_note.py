@@ -1,10 +1,8 @@
 """Tests for write_create_note (kbai/storage/note_creator.py)."""
 
 import sqlite3
-import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from kbai.storage.note_creator import create_note
 

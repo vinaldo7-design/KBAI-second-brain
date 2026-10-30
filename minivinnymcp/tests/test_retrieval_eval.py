@@ -5,13 +5,9 @@ Fast (no model, no DB): the live measurement is run via
 only prove the metric maths and that the golden set is structurally sound.
 """
 
-import os
-import sys
 from pathlib import Path
 
 _vault_root = Path(__file__).parent.parent.parent
-os.environ.setdefault("VAULT_ROOT", str(_vault_root))
-sys.path.insert(0, str(_vault_root))
 
 from kbai.eval.metrics import hit_at_k, recall_at_k, reciprocal_rank
 from kbai.eval.run_golden_eval import evaluate, load_golden

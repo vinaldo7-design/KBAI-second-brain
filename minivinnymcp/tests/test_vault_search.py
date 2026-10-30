@@ -1,12 +1,8 @@
-import os
-import sys
-from pathlib import Path
-
-_vault_root = Path(__file__).parent.parent.parent
-os.environ.setdefault("VAULT_ROOT", str(_vault_root))
-sys.path.insert(0, str(_vault_root))
+import pytest
 
 from minivinnymcp.server import retrieve_search
+
+pytestmark = pytest.mark.live
 
 REQUIRED_KEYS = {"note_id", "title", "summary", "score", "filepath"}
 

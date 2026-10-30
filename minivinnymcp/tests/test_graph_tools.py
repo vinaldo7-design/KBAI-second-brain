@@ -1,10 +1,7 @@
-import os
-import sys
+import pytest
 from pathlib import Path
 
 _vault_root = Path(__file__).parent.parent.parent
-os.environ.setdefault("VAULT_ROOT", str(_vault_root))
-sys.path.insert(0, str(_vault_root))
 
 from minivinnymcp.server import graph_expand, audit_taxonomy, notes_get_with_context, retrieve_assemble
 from vault_graph_loader import VaultGraph
@@ -18,18 +15,16 @@ def _graph_available() -> bool:
 
 # --- graph_expand ---
 
+@pytest.mark.live
 def test_graph_expand_returns_hops():
-    if not _graph_available():
-        return
     result = graph_expand("mastery-trap")
     assert "hops" in result
     assert "note_id" in result
     assert isinstance(result["hops"], list)
 
 
+@pytest.mark.live
 def test_graph_expand_hop_shape():
-    if not _graph_available():
-        return
     result = graph_expand("mastery-trap", max_hops=1)
     for hop in result["hops"]:
         assert {"note_id", "edge_type", "direction", "weight", "hop"} <= hop.keys()
@@ -38,51 +33,45 @@ def test_graph_expand_hop_shape():
         assert isinstance(hop["weight"], float)
 
 
+@pytest.mark.live
 def test_graph_expand_sorted_by_weight():
-    if not _graph_available():
-        return
     result = graph_expand("mastery-trap", max_hops=1)
     weights = [h["weight"] for h in result["hops"]]
     assert weights == sorted(weights, reverse=True)
 
 
+@pytest.mark.live
 def test_graph_expand_unknown_note():
-    if not _graph_available():
-        return
     result = graph_expand("this-note-does-not-exist-xyz")
     assert "error" in result
 
 
 # --- audit_taxonomy ---
 
+@pytest.mark.live
 def test_audit_taxonomy_returns_list():
-    if not _graph_available():
-        return
     result = audit_taxonomy("analogous-to", "exemplifies")
     assert isinstance(result, list)
 
 
+@pytest.mark.live
 def test_audit_taxonomy_result_shape():
-    if not _graph_available():
-        return
     result = audit_taxonomy("analogous-to", "exemplifies")
-    if result and "error" not in result[0]:
-        item = result[0]
-        assert {"source", "target", "score", "source_summary", "target_summary"} <= item.keys()
-        assert 0.0 <= item["score"] <= 1.0
+    assert result and "error" not in result[0]
+    item = result[0]
+    assert {"source", "target", "score", "source_summary", "target_summary"} <= item.keys()
+    assert 0.0 <= item["score"] <= 1.0
 
 
+@pytest.mark.live
 def test_audit_taxonomy_sorted_descending():
-    if not _graph_available():
-        return
     result = audit_taxonomy("analogous-to", "exemplifies")
     scores = [r["score"] for r in result if "error" not in r]
     assert scores == sorted(scores, reverse=True)
 
 
+@pytest.mark.live
 def test_audit_taxonomy_bad_type():
-    if not _graph_available():
-        return
     result = audit_taxonomy("nonexistent-type", "exemplifies")
     assert len(result) == 1
     assert "error" in result[0]
@@ -90,53 +79,47 @@ def test_audit_taxonomy_bad_type():
 
 # --- notes_get_with_context ---
 
+@pytest.mark.live
 def test_get_note_with_context_shape():
-    if not _graph_available():
-        return
     result = notes_get_with_context("mastery-trap")
     assert {"note_id", "title", "summary", "content", "edges"} <= result.keys()
     assert isinstance(result["edges"], list)
 
 
+@pytest.mark.live
 def test_get_note_with_context_edge_shape():
-    if not _graph_available():
-        return
     result = notes_get_with_context("mastery-trap")
     for edge in result["edges"]:
         assert {"note_id", "edge_type", "direction"} <= edge.keys()
         assert edge["direction"] in ("in", "out")
 
 
+@pytest.mark.live
 def test_get_note_with_context_unknown():
-    if not _graph_available():
-        return
     result = notes_get_with_context("this-note-does-not-exist-xyz")
     assert "error" in result
 
 
 # --- retrieve_assemble ---
 
+@pytest.mark.live
 def test_assemble_context_shape():
-    if not _graph_available():
-        return
     result = retrieve_assemble("mastery and deliberate practice")
     assert {"query", "notes", "chars_used", "char_budget"} <= result.keys()
     assert isinstance(result["notes"], list)
     assert result["chars_used"] <= result["char_budget"]
 
 
+@pytest.mark.live
 def test_assemble_context_note_shape():
-    if not _graph_available():
-        return
     result = retrieve_assemble("mastery and deliberate practice", seed_k=3)
     for note in result["notes"]:
         assert {"note_id", "composite_score", "source"} <= note.keys()
         assert note["source"] in ("seed", "ppr")
 
 
+@pytest.mark.live
 def test_assemble_context_returns_scored_notes():
-    if not _graph_available():
-        return
     result = retrieve_assemble("governance capital", seed_k=3)
     notes = result["notes"]
     assert notes, "expected at least one note"
@@ -146,33 +129,29 @@ def test_assemble_context_returns_scored_notes():
     assert all(isinstance(n["composite_score"], (int, float)) for n in notes)
 
 
+@pytest.mark.live
 def test_assemble_context_budget_respected():
-    if not _graph_available():
-        return
     result = retrieve_assemble("mastery", char_budget=2000)
     assert result["chars_used"] <= 2000
 
 
+@pytest.mark.live
 def test_assemble_context_sparring_mode():
-    if not _graph_available():
-        return
     result = retrieve_assemble("governance capital", seed_k=3, mode="sparring")
     assert {"query", "notes", "chars_used", "char_budget"} <= result.keys()
     assert isinstance(result["notes"], list)
 
 
+@pytest.mark.live
 def test_assemble_context_capped_at_50():
-    if not _graph_available():
-        return
     result = retrieve_assemble("AI governance", seed_k=5)
     assert len(result["notes"]) <= 50
 
 
 # --- ppr_expand ---
 
+@pytest.mark.live
 def test_ppr_expand_returns_all_nodes():
-    if not _graph_available():
-        return
     g = VaultGraph.load(str(GRAPH_PATH))
     seeds = {"mastery-trap": 0.9, "governance-capital-day1": 0.7}
     scores = g.ppr_expand(seeds)
@@ -182,9 +161,8 @@ def test_ppr_expand_returns_all_nodes():
     assert all(0.0 <= v <= 1.0 for v in scores.values())
 
 
+@pytest.mark.live
 def test_ppr_expand_seeds_rank_high():
-    if not _graph_available():
-        return
     g = VaultGraph.load(str(GRAPH_PATH))
     seeds = {"mastery-trap": 1.0}
     scores = g.ppr_expand(seeds)
@@ -193,9 +171,8 @@ def test_ppr_expand_seeds_rank_high():
     assert "mastery-trap" in top_10
 
 
+@pytest.mark.live
 def test_ppr_expand_exclude_contradicts():
-    if not _graph_available():
-        return
     g = VaultGraph.load(str(GRAPH_PATH))
     seeds = {"mastery-trap": 1.0}
     standard = g.ppr_expand(seeds, exclude_types={"contradicts"})
@@ -204,9 +181,8 @@ def test_ppr_expand_exclude_contradicts():
     assert standard != sparring
 
 
+@pytest.mark.live
 def test_ppr_expand_empty_seeds():
-    if not _graph_available():
-        return
     g = VaultGraph.load(str(GRAPH_PATH))
     scores = g.ppr_expand({})
     assert isinstance(scores, dict)
@@ -214,9 +190,8 @@ def test_ppr_expand_empty_seeds():
 
 # --- path_attributions ---
 
+@pytest.mark.live
 def test_path_attributions_returns_dict():
-    if not _graph_available():
-        return
     g = VaultGraph.load(str(GRAPH_PATH))
     result = g.path_attributions(
         seed_ids=["mastery-trap"],
@@ -226,9 +201,8 @@ def test_path_attributions_returns_dict():
     assert set(result.keys()) == {"governance-capital-day1", "schumacher-principle"}
 
 
+@pytest.mark.live
 def test_path_attributions_step_shape():
-    if not _graph_available():
-        return
     g = VaultGraph.load(str(GRAPH_PATH))
     result = g.path_attributions(
         seed_ids=["mastery-trap"],
@@ -242,9 +216,8 @@ def test_path_attributions_step_shape():
             assert isinstance(step["edge"], str)
 
 
+@pytest.mark.live
 def test_path_attributions_respects_max_hops():
-    if not _graph_available():
-        return
     g = VaultGraph.load(str(GRAPH_PATH))
     result = g.path_attributions(
         seed_ids=["mastery-trap"],
@@ -255,9 +228,8 @@ def test_path_attributions_respects_max_hops():
     assert path is None or len(path) <= 1
 
 
+@pytest.mark.live
 def test_path_attributions_prefers_semantic_edges():
-    if not _graph_available():
-        return
     g = VaultGraph.load(str(GRAPH_PATH))
     result = g.path_attributions(
         seed_ids=["zettelkasten-and-second-brain"],
@@ -272,9 +244,8 @@ def test_path_attributions_prefers_semantic_edges():
 
 # --- retrieve_assemble reasoning_path and note_hits ---
 
+@pytest.mark.live
 def test_assemble_context_has_reasoning_path():
-    if not _graph_available():
-        return
     result = retrieve_assemble("governance capital", seed_k=3)
     for note in result["notes"]:
         assert "reasoning_path" in note

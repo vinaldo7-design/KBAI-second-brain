@@ -2,14 +2,10 @@
 are plain text, so a renamed or removed tool otherwise fails only when used."""
 
 import asyncio
-import os
 import re
-import sys
 from pathlib import Path
 
 _vault_root = Path(__file__).parent.parent.parent
-os.environ.setdefault("VAULT_ROOT", str(_vault_root))
-sys.path.insert(0, str(_vault_root))
 
 import minivinnymcp.server as mv  # noqa: E402
 

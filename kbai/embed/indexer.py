@@ -18,7 +18,6 @@ from __future__ import annotations
 
 import hashlib
 import sqlite3
-from pathlib import Path
 from typing import Optional
 
 import sqlite_vec

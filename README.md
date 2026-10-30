@@ -568,16 +568,13 @@ afterward; it's the load-bearing structure of the codebase.
 
 ## Quick start
 
-Requires Python 3.10+ and an Obsidian vault.
+Requires [uv](https://github.com/astral-sh/uv), Python 3.11 or 3.12, and an Obsidian vault.
 
 ```bash
 git clone https://github.com/vinaldo7-design/KBAI-second-brain.git
 cd KBAI-second-brain
 
-python -m venv .venv && source .venv/bin/activate
-pip install -r minivinnymcp/requirements.txt
-pip install -r writeagentmcp/requirements.txt
-pip install pydantic pytest
+make install
 
 # 1. Build the typed graph from your vault
 python vault_graph.py /path/to/vault

@@ -6,31 +6,24 @@ through the matching Pydantic model, assert no validation error and that
 can switch to typed models without breaking dict-consuming callers.
 """
 
-import os
-import sys
+import pytest
 from pathlib import Path
 
 _vault_root = Path(__file__).parent.parent.parent
-os.environ.setdefault("VAULT_ROOT", str(_vault_root))
-sys.path.insert(0, str(_vault_root))
 
 from kbai.contracts import (
     AuditCandidate,
-    ClaimCheck,
     CognitiveProfile,
     Context,
     ContextNote,
-    CrossLink,
     Edge,
     ExpansionHop,
     ExpansionResult,
     Note,
-    OpenQuestion,
     ProfileComparison,
     ReasoningStep,
     ResearchPayload,
     RetrievalResult,
-    Source,
     SuggestionEntry,
     WriteReceipt,
 )
@@ -159,18 +152,16 @@ def test_profile_comparison_shape():
 # --- Validation against live tool outputs ---
 
 
+@pytest.mark.live
 def test_vault_search_output_validates():
-    if not GRAPH_PATH.exists():
-        return
     from minivinnymcp.server import retrieve_search
     rows = retrieve_search("mastery", top_k=3)
     for row in rows:
         RetrievalResult(**row)  # raises on validation failure
 
 
+@pytest.mark.live
 def test_get_note_with_context_output_validates():
-    if not GRAPH_PATH.exists():
-        return
     from minivinnymcp.server import notes_get_with_context
     out = notes_get_with_context("mastery-trap")
     if "error" in out:
@@ -179,9 +170,8 @@ def test_get_note_with_context_output_validates():
     assert note.note_id == "mastery-trap"
 
 
+@pytest.mark.live
 def test_assemble_context_output_validates():
-    if not GRAPH_PATH.exists():
-        return
     from minivinnymcp.server import retrieve_assemble
     out = retrieve_assemble("mastery", seed_k=3, char_budget=2000)
     ctx = Context(**out)
@@ -190,9 +180,8 @@ def test_assemble_context_output_validates():
         assert isinstance(note, ContextNote)
 
 
+@pytest.mark.live
 def test_graph_expand_output_validates():
-    if not GRAPH_PATH.exists():
-        return
     from minivinnymcp.server import graph_expand
     out = graph_expand("mastery-trap", max_hops=1)
     if "error" in out:
@@ -202,20 +191,17 @@ def test_graph_expand_output_validates():
         assert isinstance(hop, ExpansionHop)
 
 
+@pytest.mark.live
 def test_audit_taxonomy_output_validates():
-    if not GRAPH_PATH.exists():
-        return
     from minivinnymcp.server import audit_taxonomy
     out = audit_taxonomy("analogous-to", "exemplifies")
-    if not out or "error" in out[0]:
-        return
+    assert out and "error" not in out[0]
     for row in out:
         AuditCandidate(**row)
 
 
+@pytest.mark.live
 def test_analytics_connect_suggest_output_validates():
-    if not GRAPH_PATH.exists():
-        return
     from minivinnymcp.server import analytics_connect_suggest
     out = analytics_connect_suggest(categories=["missing_bidir"])
     for row in out.get("missing_bidir", [])[:5]:

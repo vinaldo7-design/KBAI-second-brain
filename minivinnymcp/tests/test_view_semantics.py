@@ -11,17 +11,14 @@ Three concerns:
      outgoing builds-on.
 """
 
+import pytest
 import json
 import math
-import os
-import sys
 from pathlib import Path
 
 import networkx as nx
 
 _vault_root = Path(__file__).parent.parent.parent
-os.environ.setdefault("VAULT_ROOT", str(_vault_root))
-sys.path.insert(0, str(_vault_root))
 
 from vault_graph_loader import VaultGraph
 
@@ -80,9 +77,8 @@ def test_raw_view_includes_mentioned_when_requested():
 # --- (2) PageRank / PPR parity against the fixture ------------------------
 
 
+@pytest.mark.live
 def test_pagerank_parity_against_pre_2b_fixture():
-    if not _graph_available():
-        return
     fixture = json.loads(FIXTURE_PATH.read_text())
     expected = fixture["pagerank"]
 
@@ -99,9 +95,8 @@ def test_pagerank_parity_against_pre_2b_fixture():
             f"PageRank mismatch at {nid}: expected {exp}, got {got}"
 
 
+@pytest.mark.live
 def test_ppr_parity_single_seed():
-    if not _graph_available():
-        return
     fixture = json.loads(FIXTURE_PATH.read_text())
     expected = fixture["ppr_mastery_trap"]
 
@@ -114,9 +109,8 @@ def test_ppr_parity_single_seed():
             f"PPR mismatch at {nid}: expected {exp}, got {got[nid]}"
 
 
+@pytest.mark.live
 def test_ppr_parity_multi_seed():
-    if not _graph_available():
-        return
     fixture = json.loads(FIXTURE_PATH.read_text())
     expected = fixture["ppr_two_seed"]
 
@@ -128,9 +122,8 @@ def test_ppr_parity_multi_seed():
             f"PPR mismatch at {nid}"
 
 
+@pytest.mark.live
 def test_ppr_parity_standard_exclude():
-    if not _graph_available():
-        return
     fixture = json.loads(FIXTURE_PATH.read_text())
     expected = fixture["ppr_standard_exclude"]
 
@@ -144,9 +137,8 @@ def test_ppr_parity_standard_exclude():
             f"PPR mismatch at {nid}"
 
 
+@pytest.mark.live
 def test_edge_counts_parity():
-    if not _graph_available():
-        return
     fixture = json.loads(FIXTURE_PATH.read_text())
     g = VaultGraph.load(str(GRAPH_PATH))
     stats = g.graph_stats()

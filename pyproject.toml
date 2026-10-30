@@ -6,21 +6,32 @@ build-backend = "setuptools.build_meta"
 name = "kbai"
 version = "0.1.0"
 description = "Mini Vinny / KBAI — multi-agent personal knowledge system over an Obsidian vault"
-requires-python = ">=3.10"
+requires-python = ">=3.11,<3.13"
 authors = [{ name = "Vinay Nair" }]
 license = { text = "MIT" }
 dependencies = [
-  "mcp>=1.0.0",
+  "mcp>=1.27,<2",  # mcp 2 renamed FastMCP
   "networkx>=3.0",
+  "scipy",  # networkx pagerank needs it
   "pyyaml>=6.0",
-  "sentence-transformers>=3.0",
-  "numpy>=1.26",
+  "numpy>=1.26,<2",
   "sqlite-vec",
   "pydantic>=2.0",
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=7.0"]
+# The ML stack is only needed to run the servers for real. torch stops shipping
+# Intel Mac wheels after 2.2.2, so hold it there on that platform.
+ml = [
+  "sentence-transformers==3.2.1",
+  "transformers<5",
+  "torch==2.2.2 ; sys_platform == 'darwin' and platform_machine == 'x86_64'",
+  "torch ; sys_platform != 'darwin' or platform_machine != 'x86_64'",
+]
+dev = ["pytest>=7.0", "ruff", "import-linter"]
+
+[tool.setuptools]
+py-modules = ["vault_graph", "vault_graph_loader", "vault_search", "vault_embed", "healthcheck"]
 
 [tool.setuptools.packages.find]
 include = ["kbai*", "minivinnymcp*", "writeagentmcp*"]
@@ -42,8 +53,47 @@ exclude = [
   "__pycache__*",
 ]
 
-# NOTE — Stage 1: this file declares package metadata so future `pip install -e .`
-# resolves Mini Vinny / Write Agent / kbai as proper packages.
-# Currently NOT installed; servers still use sys.path hacks at module top.
-# Stage 1 item 1.4 (assemble_context refactor) will trigger the install + remove
-# the sys.path lines from the MCP server entrypoints.
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["minivinnymcp/tests", "writeagentmcp/tests"]
+markers = ["live: needs the real vault and ML models; skipped when they are missing"]
+
+[tool.ruff]
+line-length = 120
+extend-exclude = ["docs/archive"]
+
+[tool.ruff.lint]
+select = ["E9", "F"]
+
+[tool.ruff.lint.per-file-ignores]
+"minivinnymcp/server.py" = ["E402"]
+"writeagentmcp/server.py" = ["E402"]
+
+[tool.importlinter]
+root_packages = ["kbai", "minivinnymcp", "writeagentmcp"]
+
+[[tool.importlinter.contracts]]
+name = "Only the write agent can write to the vault"
+type = "forbidden"
+source_modules = ["minivinnymcp"]
+forbidden_modules = [
+  "writeagentmcp",
+  "kbai.storage.note_creator",
+  "kbai.storage.link_applier",
+  "kbai.storage.post_write",
+  "kbai.storage.section_patcher",
+  "kbai.storage.write_journal",
+]
+
+[[tool.importlinter.contracts]]
+name = "The write agent does not depend on the read server"
+type = "forbidden"
+source_modules = ["writeagentmcp"]
+forbidden_modules = ["minivinnymcp"]
+
+[[tool.importlinter.contracts]]
+name = "The library does not depend on the servers"
+type = "forbidden"
+source_modules = ["kbai"]
+forbidden_modules = ["minivinnymcp", "writeagentmcp"]
+ignore_imports = ["kbai.eval.run_golden_eval -> minivinnymcp.server"]

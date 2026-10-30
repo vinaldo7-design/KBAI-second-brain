@@ -14,16 +14,12 @@ in the content folders) skips rather than failing, so the suite still runs.
 Test 3 is hermetic (tmp_path only) and never touches the real vault.
 """
 
-import os
-import sys
 from pathlib import Path
 
 import pytest
 import yaml
 
 _vault_root = Path(__file__).parent.parent.parent
-os.environ.setdefault("VAULT_ROOT", str(_vault_root))
-sys.path.insert(0, str(_vault_root))
 
 from kbai.schema import validate_frontmatter
 from kbai.storage.note_creator import create_note

@@ -1,12 +1,8 @@
 """Stage 1 item 1.3: kbai.storage.note_io.find_note_file unification tests."""
 
-import os
-import sys
 from pathlib import Path
 
 _vault_root = Path(__file__).parent.parent.parent
-os.environ.setdefault("VAULT_ROOT", str(_vault_root))
-sys.path.insert(0, str(_vault_root))
 
 from kbai.storage.note_io import find_note_file
 

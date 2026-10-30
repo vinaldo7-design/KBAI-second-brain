@@ -1,13 +1,10 @@
 """Stage 0 item 4: analytics.connect_suggest is pure-read, returns the
 expected category shape, and is wired through as an MCP tool."""
 
-import os
-import sys
+import pytest
 from pathlib import Path
 
 _vault_root = Path(__file__).parent.parent.parent
-os.environ.setdefault("VAULT_ROOT", str(_vault_root))
-sys.path.insert(0, str(_vault_root))
 
 GRAPH_PATH = _vault_root / "06-Maps" / "vault-graph.json"
 
@@ -61,9 +58,8 @@ def test_mcp_tool_registered():
     assert "analytics_connect_suggest" in tm._tools
 
 
+@pytest.mark.live
 def test_mcp_tool_runs_against_real_graph():
-    if not GRAPH_PATH.exists():
-        return
     from minivinnymcp.server import analytics_connect_suggest
     out = analytics_connect_suggest(categories=["missing_bidir"])
     assert isinstance(out, dict)

@@ -10,10 +10,8 @@ The write-path integration tests also live here — create_note must return
 WriteReceipt(status='error', message=reason) without touching write_text.
 """
 
-import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from kbai import schema
 from kbai.schema import (
@@ -25,7 +23,6 @@ from kbai.schema import (
     ORIGIN_TYPES,
     REQUIRED_FRONTMATTER,
     TAG_PREFIX_LENS,
-    TAG_PREFIX_TOPIC,
     allowed_keys,
     validate_frontmatter,
 )
