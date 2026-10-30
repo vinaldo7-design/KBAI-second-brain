@@ -165,12 +165,6 @@ def _vault_search_impl(query: str, top_k: int = 5) -> list[dict]:
 
 
 @app.tool()
-def vault_search(query: str, top_k: int = 5) -> list[dict]:
-    """[legacy alias of retrieve_search] Semantic search over vault note summaries."""
-    return _vault_search_impl(query, top_k)
-
-
-@app.tool()
 def retrieve_search(query: str, top_k: int = 5) -> list[dict]:
     """Semantic search over vault note summaries."""
     return _vault_search_impl(query, top_k)
@@ -312,12 +306,6 @@ def _get_note_with_context_impl(note_id: str) -> dict:
 
 
 @app.tool()
-def get_note_with_context(note_id: str) -> dict:
-    """[legacy alias of notes_get_with_context] Read a note + typed neighbourhood."""
-    return _get_note_with_context_impl(note_id)
-
-
-@app.tool()
 def notes_get_with_context(note_id: str) -> dict:
     """Read a note's full markdown content plus its typed graph neighbourhood."""
     return _get_note_with_context_impl(note_id)
@@ -349,17 +337,6 @@ def _assemble_context_impl(
         reranker=_get_reranker(),
         skip_graph=(classify_query(query) == "fact"),
     )
-
-
-@app.tool()
-def assemble_context(
-    query: str,
-    seed_k: int = 5,
-    char_budget: int = 12000,
-    mode: str = "standard",
-) -> dict:
-    """[legacy alias of retrieve_assemble] Full hybrid retrieval pipeline."""
-    return _assemble_context_impl(query, seed_k, char_budget, mode)
 
 
 @app.tool()

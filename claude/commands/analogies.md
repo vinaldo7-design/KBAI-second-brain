@@ -6,7 +6,7 @@ Find cross-domain analogies for a vault note.
 
 ## Step 0 — resolve note ref
 
-Call `mcp__mini-vinny__vault_search(query="$ARGUMENTS", top_k=5)`.
+Call `mcp__mini-vinny__retrieve_search(query="$ARGUMENTS", top_k=5)`.
 
 - If top score >= 0.7: resolve to that note_id, print `Resolved: [[<note_id>]] (score <confidence>)`, continue.
 - If 0.4 <= top score < 0.7: print candidates and ask user to pick. Stop.
@@ -14,7 +14,7 @@ Call `mcp__mini-vinny__vault_search(query="$ARGUMENTS", top_k=5)`.
 
 ## Step 1 — load
 
-Call `mcp__mini-vinny__get_note_with_context(note_id=<resolved_id>)`.
+Call `mcp__mini-vinny__notes_get_with_context(note_id=<resolved_id>)`.
 
 ## Step 2 — expand
 

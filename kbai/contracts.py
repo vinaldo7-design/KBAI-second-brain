@@ -62,7 +62,7 @@ class Note(BaseModel):
 
 
 class RetrievalResult(BaseModel):
-    """A single ranked note returned by `vault_search` / `retrieve_search`."""
+    """A single ranked note returned by `retrieve_search`."""
 
     model_config = _MODEL_CFG
 
@@ -87,7 +87,7 @@ class ReasoningStep(BaseModel):
 
 
 class ContextNote(BaseModel):
-    """A note in an assemble_context result."""
+    """A note in a retrieve_assemble result."""
 
     model_config = _MODEL_CFG
 
@@ -103,7 +103,7 @@ class ContextNote(BaseModel):
 
 
 class Context(BaseModel):
-    """Result of `assemble_context` / `retrieve_assemble`."""
+    """Result of `retrieve_assemble`."""
 
     model_config = _MODEL_CFG
 

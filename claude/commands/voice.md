@@ -1,8 +1,10 @@
 ---
-description: Apply a voice from ~/.claude/voices/ to your response (single voice or "+"-separated combination)
+description: Apply a voice from ~/.claude/voices/ to your response (single voice or "+"-separated combination), or list the voices when called with no arguments
 ---
 
 Apply a voice (or fused combination) for the response that follows.
+
+**No arguments:** read every `.md` file in `~/.claude/voices/` except `README.md`. Print a compact table of `voice`, `description` and `dimensions` from each file's frontmatter, then its `combines_well_with` and `combines_poorly_with` hints, then stop.
 
 **Parse `$ARGUMENTS`:**
 - First whitespace-delimited token = voice spec (single name like `naval` or combo like `naval+bourdain`)
@@ -11,7 +13,7 @@ Apply a voice (or fused combination) for the response that follows.
 **Voice loading:**
 
 For each voice name in the spec:
-- If voice == `vinay`: call `mcp__mini-vinny__assemble_context(query="voice exemplar", seed_k=10)` and filter for notes whose frontmatter contains `voice-exemplar: true` (read with `mcp__mini-vinny__get_note_with_context`). Use those passages as the voice prior. If no exemplar notes exist yet, say so explicitly and offer to help identify candidates.
+- If voice == `vinay`: call `mcp__mini-vinny__retrieve_assemble(query="voice exemplar", seed_k=10)` and filter for notes whose frontmatter contains `voice-exemplar: true` (read with `mcp__mini-vinny__notes_get_with_context`). Use those passages as the voice prior. If no exemplar notes exist yet, say so explicitly and offer to help identify candidates.
 - Otherwise: read `~/.claude/voices/<name>.md`. Use its style rules, anti-patterns, and exemplars as the voice prior.
 
 **Combination logic** (when spec contains `+`):

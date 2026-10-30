@@ -162,8 +162,8 @@ def test_profile_comparison_shape():
 def test_vault_search_output_validates():
     if not GRAPH_PATH.exists():
         return
-    from minivinnymcp.server import vault_search
-    rows = vault_search("mastery", top_k=3)
+    from minivinnymcp.server import retrieve_search
+    rows = retrieve_search("mastery", top_k=3)
     for row in rows:
         RetrievalResult(**row)  # raises on validation failure
 
@@ -171,8 +171,8 @@ def test_vault_search_output_validates():
 def test_get_note_with_context_output_validates():
     if not GRAPH_PATH.exists():
         return
-    from minivinnymcp.server import get_note_with_context
-    out = get_note_with_context("mastery-trap")
+    from minivinnymcp.server import notes_get_with_context
+    out = notes_get_with_context("mastery-trap")
     if "error" in out:
         return
     note = Note(**out)
@@ -182,8 +182,8 @@ def test_get_note_with_context_output_validates():
 def test_assemble_context_output_validates():
     if not GRAPH_PATH.exists():
         return
-    from minivinnymcp.server import assemble_context
-    out = assemble_context("mastery", seed_k=3, char_budget=2000)
+    from minivinnymcp.server import retrieve_assemble
+    out = retrieve_assemble("mastery", seed_k=3, char_budget=2000)
     ctx = Context(**out)
     assert ctx.query == "mastery"
     for note in ctx.notes:

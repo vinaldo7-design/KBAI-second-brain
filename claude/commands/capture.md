@@ -6,13 +6,13 @@ Idea: `$ARGUMENTS`
 
 ## Step 1 — context
 
-Call `mcp__mini-vinny__assemble_context(query="$ARGUMENTS", seed_k=3)`.
+Call `mcp__mini-vinny__retrieve_assemble(query="$ARGUMENTS", seed_k=3)`.
 
 Use results to identify the closest neighbour notes and candidate edge types.
 
 ## Step 1b — duplicate check
 
-Draft the one-sentence summary first, then call `mcp__mini-vinny__vault_search(query="<draft summary>", top_k=10)`.
+Draft the one-sentence summary first, then call `mcp__mini-vinny__retrieve_search(query="<draft summary>", top_k=10)`.
 
 Read the ten summaries. If any states the same claim (same question, same answer, even in different words), do not draft a new note: say which note already holds it and offer to append to that note or add an edge instead. If a hit is adjacent but distinct, carry it into the preview as a candidate edge. Never use `obsidian_simple_search` for this check; literal search misses paraphrased duplicates.
 

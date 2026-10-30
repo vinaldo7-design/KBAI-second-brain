@@ -18,7 +18,7 @@ Split `$ARGUMENTS` by whitespace. The last token, if it matches one of `extend|f
 
 ## Step 1 — resolve note ref
 
-Call `mcp__mini-vinny__vault_search(query="<note ref>", top_k=5)`.
+Call `mcp__mini-vinny__retrieve_search(query="<note ref>", top_k=5)`.
 
 - If top score >= 0.7: resolve to that note_id, print `Resolved: [[<note_id>]] (score <confidence>)`, continue.
 - If 0.4 <= top score < 0.7: print candidates and ask the user to pick. Stop.

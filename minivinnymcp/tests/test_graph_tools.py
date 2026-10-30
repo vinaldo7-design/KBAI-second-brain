@@ -6,7 +6,7 @@ _vault_root = Path(__file__).parent.parent.parent
 os.environ.setdefault("VAULT_ROOT", str(_vault_root))
 sys.path.insert(0, str(_vault_root))
 
-from minivinnymcp.server import graph_expand, audit_taxonomy, get_note_with_context, assemble_context
+from minivinnymcp.server import graph_expand, audit_taxonomy, notes_get_with_context, retrieve_assemble
 from vault_graph_loader import VaultGraph
 
 GRAPH_PATH = _vault_root / "06-Maps" / "vault-graph.json"
@@ -88,12 +88,12 @@ def test_audit_taxonomy_bad_type():
     assert "error" in result[0]
 
 
-# --- get_note_with_context ---
+# --- notes_get_with_context ---
 
 def test_get_note_with_context_shape():
     if not _graph_available():
         return
-    result = get_note_with_context("mastery-trap")
+    result = notes_get_with_context("mastery-trap")
     assert {"note_id", "title", "summary", "content", "edges"} <= result.keys()
     assert isinstance(result["edges"], list)
 
@@ -101,7 +101,7 @@ def test_get_note_with_context_shape():
 def test_get_note_with_context_edge_shape():
     if not _graph_available():
         return
-    result = get_note_with_context("mastery-trap")
+    result = notes_get_with_context("mastery-trap")
     for edge in result["edges"]:
         assert {"note_id", "edge_type", "direction"} <= edge.keys()
         assert edge["direction"] in ("in", "out")
@@ -110,16 +110,16 @@ def test_get_note_with_context_edge_shape():
 def test_get_note_with_context_unknown():
     if not _graph_available():
         return
-    result = get_note_with_context("this-note-does-not-exist-xyz")
+    result = notes_get_with_context("this-note-does-not-exist-xyz")
     assert "error" in result
 
 
-# --- assemble_context ---
+# --- retrieve_assemble ---
 
 def test_assemble_context_shape():
     if not _graph_available():
         return
-    result = assemble_context("mastery and deliberate practice")
+    result = retrieve_assemble("mastery and deliberate practice")
     assert {"query", "notes", "chars_used", "char_budget"} <= result.keys()
     assert isinstance(result["notes"], list)
     assert result["chars_used"] <= result["char_budget"]
@@ -128,7 +128,7 @@ def test_assemble_context_shape():
 def test_assemble_context_note_shape():
     if not _graph_available():
         return
-    result = assemble_context("mastery and deliberate practice", seed_k=3)
+    result = retrieve_assemble("mastery and deliberate practice", seed_k=3)
     for note in result["notes"]:
         assert {"note_id", "composite_score", "source"} <= note.keys()
         assert note["source"] in ("seed", "ppr")
@@ -137,7 +137,7 @@ def test_assemble_context_note_shape():
 def test_assemble_context_returns_scored_notes():
     if not _graph_available():
         return
-    result = assemble_context("governance capital", seed_k=3)
+    result = retrieve_assemble("governance capital", seed_k=3)
     notes = result["notes"]
     assert notes, "expected at least one note"
     # Every note carries its first-stage PPR composite_score. The FINAL order is
@@ -149,14 +149,14 @@ def test_assemble_context_returns_scored_notes():
 def test_assemble_context_budget_respected():
     if not _graph_available():
         return
-    result = assemble_context("mastery", char_budget=2000)
+    result = retrieve_assemble("mastery", char_budget=2000)
     assert result["chars_used"] <= 2000
 
 
 def test_assemble_context_sparring_mode():
     if not _graph_available():
         return
-    result = assemble_context("governance capital", seed_k=3, mode="sparring")
+    result = retrieve_assemble("governance capital", seed_k=3, mode="sparring")
     assert {"query", "notes", "chars_used", "char_budget"} <= result.keys()
     assert isinstance(result["notes"], list)
 
@@ -164,7 +164,7 @@ def test_assemble_context_sparring_mode():
 def test_assemble_context_capped_at_50():
     if not _graph_available():
         return
-    result = assemble_context("AI governance", seed_k=5)
+    result = retrieve_assemble("AI governance", seed_k=5)
     assert len(result["notes"]) <= 50
 
 
@@ -270,12 +270,12 @@ def test_path_attributions_prefers_semantic_edges():
             assert step["edge"] not in ("referenced-in", "untyped", "mentioned")
 
 
-# --- assemble_context reasoning_path and note_hits ---
+# --- retrieve_assemble reasoning_path and note_hits ---
 
 def test_assemble_context_has_reasoning_path():
     if not _graph_available():
         return
-    result = assemble_context("governance capital", seed_k=3)
+    result = retrieve_assemble("governance capital", seed_k=3)
     for note in result["notes"]:
         assert "reasoning_path" in note
         if note["source"] == "ppr" and note["reasoning_path"] is not None:
