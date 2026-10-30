@@ -6,7 +6,8 @@
         "/path/to/KBAI-second-brain/minivinnymcp/server.py"
       ],
       "env": {
-        "VAULT_ROOT": "/path/to/your/vault"
+        "VAULT_ROOT": "/path/to/your/vault",
+        "HF_HUB_OFFLINE": "1"
       }
     }
   }

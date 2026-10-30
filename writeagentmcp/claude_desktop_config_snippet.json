@@ -5,7 +5,8 @@
       "command": "python",
       "args": ["-m", "writeagentmcp.server"],
       "env": {
-        "VAULT_ROOT": "/path/to/vault"
+        "VAULT_ROOT": "/path/to/vault",
+        "HF_HUB_OFFLINE": "1"
       }
     }
   }
