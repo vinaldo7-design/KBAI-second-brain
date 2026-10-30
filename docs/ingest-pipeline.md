@@ -30,7 +30,7 @@ Agents do not touch the vault. They read, extract, and pre-check every candidate
 ## Stage 3 — Collision check and merge (orchestrator, serial)
 
 For every candidate across all agents, in order:
-1. `vault_search(summary, top_k=10)` (10, not 5, since the vault passed 500 notes); if any hit scores above the collision threshold (empirically ~0.75 cosine distance in this index; lower is closer), read it with `get_note_with_context` and decide: **skip** (already held), **append** (existing note gains a section or an edge), or **create**.
+1. `retrieve_search(summary, top_k=10)` (10, not 5, since the vault passed 500 notes); if any hit scores above the collision threshold (empirically ~0.75 cosine distance in this index; lower is closer), read it with `get_note_with_context` and decide: **skip** (already held), **append** (existing note gains a section or an edge), or **create**.
 2. Cross-agent dedup: two sessions proposing the same idea collapse into one candidate with both sessions as provenance.
 3. Edge targets must exist (snapshot ids) or be in the same batch.
 

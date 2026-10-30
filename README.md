@@ -439,8 +439,7 @@ weighting from usage*, never hand-coded.
 **No profile is named after a person.** Naming a profile "Karpathy" or "Pearl"
 would be a claim to model that mind, and there's no data backing that claim yet.
 Until calibration *earns* a named lens from real usage, only functional lenses
-ship. (The system logs every Council invocation to a `council_events` table
-precisely so that one day it can.)
+ship.
 
 **Council Mode** is the flagship. It runs explorer + operator + skeptic in
 parallel on one query and returns a `CouncilEvidence` object: each lens's top
@@ -616,44 +615,42 @@ Two MCP servers, configured in
 ```
 
 Restart Claude Desktop after edits; the MCP tool list is cached at process start.
-Slash commands and voices live canonically in `~/.claude/commands/` and
-`~/.claude/voices/`; the copies under `claude/` here are a versioned snapshot for
-review. Copy them across to use them:
+Slash commands and voices live under `claude/`. Link the commands and copy the
+voices to use them:
 
 ```bash
-cp claude/commands/*.md ~/.claude/commands/
-cp claude/voices/*.md   ~/.claude/voices/
+ln -s "$PWD/claude/commands" ~/.claude/commands
+cp claude/voices/*.md ~/.claude/voices/
 ```
 
 ---
 
 ## Reference
 
-### Slash commands (21)
+### Slash commands (12)
 
 Each command encodes the right tool sequence for one intent; prefer them over
 ad-hoc tool calls.
 
-**Discovery:** `/find` (semantic search, top-5 + summaries), `/recent [N]`,
-`/today`, `/touched <topic>`, `/morning` (daily orientation, *experimental*).
+**Discovery:** `/find` (semantic search, or `recent [N]`, `today`,
+`touched <topic>`).
 
 **Read & explain:** `/about <note>` (note + its graph neighbourhood),
 `/analogies <note>` (cross-domain parallels), `/ops <note>` (operational how-to),
 `/paths <a> <b>` (how two notes connect).
 
-**Pressure-test:** `/challenge <note>` (skeptic-lens counter-arguments),
-**`/council <query>`** (the flagship), `/compare-thinkers <p1>+<p2> <query>`,
-`/pressure-test <note>` (auto-escalates challenge to council).
+**Pressure-test:** `/challenge <note>` (counter-arguments, escalating to the
+council when contradictions turn up), **`/council <query>`** (the flagship),
+`/compare-thinkers <p1>+<p2> <query>`.
 
 **Generative:** `/imagine <note>` (propose new research domains from cluster
 shape: extend / fracture / bridge / deepen / historicise).
 
-**Maintenance:** `/audit` (read-only vault health), `/audit-edges <t1> <t2>`
-(triage mis-typed edges), `/connect <note>` (suggest new typed links, preview
-only), `/capture <text>` (idea capture; preview, then write on confirmation).
+**Maintenance:** `/audit` (read-only: suggested links, or `edges <t1> <t2>` for
+mis-typed edges), `/capture <text>` (idea capture; preview, then write on
+confirmation).
 
-**Voice & routing:** `/voice <name> <query>`, `/voices`, `/ask <query>`
-(deterministic intent router).
+**Voice:** `/voice <name> <query>`, or `/voice` alone to list voices.
 
 A fuller user guide lives in [`docs/operating-manual.md`](docs/operating-manual.md).
 
@@ -677,16 +674,15 @@ retrieved.
 │   ├── council/               # Council Mode retrieval + overlap analysis
 │   ├── eval/                  # Metrics + golden-set runner (MRR/recall/hit)
 │   ├── embed/                 # Embed-on-write freshness indexer
-│   ├── storage/               # note_io, resolver, writers, journal
-│   ├── instrumentation/       # note_hits + council_events logs
+│   ├── storage/               # note_io, writers, post-write steps, journal
 │   ├── schema.py              # Canonical frontmatter schema, single source of truth
 │   └── contracts.py           # Pydantic models for every boundary
 │
-├── minivinnymcp/              # Mini Vinny MCP server (read-only, 16 tools)
+├── minivinnymcp/              # Mini Vinny MCP server (read-only, 13 tools)
 ├── writeagentmcp/             # Write Agent MCP server (live, 2 journaled mutators)
 │
-├── claude/{commands,voices}/  # Slash-command + voice snapshot (canonical: ~/.claude/)
-├── docs/                      # operating-manual, refactor-plan, refactor-state
+├── claude/{commands,voices}/  # Slash commands and voices
+├── docs/                      # operating-manual, ingest-pipeline, archive/
 ├── eval/                      # golden_set.yaml + baseline.json
 │
 ├── healthcheck.py             # Guard both search layers against silent failure

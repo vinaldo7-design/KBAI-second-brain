@@ -265,7 +265,7 @@ class CognitiveProfile(BaseModel):
 
     v1 ships functional profiles only: default, skeptic, operator, builder.
     Person-named profiles (e.g. `vinay`) are calibrated, not declared — see
-    Stage 8 in docs/refactor-plan.md.
+    Stage 8 in docs/archive/refactor-plan.md.
     """
 
     model_config = _MODEL_CFG
