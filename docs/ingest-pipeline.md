@@ -42,7 +42,7 @@ One table: candidate id, type, folder, one-line summary, action (create/append/s
 
 ## Stage 5 — Push (orchestrator, serial)
 
-After approval the orchestrator writes `07-attachments/oxford-inbox/_payloads_<module>.json` (list of {folder, note_id, frontmatter, body}, pre-validated against `kbai/schema.py`) and a `scripts/push_<module>.command`. The push runs NATIVELY on the Mac via `scripts/ingest_push.py`, which calls the write agent's own `create_note` for every payload (schema gate, journal, on-write embedding and edge hooks, no overwrite), then rebuilds the graph and runs the healthcheck. 83 notes took 66 seconds on M1. Launch it by double-clicking the `.command` in Finder (Claude can do this through desktop control) or from a terminal. One MCP `write_create_note` call per note also works but costs ~25 s per note through the bridge.
+After approval the orchestrator writes `07-attachments/oxford-inbox/_payloads_<module>.json` (list of {folder, note_id, frontmatter, body}, pre-validated against `kbai/schema.py`) . `make ingest M=<module>` then runs the push NATIVELY on the Mac via `scripts/ingest_push.py`, which calls the write agent's own `create_note` for every payload (schema gate, journal, on-write embedding and edge hooks, no overwrite), then rebuilds the graph and runs the healthcheck. 83 notes took 66 seconds on M1. Launch it by double-clicking the `.command` in Finder (Claude can do this through desktop control) or from a terminal. One MCP `write_create_note` call per note also works but costs ~25 s per note through the bridge.
 
 Then the orchestrator reverse-patches existing notes (symmetric types and the builds pair get their mirror line; `challenges`, `exemplifies`, `operationalises` stay one-way), marks the manifest `pushed`, and refreshes the snapshot.
 From the Cowork shell: `python3 vault_graph.py . && python3 scripts/vault_audit.py && python3 scripts/ingest_snapshot.py`.
@@ -53,8 +53,7 @@ Lessons from the first four modules (2026-10-01 to 02), now rules:
 - **Numeric ids must not collide across batches.** `ingest_push.py` refuses the whole payload if any frontmatter `id` is already in the vault or repeats inside the batch. Start each batch's id counter after the highest id of the same date.
 - **Mirror edges inside the batch too.** The reverse-patch only covers edges that point at pre-existing notes; `builds-on`/`builds-toward`, `contradicts` and `analogous-to` between two notes of the same batch need their mirror line written by the build. Check with `analytics_connect_suggest(["missing_bidir"])` after the push; it should return nothing for the new notes.
 - **Do not cap an edge type in a review brief.** A cap on `contradicts` pushed real contradictions into `challenges`. Give reviewers the test (can both notes be true at once?) and no quota.
-- **Back up before bulk link edits.** Notes are git-ignored and direct patches bypass the write journal: `tar czf 07-attachments/_backups/vault-notes-<date>.tar.gz 0[0-6]-*` first.
-- **Launching a `.command` from Finder:** Finder must be frontmost, and the row must be selected with the keyboard (a click on the filename enters rename mode).
+- **Apply bulk links with `make links FILE=<file>`.** It checks the whole list first, keeps reasons, writes mirrors, journals every line, snapshots the notes and runs the audit.
 
 ---
 

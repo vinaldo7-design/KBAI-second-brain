@@ -2,7 +2,8 @@
 
 Wraps kbai.storage.section_patcher.patch_section over a list of
 suggestions. Each suggestion targets the source note's typed-link
-section (### Builds on, etc.) and inserts `- [[target_id]]`.
+section (### Builds on, etc.) and inserts `- [[target_id]]`, followed
+by `: why` when the suggestion carries a reason.
 
 Status taxonomy for each row:
   patched          — file changed, journal row written
@@ -133,7 +134,8 @@ def apply_link_suggestions(
             continue
 
         hash_before = hashlib.sha256(source_file.read_bytes()).hexdigest()
-        new_text, status = patch_section(original, edge_type, target_id)
+        why = raw.get("why")
+        new_text, status = patch_section(original, edge_type, target_id, why=why)
         rel_file = _rel_or_abs(source_file, vault_root)
 
         if status == "already_present":
@@ -208,6 +210,7 @@ def apply_link_suggestions(
                     "target_id": target_id,
                     "edge_type": edge_type,
                     "section": section,
+                    "why": why,
                 }
             ),
         )

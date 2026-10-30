@@ -34,5 +34,32 @@ Used by `/council`, `/compare-thinkers` and `cognition_retrieve_as`: `default`, 
 
 ## Running it
 
-- Check everything: `bash scripts/verify_vault.command`
-- Restart Claude Desktop after changing server code.
+`make` lists everything. The ones you need:
+
+| Command | What it does |
+|---|---|
+| `make install` | Set up the environment and the pre-push check |
+| `make verify` | Rebuild the graph and index, then run every check |
+| `make test-fast` | Tests that need no vault or ML; this is what CI runs |
+| `make links FILE=<file>` | Apply a reviewed list of links; add `DRY=1` to preview |
+| `make ingest M=<module>` | Push reviewed lecture notes |
+| `make notes-snapshot` | Save the notes to their private history |
+
+Restart Claude Desktop after changing server code.
+
+## Applying links in bulk
+
+Give `make links` a JSON list. Reasons are kept on the link, and `contradicts`, `analogous-to` and the builds pair get their mirror line automatically. One bad entry stops the whole batch.
+
+```json
+[{"source": "note-a", "target": "note-b", "type": "contradicts", "why": "the question they disagree on"}]
+```
+
+## Note history
+
+Notes are git-ignored in this public repo. Their history is a separate private repo at `~/.local/share/kbai/notes.git`, with no remote. To see or recover a note:
+
+```bash
+git --git-dir="$HOME/.local/share/kbai/notes.git" log --oneline -- 01-Ideas/some-note.md
+git --git-dir="$HOME/.local/share/kbai/notes.git" show <commit>:01-Ideas/some-note.md
+```

@@ -87,9 +87,13 @@ def _heading_re(heading: str) -> re.Pattern[str]:
     return re.compile(rf"^{re.escape(heading)}\s*$", re.MULTILINE | re.IGNORECASE)
 
 
-def _insert_missing_heading(text: str, edge_type: str, target_stem: str) -> str:
+def _link_line(target_stem: str, why: str | None) -> str:
+    return f"- [[{target_stem}]]: {' '.join(why.split())}" if why else f"- [[{target_stem}]]"
+
+
+def _insert_missing_heading(text: str, edge_type: str, new_line: str) -> str:
     """Return `text` with a freshly created `### {heading}` section carrying
-    `- [[target_stem]]`, placed in canonical taxonomy order.
+    `new_line`, placed in canonical taxonomy order.
 
     Placement rules (in priority order):
       1. Insert before the first EXISTING typed-link heading that comes *after*
@@ -104,7 +108,7 @@ def _insert_missing_heading(text: str, edge_type: str, target_stem: str) -> str:
          append at end of body.
     """
     heading = EDGE_HEADING[edge_type]
-    block = f"{heading}\n- [[{target_stem}]]\n\n"
+    block = f"{heading}\n{new_line}\n\n"
 
     # Map each existing headed edge_type to the (start, end) span of its line.
     present: dict[str, re.Match[str]] = {}
@@ -156,8 +160,12 @@ def _insert_missing_heading(text: str, edge_type: str, target_stem: str) -> str:
     return f"{body}{sep}{block}"
 
 
-def patch_section(text: str, edge_type: str, target_stem: str) -> tuple[str, str]:
-    """Insert `- [[target_stem]]` under the `### {edge_type}` heading.
+def patch_section(
+    text: str, edge_type: str, target_stem: str, why: str | None = None
+) -> tuple[str, str]:
+    """Insert `- [[target_stem]]` under the `### {edge_type}` heading, followed by
+    `: why` when a reason is given. A reason also fills in an existing bare link;
+    it never replaces one already written.
 
     Returns (new_text, status). Status ∈ {patched, already_present, no_section}.
 
@@ -171,12 +179,13 @@ def patch_section(text: str, edge_type: str, target_stem: str) -> tuple[str, str
     if heading is None:
         return text, "no_section"
 
+    new_line = _link_line(target_stem, why)
     m = _heading_re(heading).search(text)
     if not m:
         # Idempotency guard: if the link already exists anywhere as a list item
         # we never duplicate it — but a missing heading means it cannot be a
         # labelled edge yet, so create the heading and insert.
-        return _insert_missing_heading(text, edge_type, target_stem), "patched"
+        return _insert_missing_heading(text, edge_type, new_line), "patched"
 
     section_start = m.end()
     next_re = re.compile(r"^#{2,3}\s", re.MULTILINE)
@@ -185,10 +194,13 @@ def patch_section(text: str, edge_type: str, target_stem: str) -> tuple[str, str
     section_body = text[section_start:section_end]
 
     if f"[[{target_stem}]]" in section_body:
+        bare = re.compile(rf"^- \[\[{re.escape(target_stem)}\]\][ \t]*$", re.MULTILINE)
+        if why and bare.search(section_body):
+            filled = bare.sub(lambda _: new_line, section_body, count=1)
+            return text[:section_start] + filled + text[section_end:], "patched"
         return text, "already_present"
 
     stripped = section_body.strip()
-    new_line = f"- [[{target_stem}]]"
 
     if stripped in ("", "-"):
         # Empty placeholder section — replace whole body
