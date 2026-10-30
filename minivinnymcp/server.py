@@ -38,6 +38,7 @@ _TAXONOMY_PATH = _vault_root / "vault_taxonomy.yaml"
 
 _model: SentenceTransformer | None = None
 _graph: VaultGraph | None = None
+_graph_mtime: int | None = None
 _pagerank: dict[str, float] | None = None
 
 # Retrieval modes (Stage 0 item 3 — formalised cognitive routing precursor).
@@ -69,10 +70,20 @@ def _get_reranker():
 
 def _get_graph() -> VaultGraph:
     """Single VaultGraph cache. Post-2b the constructor preserves every edge;
-    query-time options (collapse, include_mentioned) select the view."""
-    global _graph
-    if _graph is None:
-        _graph = VaultGraph.load(str(_GRAPH_PATH))
+    query-time options (collapse, include_mentioned) select the view. Reloads
+    when the file changes, because the write-agent process updates it."""
+    global _graph, _graph_mtime, _pagerank
+    mtime = _GRAPH_PATH.stat().st_mtime_ns if _GRAPH_PATH.exists() else None
+    if _graph is None or mtime != _graph_mtime:
+        try:
+            _graph = VaultGraph.load(str(_GRAPH_PATH))
+        except Exception as exc:
+            if _graph is None:
+                raise
+            print(f"graph reload failed, keeping the last good graph: {exc}", file=sys.stderr)
+            return _graph
+        _graph_mtime = mtime
+        _pagerank = None
     return _graph
 
 

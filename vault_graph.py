@@ -19,8 +19,10 @@ Edge types (closed set, see vault_taxonomy.yaml):
 from __future__ import annotations
 
 import json
+import os
 import re
 import sys
+import tempfile
 from dataclasses import dataclass, field, asdict
 from pathlib import Path
 from typing import Optional
@@ -464,6 +466,21 @@ def _json_default(obj):
     return str(obj)
 
 
+def write_graph(graph: dict, path: Path) -> None:
+    """Write the graph JSON atomically, so a reader in another process never
+    sees a partial file. A failed write leaves the old file in place."""
+    path = Path(path)
+    fd, tmp = tempfile.mkstemp(dir=path.parent, prefix=f".{path.name}.", suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            json.dump(graph, f, indent=2, ensure_ascii=False, default=_json_default)
+        os.chmod(tmp, 0o644)
+        os.replace(tmp, path)
+    except BaseException:
+        Path(tmp).unlink(missing_ok=True)
+        raise
+
+
 def main():
     if len(sys.argv) < 2:
         print("Usage: python vault_graph.py <vault_path> [output_path]", file=sys.stderr)
@@ -485,10 +502,7 @@ def main():
     graph["generated_at"] = _dt.datetime.now().isoformat(timespec="seconds")
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_path.write_text(
-        json.dumps(graph, indent=2, ensure_ascii=False, default=_json_default),
-        encoding="utf-8",
-    )
+    write_graph(graph, output_path)
 
     s = graph["validation"]["summary"]
     print(f"Wrote {output_path}")

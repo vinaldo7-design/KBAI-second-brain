@@ -78,10 +78,7 @@ def update_note_edges(note_id: str, vault_root=None) -> dict:
 
         graph["nodes"] = nodes
         graph["edges"] = merged_edges
-        graph_path.write_text(
-            json.dumps(graph, default=vault_graph._json_default, indent=2),
-            encoding="utf-8",
-        )
+        vault_graph.write_graph(graph, graph_path)
         logger.info("reindex_edges: merged note=%s edges=%d", note_id, len(edges))
         return {"status": "updated", "note_id": note_id, "edges": len(edges)}
     except Exception as exc:  # fail soft — never break the write path
