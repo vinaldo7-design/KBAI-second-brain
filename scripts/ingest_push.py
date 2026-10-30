@@ -5,7 +5,7 @@ no-overwrite, write journal, on-write embedding and edge hooks. Identical to wri
 minus the MCP round trip.
 
 Usage (vault root):
-  HF_HUB_OFFLINE=1 /Users/vinaynair/opt/anaconda3/envs/minivinnymcp/bin/python scripts/ingest_push.py 07-attachments/oxford-inbox/_payloads_M1.json [--dryrun]
+  make ingest M=M1
 
 Payload file: a JSON list of {folder, note_id, frontmatter, body}, produced by the orchestrator after
 Vinay's approval. Notes that already exist are reported and skipped (the writer refuses to overwrite).

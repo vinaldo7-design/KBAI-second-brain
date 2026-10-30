@@ -1,0 +1,9 @@
+#!/bin/bash
+# Stop a push that breaks the fast tests or the import boundaries. CI runs the same
+# checks; this just finds out sooner. Skip once with: git push --no-verify
+export PATH="$HOME/.local/bin:$HOME/opt/anaconda3/bin:$PATH"
+if ! command -v uv >/dev/null; then
+  echo "pre-push: uv not found, skipping the local check (CI still runs it)" >&2
+  exit 0
+fi
+make --no-print-directory lint test-fast
